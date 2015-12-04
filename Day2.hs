@@ -39,9 +39,11 @@ paperF = liftM2 (+) surfaceArea slack
   where
     surfaceArea :: [Int] -> Int
     surfaceArea = sum . map (\(x,y) -> 2*x*y) . combinations
+    --surfaceArea = sum . map ((*2) . uncurry (*)) . combinations
 
     slack :: [Int] -> Int
-    slack = minimum . map (\(x,y) -> x*y) . combinations
+    slack = minimum . map (uncurry (*)) . combinations
+    --slack = minimum . map (\(x,y) -> x*y) . combinations
 
 combinations :: [a] -> [(a,a)]
 combinations [x,y,z] = [(x,y),(x,z),(y,z)]
