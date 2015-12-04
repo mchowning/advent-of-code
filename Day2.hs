@@ -1,8 +1,13 @@
 {-# OPTIONS_GHC -Wall -Werror #-}
 
+module Day2( results
+           , tests
+           ) where 
+
 import Control.Monad
 import Data.List
 import Data.List.Split
+import Test.HUnit
 import Text.Printf
 
 results :: IO ()
@@ -41,3 +46,26 @@ paperF = liftM2 (+) surfaceArea slack
 combinations :: [a] -> [(a,a)]
 combinations [x,y,z] = [(x,y),(x,z),(y,z)]
 combinations _       = undefined
+
+tests :: IO Counts
+tests = runTestTT $ TestList [ requiredAmount paperF "2x3x4\n1x1x10" ~?= 58+43
+                             , requiredAmount ribbonF "2x3x4\n1x1x10" ~?= 34+14
+
+                             , parseDimens "45x222x53" ~?= [45,222,53]
+                             , parseDimens "1x1x1" ~?= [1,1,1]
+
+                             , paperF [2,3,4] ~?= 58
+                             , paperF [1,1,10] ~?= 43
+
+                             , ribbonF [2,3,4] ~?= 34
+                             , ribbonF [1,1,10] ~?= 14
+
+                             , length (combinations "abc") ~?= 3
+                             , testCombinationContains [1,2,3] (1,2)
+                             , testCombinationContains [1,2,3] (1,3)
+                             , testCombinationContains [1,2,3] (2,3)
+                             ]
+  where
+    testCombinationContains :: [Int] -> (Int,Int) -> Test
+    testCombinationContains input expected = TestCase(assertBool "" (elem expected $ combinations input))
+
