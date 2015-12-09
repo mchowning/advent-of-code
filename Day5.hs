@@ -1,13 +1,17 @@
 {-# OPTIONS_GHC -Wall -Werror #-}
 
+module Day5 where
+
 import Data.List
 import Test.HUnit
 import Text.Printf
+--import Control.Monad
 
 results :: IO ()
 results = do input <- readFile "day5_input.txt"
-             printResult 1 (numPass isNice1Reqs $ input)
-             printResult 2 (numPass isNice2Reqs $ input)
+             --printResult 1 (numPass isNice1Reqs input)
+             --printResult 2 (numPass isNice2Reqs input)
+             mapM_ (\(i,f) -> printResult i $ numPass f input) $ zip [1..] [isNice1Reqs, isNice2Reqs]
   where 
     printResult :: Int -> Int -> IO ()
     printResult = printf "result %d: %d\n"
@@ -17,7 +21,7 @@ numPass :: [String -> Bool] -> String -> Int
 numPass fs = length . filter (passesAll fs) . lines
 
 passesAll :: [String -> Bool] -> String -> Bool
-passesAll reqs str = all ($ str) reqs 
+passesAll reqs str = all ($ str) reqs
 --passesAll reqs = flip all reqs . flip id 
 
 isNice1Reqs :: [String -> Bool]
@@ -29,6 +33,7 @@ isNice2Reqs = [ hasTwoPairs, hasSpacedRepeat ]
 hasTwoPairs :: String -> Bool
 hasTwoPairs (x:y:zs) = isInfixOf [x,y] zs || hasTwoPairs (y:zs)
 hasTwoPairs _ = False
+--hasTwoPairs ls = ((any)) (uncurry isInfixOf . splitAt 2 . flip drop ls) $ [0..(length ls - 4)]
 
 hasSpacedRepeat :: String -> Bool
 hasSpacedRepeat ls = any (uncurry (==)) $ zip ls (drop 2 ls)
@@ -44,6 +49,9 @@ hasDoubleLetters = any ((>1) . length) . group
 
 noInvalidPairs :: String -> Bool
 noInvalidPairs str = not . any (`isInfixOf` str) $ ["ab","cd","pq","xy"] 
+
+main :: IO Counts
+main = tests
 
 tests :: IO Counts
 tests = runTestTT $ TestList [ numPassTests
