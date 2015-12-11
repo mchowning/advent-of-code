@@ -27,7 +27,7 @@ getSortedDistances :: String -> [Int]
 getSortedDistances input = let routes = parseRoutes input
                                allTrips = permutations . allLocations $ routes
                                -- TODO has to be a better way that (map fromJust . filter isJust)
-                           in sort . map fromJust . filter isJust . map (getTripDistance routes) $ allTrips
+                           in map fromJust . filter isJust . sort . map (getTripDistance routes) $ allTrips
 
 getTripDistance :: [Route] -> [Location] -> Maybe Int
 getTripDistance rs ls = let distances = map legDistance tripLegs
@@ -37,28 +37,24 @@ getTripDistance rs ls = let distances = map legDistance tripLegs
     tripLegs = map (\(x:y:_) -> (x,y)) . filter ((>1) . length) . tails $ ls
 
     legDistance :: (Location,Location) -> Maybe Int
-    legDistance lsTup = let mRoute = uncurry (getRoute rs) lsTup
-                        in if isNothing mRoute then Nothing else Just (distance . fromJust $ mRoute)
+    legDistance lsTup = distance <$> uncurry (getRoute rs) lsTup
 
 allLocations :: [Route] -> [Location]
 allLocations = nub . foldr (\(Route s e _) acc -> s:e:acc) []
 
 getRoute :: [Route] -> Location -> Location -> Maybe Route
-getRoute rs l1 l2 = let matches = filter routeMatches rs
-                    in if length matches < 1 then Nothing else Just (head matches)
+getRoute rs l1 l2 = case filter routeMatches rs of
+                      []      -> Nothing
+                      matches -> Just (head matches)
   where
     routeMatches :: Route -> Bool
-    routeMatches (Route r1 r2 _) = r1 == l1 && r2 == l2
-                                || r1 == l2 && r2 == l1
+    routeMatches (Route r1 r2 _) = all (`elem` [l1,l2]) [r1,r2]
 
 parseRoutes :: String -> [Route]
 parseRoutes = map parseRoute . lines
   where 
     parseRoute :: String -> Route
-    parseRoute str = let ws = words str
-                         departure = head ws
-                         destination = ws !! 2
-                         dist = last ws
+    parseRoute str = let [departure,_,destination,_,dist] = words str
                      in Route departure destination (read dist)
                  
 
