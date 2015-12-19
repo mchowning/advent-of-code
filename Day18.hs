@@ -7,8 +7,10 @@ import Test.HUnit
 import Data.Array.Repa(Z(..),(:.)(..))
 import qualified Data.Array.Repa as R
 import qualified Data.Array.Repa.Repr.Undefined as RU
+import qualified Data.Array.Repa.Shape as RS
 import Data.Array.Repa.Stencil
 import Data.Array.Repa.Stencil.Dim2
+import Data.Bits((.|.))
 
 import Text.Printf
 
@@ -17,13 +19,18 @@ import Text.Printf
 results :: IO ()
 results = do input <- readFile "day18_input.txt"
              printResult 1 $ result1 input
+             printResult 2 $ result2 input
   where
     printResult :: Int -> Int -> IO ()
     printResult = printf "result %d: %d\n"
 
---2241 too high
+-- 1061
 result1 :: String -> Int
 result1 = countLights . cycleWorldNTimes 100 . getWorld . initializeInput . lines
+
+-- 1006
+result2 :: String -> Int
+result2 = countLights . cycleWorldWithCornerLightsNTimes 100 . getWorld . initializeInput . lines
 
 countLights :: R.Array R.U R.DIM2 Int -> Int
 countLights = sum . R.toList
@@ -34,13 +41,22 @@ cycleWorldNTimes n = head . drop n . iterate cycleWorld
 cycleWorld :: R.Array R.U R.DIM2 Int -> R.Array R.U R.DIM2 Int
 cycleWorld i = updateWorldState i (countNeighbors i) 
 
+cycleWorldWithCornerLightsNTimes :: Int -> R.Array R.U R.DIM2 Int -> R.Array R.U R.DIM2 Int
+cycleWorldWithCornerLightsNTimes n = head . drop n . iterate cycleWorldWithCornerLights
+
+cycleWorldWithCornerLights :: R.Array R.U R.DIM2 Int -> R.Array R.U R.DIM2 Int
+cycleWorldWithCornerLights i = let newWorld = cycleWorld i 
+                                   worldDimens = RS.listOfShape . R.extent $ newWorld
+                             in applyConstantOnLights (cornerLights (head worldDimens)) newWorld
+
 -- On is 1 and off is 0
 initializeInput :: [String] -> [[Int]]
 initializeInput = map (map getLight)
-  where getLight :: Char -> Int
-        getLight '.' = 0
-        getLight '#' = 1
-        getLight _   = undefined
+
+getLight :: Char -> Int
+getLight '.' = 0
+getLight '#' = 1
+getLight _   = undefined
 
 neighborStencil :: Stencil R.DIM2 Int
 neighborStencil = [stencil2| 1 1 1
@@ -66,6 +82,9 @@ countNeighbors = mapStencil2 (BoundConst 0) neighborStencil
 updateWorldState :: R.Array R.U R.DIM2 Int -> RU.Array PC5 R.DIM2 Int -> R.Array R.U R.DIM2 Int
 updateWorldState worldState = R.computeUnboxedS . R.zipWith updateLightState worldState
 
+applyConstantOnLights :: R.Array R.U R.DIM2 Int -> R.Array R.U R.DIM2 Int -> R.Array R.U R.DIM2 Int
+applyConstantOnLights alwaysOn worldState = R.computeUnboxedS (R.zipWith (.|.) worldState alwaysOn) 
+
 -- 1 is on and 0 is off
 updateLightState :: Int -> Int -> Int
 updateLightState 1 n
@@ -75,6 +94,17 @@ updateLightState 0 n
   | n == 3 = 1
   | otherwise = 0
 updateLightState _ _ = undefined
+
+cornerLights :: Int -> R.Array R.U R.DIM2 Int
+cornerLights = getWorld . cornerLightsArray
+
+cornerLightsArray :: Int -> [[Int]]
+cornerLightsArray n = let firstLastLine = firstLast n 1 0
+                          middleLines = replicate n 0
+                      in firstLast n firstLastLine middleLines
+
+firstLast :: Int -> a -> a -> [a]
+firstLast n fl other = [fl] ++ replicate (n-2) other ++ [fl]
 
 
 -------------------------------------------------------------------------------
@@ -119,7 +149,7 @@ main = runTestTT $ TestList
                                 , 1, 1, 0
                                 , 1, 1, 0 ]
 
-  , let result = R.toList . cycleWorldNTimes 100 . getWorld . initializeInput . lines $ testInput 
+  , let result = R.toList . cycleWorldNTimes 5 . getWorld . initializeInput . lines $ testInput 
     in result ~?= [ 0, 0, 0, 0, 0, 0
                   , 0, 0, 0, 0, 0, 0
                   , 0, 0, 1, 1, 0, 0
@@ -127,6 +157,43 @@ main = runTestTT $ TestList
                   , 0, 0, 0, 0, 0, 0
                   , 0, 0, 0, 0, 0, 0 ]
 
+  , let worldState1 = getWorld [[ 0, 1, 0 ]
+                               ,[ 0, 1, 0 ]
+                               ,[ 0, 1, 0 ]]
+        worldState2 = cycleWorld worldState1
+    in R.toList worldState2 ~?= [ 0, 0, 0 
+                                , 1, 1, 1 
+                                , 0, 0, 0 ]
+
+  , let worldState1 = getWorld [[ 0, 1, 0 ]
+                               ,[ 0, 1, 0 ]
+                               ,[ 0, 1, 0 ]]
+        worldState2 = cycleWorldWithCornerLights worldState1
+    in R.toList worldState2 ~?= [ 1, 0, 1 
+                                , 1, 1, 1 
+                                , 1, 0, 1 ]
+
+  , let worldState1 = getWorld [[ 0, 1, 0 ]
+                               ,[ 0, 1, 0 ]
+                               ,[ 0, 1, 0 ]]
+        worldState2 = cycleWorldWithCornerLightsNTimes 2 worldState1
+    in R.toList worldState2 ~?= [ 1, 0, 1 
+                                , 1, 0, 1 
+                                , 1, 0, 1 ]
+
+  , let worldState1 = getWorld . initializeInput $ [ "##.#.#"
+                                                   , "...##."
+                                                   , "#....#"
+                                                   , "..#..."
+                                                   , "#.#..#"
+                                                   , "####.#" ]
+        worldStateAfter5Cycles = cycleWorldWithCornerLightsNTimes 5 worldState1
+    in R.toList worldStateAfter5Cycles ~?= [ 1, 1, 0, 1, 1, 1
+                                           , 0, 1, 1, 0, 0, 1
+                                           , 0, 1, 1, 0, 0, 0
+                                           , 0, 1, 1, 0, 0, 0
+                                           , 1, 0, 1, 0, 0, 0
+                                           , 1, 1, 0, 0, 0, 1 ]
   ]
     where 
       testArray :: [[Int]]
