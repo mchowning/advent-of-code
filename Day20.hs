@@ -77,6 +77,3 @@ main = runTestTT $ TestList
   , allFactors' 5 \\ [1,5] ~?= []
   , allFactors' 6 \\ [1,2,3,6] ~?= []
   ]
-
---[>presents2 :: Int -> Int<]
---[>presents2 n = (11 *) . sum . filter (> (n - 1) `div` 50) . factors $ n<]
