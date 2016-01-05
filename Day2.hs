@@ -4,7 +4,6 @@ module Day2( results
            , tests
            ) where 
 
-import Control.Monad
 import Data.List
 import Data.List.Split
 import Test.HUnit
@@ -12,8 +11,8 @@ import Text.Printf
 
 results :: IO ()
 results = do input <- readFile "day2_input.txt"
-             printResult 1 $ requiredAmount paperF input
-             printResult 2 $ requiredAmount ribbonF input
+             printResult 1 $ requiredAmount paperF input  -- 1606483
+             printResult 2 $ requiredAmount ribbonF input -- 3842356
   where 
     printResult :: Int -> Int -> IO ()
     printResult = printf "result %d: %d\n"
@@ -26,7 +25,7 @@ parseDimens :: String -> [Int]
 parseDimens = map read . splitOn "x"
 
 ribbonF :: [Int] -> Int
-ribbonF = liftM2 (+) ribbonAround ribbonBow
+ribbonF = (+) <$> ribbonAround <*> ribbonBow
   where
     ribbonAround :: [Int] -> Int
     ribbonAround = (*2) . sum . take 2 . sort
@@ -35,19 +34,47 @@ ribbonF = liftM2 (+) ribbonAround ribbonBow
     ribbonBow = product
 
 paperF :: [Int] -> Int
-paperF = liftM2 (+) surfaceArea slack
+paperF = (+) <$> surfaceArea <*> slack
   where
     surfaceArea :: [Int] -> Int
-    surfaceArea = sum . map (\(x,y) -> 2*x*y) . combinations
-    --surfaceArea = sum . map ((*2) . uncurry (*)) . combinations
+    surfaceArea = sum . map ((*2) . product) . combinationsOf2
 
     slack :: [Int] -> Int
-    slack = minimum . map (uncurry (*)) . combinations
-    --slack = minimum . map (\(x,y) -> x*y) . combinations
+    slack = minimum . map product . combinationsOf2
 
-combinations :: [a] -> [(a,a)]
-combinations [x,y,z] = [(x,y),(x,z),(y,z)]
-combinations _       = undefined
+combinationsOf2 :: [a] -> [[a]]
+combinationsOf2 = combinationsOf 2
+  where
+    combinationsOf :: Int -> [a] -> [[a]]
+    combinationsOf n = filter ((==n) . length) . subsequences
+
+-- Tuple implementations
+
+-- Simple implementation that only handles lists of 3
+-- combinations :: [a] -> [(a,a)]
+-- combinations [x,y,z] = [(x,y),(x,z),(y,z)]
+-- combinations _       = undefined
+
+
+-- More advanced implementations that handle lists of any length
+
+-- explicit recursion
+-- combinations ls@(_:xs) = combinations' ls ++ combinations xs
+--   where
+--     combinations' :: [a] -> [(a,a)]
+--     combinations' (y:ys) = (,) <$> [y] <*> ys
+--     combinations' _      = []
+-- combinations _ = []
+
+-- handling recursion with fold
+-- combinations = foldr accumulateCombosWithFirst [] . tails
+--   where
+--     accumulateCombosWithFirst :: [a] -> [(a,a)] -> [(a,a)]
+--     accumulateCombosWithFirst ls acc = combosWithFirst ls ++ acc
+--
+--     combosWithFirst :: [a] -> [(a,a)]
+--     combosWithFirst (x:xs) = (,) <$> pure x <*> xs
+--     combosWithFirst _ = []
 
 tests :: IO Counts
 tests = runTestTT $ TestList [ requiredAmount paperF "2x3x4\n1x1x10" ~?= 58+43
@@ -62,12 +89,15 @@ tests = runTestTT $ TestList [ requiredAmount paperF "2x3x4\n1x1x10" ~?= 58+43
                              , ribbonF [2,3,4] ~?= 34
                              , ribbonF [1,1,10] ~?= 14
 
-                             , length (combinations "abc") ~?= 3
-                             , testCombinationContains [1,2,3] (1,2)
-                             , testCombinationContains [1,2,3] (1,3)
-                             , testCombinationContains [1,2,3] (2,3)
+                             , length (combinationsOf2  "abc") ~?= 3
+--                              , testCombinationContains [1,2,3] (1,2)
+--                              , testCombinationContains [1,2,3] (1,3)
+--                              , testCombinationContains [1,2,3] (2,3)
+                             , testCombinationOf2Contains [1,2,3] [1,2]
+                             , testCombinationOf2Contains [1,2,3] [1,3]
+                             , testCombinationOf2Contains [1,2,3] [2,3]
                              ]
   where
-    testCombinationContains :: [Int] -> (Int,Int) -> Test
-    testCombinationContains input expected = TestCase(assertBool "" (elem expected $ combinations input))
+    testCombinationOf2Contains :: [Int] -> [Int] -> Test
+    testCombinationOf2Contains input expected = TestCase(assertBool "" (elem expected $ combinationsOf2 input))
 
