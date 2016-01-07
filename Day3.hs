@@ -38,6 +38,7 @@ allLocationsForPair = mergeTuple . applyToTuple locations . splitMoves
 
     mergeTuple :: ([a],[a]) -> [a]
     mergeTuple (x,y) = x ++ y
+    -- mergeTuple = (++) <$> fst <*> snd
 
 tests :: IO Counts
 tests = runTestTT $ TestList [ inputTests 
