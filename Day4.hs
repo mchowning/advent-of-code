@@ -20,7 +20,7 @@ result :: String -> String -> (Int,String)
 result startPrefix endPrefix = head . filter (isPrefixOf endPrefix . snd) . map (md5ForString startPrefix) $ [0..]
 
 md5ForString :: String -> Int -> (Int,String)
-md5ForString str n = (n, M.md5s (M.Str (str ++ (show n))))
+md5ForString str n = (n, M.md5s (M.Str $ str ++ show n))
 
 input :: String
 input = "bgvyzdsv"
