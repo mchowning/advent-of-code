@@ -9,9 +9,9 @@ import Text.Printf
 
 results :: IO ()
 results = do input <- readFile "day5_input.txt"
-             --printResult 1 (numPass isNice1Reqs input)
-             --printResult 2 (numPass isNice2Reqs input)
-             mapM_ (\(i,f) -> printResult i $ numPass f input) $ zip [1..] [isNice1Reqs, isNice2Reqs]
+             printResult 1 (numPass isNice1Reqs input)
+             printResult 2 (numPass isNice2Reqs input)
+             -- mapM_ (\(i,f) -> printResult i $ numPass f input) $ zip [1..] [isNice1Reqs, isNice2Reqs]
   where 
     printResult :: Int -> Int -> IO ()
     printResult = printf "result %d: %d\n"
@@ -22,25 +22,19 @@ numPass fs = length . filter (passesAll fs) . lines
 
 passesAll :: [String -> Bool] -> String -> Bool
 passesAll reqs str = all ($ str) reqs
---passesAll reqs = flip all reqs . flip id 
+
+--- part 1
 
 isNice1Reqs :: [String -> Bool]
 isNice1Reqs = [ contains3Vowels, hasDoubleLetters, noInvalidPairs ]
 
-isNice2Reqs :: [String -> Bool]
-isNice2Reqs = [ hasTwoPairs, hasSpacedRepeat ]
-
-hasTwoPairs :: String -> Bool
-hasTwoPairs (x:y:zs) = isInfixOf [x,y] zs || hasTwoPairs (y:zs)
-hasTwoPairs _ = False
---hasTwoPairs ls = ((any)) (uncurry isInfixOf . splitAt 2 . flip drop ls) $ [0..(length ls - 4)]
-
-hasSpacedRepeat :: String -> Bool
-hasSpacedRepeat ls = any (uncurry (==)) $ zip ls (drop 2 ls)
-
 contains3Vowels :: String -> Bool
-contains3Vowels = (>(2::Int)) . length . filter isVowel
+-- contains3Vowels = (>2) . length . filter isVowel
+contains3Vowels = containsNVowels 3
   where
+    containsNVowels :: Int -> String -> Bool
+    containsNVowels n = (>= n) . length . filter isVowel
+
     isVowel :: Char -> Bool
     isVowel = flip elem "aeiou"
 
@@ -48,7 +42,33 @@ hasDoubleLetters :: String -> Bool
 hasDoubleLetters = any ((>1) . length) . group
 
 noInvalidPairs :: String -> Bool
-noInvalidPairs str = not . any (`isInfixOf` str) $ ["ab","cd","pq","xy"] 
+noInvalidPairs str = not . any (`isInfixOf` str) $ ["ab","cd","pq","xy"]
+
+--- part 2
+
+isNice2Reqs :: [String -> Bool]
+isNice2Reqs = [ hasTwoPairs, hasSpacedRepeat ]
+
+hasTwoPairs :: String -> Bool
+hasTwoPairs (x:y:ys) = isInfixOf [x,y] ys || hasTwoPairs (y:ys)
+hasTwoPairs _ = False
+-- hasTwoPairs ls = any (uncurry isInfixOf . splitAt 2 . flip drop ls) [0..(length ls - 4)]
+-- hasTwoPairs ls = any (uncurry isInfixOf . splitAt 2) . filter ((>3) . length) $ tails ls
+-- hasTwoPairs = foldr hasTwoPairs' False . tails
+--   where
+--     hasTwoPairs' :: String -> Bool -> Bool
+--     hasTwoPairs' _ True     = True
+--     hasTwoPairs' (x:y:ys) _ = [x,y] `isInfixOf` ys
+--     hasTwoPairs' _ _        = False
+
+hasSpacedRepeat :: String -> Bool
+hasSpacedRepeat ls = let spacedPairs = zip ls (drop 2 ls)
+                     in any (uncurry (==)) spacedPairs
+
+
+-------------
+--- Tests ---
+-------------
 
 main :: IO Counts
 main = tests
