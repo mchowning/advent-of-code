@@ -12,26 +12,29 @@ import Text.Printf
 data RangeInstruction = RangeInstruction ChangeType (Int,Int) (Int,Int)
   deriving (Eq, Show)
 
-data PointInstruction = PointInstruction { changeType::ChangeType, coord::(Int,Int) }
-  deriving (Show)
+data PointInstruction = PointInstruction { changeType :: ChangeType
+                                         , coord      :: (Int,Int)
+                                         } deriving (Show)
 instance Ord PointInstruction where
   compare = compare `on` coord
 instance Eq PointInstruction where
-  (==) = (==) `on` coord
+  (==) = (==) `on` coord -- ignoring the changeType here might be unwise
 
-data LightState = LightOn | LightOff deriving (Show, Eq)
+data LightState = LightOn
+                | LightOff
+                deriving (Show, Eq)
 
 data ChangeType = On
                 | Off 
                 | Toggle
                 deriving (Eq, Show)
 
--- Need to speed this up a lot
+-- TODO so slow
 results :: IO ()
 results = do input <- readFile "day6_input.txt"
              let numLightsOn = filter (== LightOn) . getLightOnOffStates $ input
-             let lightBrightness = sum . getLightIntStates $ input
              printResult 1 (show $ length numLightsOn)
+             let lightBrightness = sum . getLightIntStates $ input
              printResult 2 (show lightBrightness)
   where
     printResult :: Int -> String -> IO ()
@@ -61,20 +64,22 @@ updateLightOnOffState :: LightState -> ChangeType -> LightState
 updateLightOnOffState _ On = LightOn
 updateLightOnOffState _ Off = LightOff
 updateLightOnOffState s Toggle | s == LightOn = LightOff
-                          | otherwise    = LightOn
+                               | otherwise    = LightOn
 
---Returns each sublist returned is the list of instructions for a particular coordinate
+-- Each sublist returned is the list of instructions for a particular coordinate
 allPointInstructions :: [RangeInstruction] -> [[PointInstruction]]
 allPointInstructions = group . sort . concatMap getPointInstructions
 
 getPointInstructions :: RangeInstruction -> [PointInstruction]
-getPointInstructions (RangeInstruction ct (x1,y1) (x2,y2)) = 
-  map (PointInstruction ct . tuplify) . sequence $ [[x1..x2], [y1..y2]]
+getPointInstructions (RangeInstruction ct p1 p2) = map (PointInstruction ct) (pointsInRange p1 p2)
+  where
+    pointsInRange :: (Int,Int) -> (Int,Int) -> [(Int,Int)]
+    pointsInRange (x1,y1) (x2,y2) = map tuplify $ sequence [[x1..x2], [y1..y2]]
 
 getRangeInstruction :: String -> RangeInstruction
-getRangeInstruction str = let ct = getChangeType str
-                              (coord1,coord2) = getCoords str
-                          in RangeInstruction ct coord1 coord2
+getRangeInstruction str = let ct      = getChangeType str
+                              (c1,c2) = parseCoords str
+                          in RangeInstruction ct c1 c2
 
 getChangeType :: String -> ChangeType
 getChangeType str | "turn on"  `isPrefixOf` str = On
@@ -82,14 +87,28 @@ getChangeType str | "turn on"  `isPrefixOf` str = On
                   | "toggle"   `isPrefixOf` str = Toggle
                   | otherwise                   = undefined
 
-getCoords :: String -> ((Int,Int), (Int,Int))
-getCoords = tuplify . map parseCoord . dropMid . splitOn " " . dropWhile (not . isDigit)
-  where parseCoord :: String -> (Int,Int)
-        parseCoord = tuplify . map read . splitOn ","
+parseCoords :: String -> ((Int,Int), (Int,Int))
+parseCoords = parseCoords' . extractCoordStrings
+  where
+    extractCoordStrings :: String -> (String,String)
+    extractCoordStrings = tuplify . dropMid . splitOn " " . dropWhile (not . isDigit)
+
+    parseCoords' :: (String,String) -> ((Int,Int), (Int,Int))
+    parseCoords' = mapTuple parseCoord
+      where
+        mapTuple :: (a -> b) -> (a,a) -> (b,b)
+        mapTuple f (a,b) = (f a, f b)
+        -- mapTuple f = uncurry ((,) `on` f)
+        -- mapTuple f = (,) <$> f . fst <*> f . snd
+        -- mapTuple = join bimap -- Data.Bifunctor
+        -- mapTuple = join (***) -- Control.Arrow
+
+    parseCoord :: String -> (Int,Int)
+    parseCoord = tuplify . map read . splitOn ","
         
-        dropMid :: [a] -> [a]
-        dropMid [x,_,z] = [x,z]
-        dropMid _       = undefined
+    dropMid :: [a] -> [a]
+    dropMid [x,_,z] = [x,z]
+    dropMid _       = undefined
 
 tuplify :: [a] -> (a,a)
 tuplify [x,y] = (x,y)
@@ -106,7 +125,7 @@ main = runTestTT $ TestList
   , getChangeType "turn off 341,304 through 638,850" ~?= Off
   , getChangeType "toggle 322,558 through 977,958"   ~?= Toggle
 
-  , getCoords "456,345 through 123,987" ~?= (((456,345),(123,987))::((Int,Int),(Int,Int)))
+  , parseCoords "456,345 through 123,987" ~?= (((456,345),(123,987))::((Int,Int),(Int,Int)))
 
   , getRangeInstruction "turn on 660,55 through 986,197"   ~?= RangeInstruction On     (660,55)  (986,197)
   , getRangeInstruction "turn off 341,304 through 638,850" ~?= RangeInstruction Off    (341,304) (638,850)
