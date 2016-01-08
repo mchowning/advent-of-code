@@ -18,9 +18,11 @@ result2 = result input "000000"
 
 result :: String -> String -> (Int,String)
 result startPrefix endPrefix = head . filter (isPrefixOf endPrefix . snd) . map (md5ForString startPrefix) $ [0..]
+-- result startPrefix endPrefix = head . dropWhile (not . isPrefixOf endPrefix . snd) . map (md5ForString startPrefix) $ [0..]
 
 md5ForString :: String -> Int -> (Int,String)
-md5ForString str n = (n, M.md5s (M.Str $ str ++ show n))
+md5ForString str n = let md5String = M.md5s (M.Str $ str ++ show n)
+                     in (n, md5String)
 
 input :: String
 input = "bgvyzdsv"
