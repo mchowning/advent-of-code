@@ -3,10 +3,9 @@
 module Day7 where
 
 import Control.Applicative
+import Control.Monad
 import Data.Bits
-import Data.List
 import Data.List.Split
-import Data.Maybe
 import Data.Word
 import Test.HUnit
 import Text.Printf
@@ -25,85 +24,131 @@ results = do input <- readFile "day7_input.txt"
 --- part 1
 
 getValue :: Identifier -> String -> String
-getValue ident = getValueFromMap ident . valueMapper
+getValue ident = getValueFromMap ident . mapValues
 
 getValueFromMap :: Identifier -> [(Identifier,Word16)] -> String
 getValueFromMap ident = show . snd . head . filter ((== ident) . fst)
 
-valueMapper :: String -> [(Identifier,Word16)]
-valueMapper str = mapValues ([],lines str)
 
-mapValues :: ([(Identifier,Word16)],[String]) -> [(Identifier,Word16)]
-mapValues (result,[]) = result
-mapValues (result,x:xs) = let mappedValue = mapValue x
-                          in if isNothing mappedValue then
-                               mapValues (result, xs ++ [x])
-                             else
-                               let newValue = fromJust mappedValue
-                                   newInputs = updateInputs newValue xs
-                               in mapValues (newValue:result, newInputs)
+mapValues :: String -> [(Identifier,Word16)]
+mapValues ls = mapValues' ([], lines ls)
 
--- TODO good place to use Maybe as Monad
+-- TODO can't use fold because I'm changing the list as I go, but something like that must work?
+mapValues' :: ([(Identifier,Word16)],[String]) -> [(Identifier,Word16)]
+mapValues' (result,[]) = result
+mapValues' (result,x:xs) = case mapValue x of
+                            Nothing -> mapValues' (result, xs ++ [x])
+                            Just v  -> let newInputs = updateValues v xs
+                                       in mapValues' (v:result, newInputs)
+
+
 mapValue :: String -> Maybe (Identifier,Word16)
-mapValue str1 = let strWords = words str1
-                    identifier = last strWords
-                    value = parseInput (unwords . init . init $ strWords)
-                in if isNothing value then Nothing else Just (identifier, fromJust value)
-
--- (>>=) :: Maybe m => m a -> (a -> m b) -> m b
--- ()    :: Maybe m => m a -> m b -> (a -> b -> m c) -> m c
-
-
--- TODO use monad to apply all these "parsers" and keep the result of the one that succeeds (library?)
--- TODO probably a good chance to use a Parser Monad
-parseInput :: String -> Maybe Word16
-parseInput str2
-  | isJust (readMaybe str2::Maybe Word16) = readMaybe str2
---   | "AND" `isInfixOf` str2 = (\[x,y] -> (.&.) <$> readMaybe x <*> readMaybe y) . splitOn " AND " $ str2
-  | "AND" `isInfixOf` str2 =  foldr1 (liftA2 (.&.)) . map readMaybe . splitOn " AND " $ str2
---   | "OR" `isInfixOf` str2 = (\[x,y] -> (.|.) <$> readMaybe x <*> readMaybe y) . splitOn " OR " $ str2
-  | "OR" `isInfixOf` str2 = foldr1 (liftA2 (.|.)) . map readMaybe . splitOn " OR " $ str2
-  | "LSHIFT" `isInfixOf` str2 = lShift . splitOn " LSHIFT " $ str2
-  | "RSHIFT" `isInfixOf` str2 = rShift . splitOn " RSHIFT " $ str2
-  | "NOT" `isInfixOf` str2 = complement <$> (readMaybe . last $ words str2)
-  | otherwise = Nothing
-    where
-      lShift :: [String] -> Maybe Word16
-      lShift [w,i] = shift <$> readMaybe w <*> readMaybe i
-      lShift _     = undefined
-
-      rShift :: [String] -> Maybe Word16
-      rShift [w,i] = shift <$> readMaybe w <*> (negate <$> readMaybe i)
-      rShift _     = undefined
-
-updateInputs :: (Identifier,Word16) -> [String] -> [String]
-updateInputs (id1,val) = map (replace id1 val)
+mapValue str = do let identifier = last $ words str
+                  v <- parseInput $ dropLastWords 2 str
+                  Just (identifier, v)
   where
-    replace :: Identifier -> Word16 -> String -> String
-    --replace identifier w = map (\x -> if (x /= identifier) then x else show w) . words
-    replace identifier w line = unwords . map (replaceIfMatch identifier w) . words $ line
+    dropLastWords :: Int -> String -> String
+    dropLastWords n = unwords . reverse . drop n . reverse . words
 
-    replaceIfMatch :: Identifier -> Word16 -> String -> String
-    replaceIfMatch ident newVal input = if input /= ident then input else show newVal
+
+parseInput :: String -> Maybe Word16
+-- parseInput str
+--   | isJust (readMaybe str::Maybe Word16) = readMaybe str
+--   | "AND" `isInfixOf` str =  foldr1 (liftA2 (.&.)) . map readMaybe . splitOn " AND " $ str
+--   | "OR" `isInfixOf` str = foldr1 (liftA2 (.|.)) . map readMaybe . splitOn " OR " $ str
+--   | "LSHIFT" `isInfixOf` str = lShift . splitOn " LSHIFT " $ str
+--   | "RSHIFT" `isInfixOf` str = rShift . splitOn " RSHIFT " $ str
+--   | "NOT" `isInfixOf` str = complement <$> (readMaybe . last $ words str)
+--   | otherwise = Nothing
+
+-- parseInput str
+--   | isJust (readMaybe str::Maybe Word16) = parseJust str
+--   | "AND" `isInfixOf` str =  parseAnd str
+--   | "OR" `isInfixOf` str = parseOr str
+--   | "LSHIFT" `isInfixOf` str = parseLShift str
+--   | "RSHIFT" `isInfixOf` str = parseRShift str
+--   | "NOT" `isInfixOf` str = parseNot str
+--   | otherwise = Nothing
+
+-- parseInput str = parseJust str `mplus`
+--                  parseAnd str `mplus`
+--                  parseOr str `mplus`
+--                  parseLShift str `mplus`
+--                  parseRShift str `mplus`
+--                  parseNot str
+
+-- parseInput str = let parserFs = [ parseJust
+--                                , parseAnd
+--                                , parseOr
+--                                , parseLShift
+--                                , parseRShift
+--                                , parseNot ]
+--                  in foldl (\acc f -> acc `mplus` f str) Nothing parserFs
+
+-- parseInput str = msum [ parseJust str
+--                       , parseAnd str
+--                       , parseOr str
+--                       , parseLShift str
+--                       , parseRShift str
+--                       , parseNot str ]
+
+parseInput str = let parsers = [ parseJust, parseAnd, parseOr, parseLShift, parseRShift, parseNot ]
+                     parserResults = map ($ str) parsers
+                 in msum parserResults
+    where
+      parseJust :: String -> Maybe Word16
+      parseJust = readMaybe
+
+      parseAnd :: String -> Maybe Word16
+      -- parseAnd = (\[x,y] -> (.&.) <$> readMaybe x <*> readMaybe y) . splitOn " AND "
+      parseAnd = foldr1 (liftA2 (.&.)) . map readMaybe . splitOn " AND "
+
+      parseOr :: String -> Maybe Word16
+      -- parseOr = (\[x,y] -> (.|.) <$> readMaybe x <*> readMaybe y) . splitOn " AND "
+      parseOr = foldr1 (liftA2 (.|.)) . map readMaybe . splitOn " OR "
+
+      parseLShift :: String -> Maybe Word16
+      parseLShift = lShift . splitOn " LSHIFT "
+        where
+          lShift :: [String] -> Maybe Word16
+          lShift [w,i] = shift <$> readMaybe w <*> readMaybe i
+          lShift _     = Nothing
+
+      parseRShift :: String -> Maybe Word16
+      parseRShift = rShift . splitOn " RSHIFT "
+        where
+          rShift :: [String] -> Maybe Word16
+          rShift [w,i] = shift <$> readMaybe w <*> (negate <$> readMaybe i)
+          rShift _     = Nothing
+
+      parseNot :: String -> Maybe Word16
+      parseNot s = complement <$> (readMaybe . last . splitOn "NOT " $ s)
+
+updateValues :: (Identifier,Word16) -> [String] -> [String]
+updateValues (id1,val) = map (unwords . updateIfMatch . words)
+  where
+    updateIfMatch :: [String] -> [String]
+    updateIfMatch = map (\id2 -> if id1 /= id2 then id2 else show val)
 
 --- part 2
 
 getValueWithStartValues :: Identifier -> String -> [(Identifier,Word16)] -> String
-getValueWithStartValues ident input presets = getValueFromMap ident . valueMapperWithStartValues input $ presets
+getValueWithStartValues ident input = getValueFromMap ident . valueMapperWithStartValues input
 
 valueMapperWithStartValues :: String -> [(Identifier,Word16)] -> [(Identifier,Word16)]
 valueMapperWithStartValues str startVals = 
-  let filteredInputs = filterInputs startVals $ lines str
-      updatedInputs = head . map (`updateInputs` filteredInputs) $ startVals
-      --updatedInputs = map (concat . flip updateInputs filteredInputs) startVals
-  in mapValues (startVals, updatedInputs)
+  let unsetInputs = filterSetVals startVals str
+      inputsUpdatedWithStartValues = head $ map (`updateValues` unsetInputs) startVals
+  in mapValues' (startVals, inputsUpdatedWithStartValues)
 
-filterInputs :: [(Identifier,Word16)] -> [String] -> [String]
-filterInputs presets = filter (flip notAlreadySet presets . last . splitOn " -> ")
---filterInputs presets = filter (`notAlreadySet` presets) . map (last . splitOn " -> ")
+filterSetVals :: [(Identifier,Word16)] -> String -> [String]
+filterSetVals preSetVals = filter (not . alreadySet . assignedVar) . lines
+  where
+    assignedVar :: String -> String
+    assignedVar = last . splitOn " -> "
 
-notAlreadySet :: Identifier -> [(Identifier,Word16)] -> Bool
-notAlreadySet ident = not . any ((== ident) . fst)
+    alreadySet :: Identifier -> Bool
+    alreadySet ident = any ((== ident) . fst) preSetVals
 
 
 -------------------------------------------------------------------------------
@@ -112,18 +157,30 @@ notAlreadySet ident = not . any ((== ident) . fst)
 
 main :: IO Counts
 main = runTestTT $ TestList 
-  [ getValue "d" testInput ~?= "72"
-  , getValue "e" testInput ~?= "507"
-  , getValue "f" testInput ~?= "492"
-  , getValue "g" testInput ~?= "114"
-  , getValue "h" testInput ~?= "65412"
-  , getValue "i" testInput ~?= "65079"
-  , getValue "x" testInput ~?= "123"
-  , getValue "yz" testInput ~?= "456"
-  , getValue "z" testInput ~?= "456"
+  [ TestLabel "parseInput" $ TestList
+    [ parseInput "12345"        ~?= Just 12345
+    , parseInput "7 AND 4"      ~?= Just 4
+    , parseInput "7 OR 3"       ~?= Just 7
+    , parseInput "532 LSHIFT 2" ~?= Just 2128
+    , parseInput "532 RSHIFT 2" ~?= Just 133
+    , parseInput "NOT 34"       ~?= Just 65501
+    ]
+  , TestLabel "getValue" $ TestList
+    [ getValue "d" testInput  ~?= "72"
+    , getValue "e" testInput  ~?= "507"
+    , getValue "f" testInput  ~?= "492"
+    , getValue "g" testInput  ~?= "114"
+    , getValue "h" testInput  ~?= "65412"
+    , getValue "i" testInput  ~?= "65079"
+    , getValue "x" testInput  ~?= "123"
+    , getValue "yz" testInput ~?= "456"
+    , getValue "z" testInput  ~?= "456"
+    ]
 
-  , getValueWithStartValues "b" "a -> b\n10 -> a" [("a",11)] ~?= "11"
-  , getValueWithStartValues "x" testInput [("x",1000)] ~?= "1000"
+  , TestLabel "getValueWithStartValues" $ TestList
+    [ getValueWithStartValues "b" "a -> b\n10 -> a" [("a",11)] ~?= "11"
+    , getValueWithStartValues "x" testInput [("x",1000)]       ~?= "1000"
+    ]
   ]
 
 testInput :: String
