@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -Wall -Werror #-}
+{-# LANGUAGE TupleSections #-}
 
 module Day2( results
            , tests
@@ -9,6 +10,16 @@ import Data.List.Split
 import Test.HUnit
 import Text.Printf
 
+type Dimensions = (Int, Int, Int)
+
+fromList :: [Int] -> Dimensions
+fromList [x, y, z] = (x, y, z)
+fromList _         = undefined
+
+toList :: Dimensions -> [Int]
+toList (x, y, z) = [x, y, z]
+toList _         = undefined
+
 results :: IO ()
 results = do input <- readFile "day2_input.txt"
              printResult 1 $ requiredAmount paperF input  -- 1606483
@@ -18,28 +29,28 @@ results = do input <- readFile "day2_input.txt"
     printResult = printf "result %d: %d\n"
 
 
-requiredAmount :: ([Int] -> Int) -> String -> Int
+requiredAmount :: (Dimensions -> Int) -> String -> Int
 requiredAmount f = sum . map (f . parseDimens) . lines
 
-parseDimens :: String -> [Int]
-parseDimens = map read . splitOn "x"
+parseDimens :: String -> Dimensions
+parseDimens = fromList . map read . splitOn "x"
 
-ribbonF :: [Int] -> Int
+ribbonF :: Dimensions -> Int
 ribbonF = (+) <$> ribbonAround <*> ribbonBow
   where
-    ribbonAround :: [Int] -> Int
+    ribbonAround :: Dimensions -> Int
     ribbonAround = (*2) . sum . take 2 . sort
 
-    ribbonBow :: [Int] -> Int
+    ribbonBow :: Dimensions -> Int
     ribbonBow = product
 
-paperF :: [Int] -> Int
+paperF :: Dimensions -> Int
 paperF = (+) <$> surfaceArea <*> slack
   where
-    surfaceArea :: [Int] -> Int
+    surfaceArea :: Dimensions -> Int
     surfaceArea = sum . map ((*2) . product) . combinationsOf2
 
-    slack :: [Int] -> Int
+    slack :: Dimensions -> Int
     slack = minimum . map product . combinationsOf2
 
 combinationsOf2 :: [a] -> [[a]]

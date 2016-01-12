@@ -13,10 +13,11 @@ result1 = foldr upDown 0 input
 result2 :: Int
 result2 = length . takeWhile (>=0) . scanl (flip upDown) 0 $ input
 
+-- TODO maybe see with Maybe
 upDown :: Char -> Int -> Int
-upDown '(' = (+1)
-upDown ')' = subtract 1
-upDown _   = undefined
+upDown '(' = succ
+upDown ')' = pred
+upDown _   = error "unexpected input"
 
 tests :: IO Counts
 tests = runTestTT $ 

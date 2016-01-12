@@ -7,15 +7,17 @@ module Day3( result1
 
 import Data.List
 import Test.HUnit
+import Control.Arrow
+import Data.Tuple
+
+--- part 1
 
 result1 :: Int
 result1 = numUniq . locations $ input
 
-result2 :: Int
-result2 = numUniq . allLocationsForPair $ input
-
 numUniq :: (Eq a) => [a] -> Int
 numUniq = length . nub
+-- TODO convert to set and get length for higher efficiency (nub is slow)
 
 locations :: String -> [(Int,Int)]
 locations = scanl move (0,0)
@@ -27,18 +29,24 @@ locations = scanl move (0,0)
                                    '<' -> (x-1,y)
                                    _   -> undefined
 
+--- part2
+
+result2 :: Int
+result2 = numUniq . allLocationsForPair $ input
+
 allLocationsForPair :: String -> [(Int,Int)]
 allLocationsForPair = mergeTuple . applyToTuple locations . splitMoves
   where
     splitMoves :: String -> (String,String)
-    splitMoves = foldr (\x (l,r) -> (x:r,l)) ([],[])
+    splitMoves = foldr (\x -> first (x :) . swap) ([],[])
 
     applyToTuple :: (a -> b) -> (a,a) -> (b,b)
-    applyToTuple f (x,y) =  (f x, f y)
+    applyToTuple f = f *** f
+    --applyToTuple f (x,y) =  (f x, f y)
+    --applyToTuple = over both
 
     mergeTuple :: ([a],[a]) -> [a]
-    mergeTuple (x,y) = x ++ y
-    -- mergeTuple = (++) <$> fst <*> snd
+    mergeTuple = uncurry (++)
 
 tests :: IO Counts
 tests = runTestTT $ TestList [ inputTests 
