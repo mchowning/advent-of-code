@@ -11,35 +11,34 @@ import Test.HUnit
 import Text.Printf
 import Text.Read
 
+import qualified Data.Map.Strict as M
+
 type Identifier = String
 
 results :: IO ()
 results = do input <- readFile "day7_input.txt"
-             printResult 1 (getValue "a" input)
-             printResult 2 (getValueWithStartValues "a" input [("b",46065)])
+             printResult 1 . show $ getValue "a" input
+             printResult 2 . show $ getValueWithStartValues "a" input (M.singleton "b" 46065)
   where
     printResult :: Int -> String -> IO ()
     printResult = printf "result %d: %s\n"
 
 --- part 1
 
-getValue :: Identifier -> String -> String
-getValue ident = getValueFromMap ident . mapValues
+getValue :: Identifier -> String -> Maybe Word16
+getValue ident = M.lookup ident . mapValues
 
-getValueFromMap :: Identifier -> [(Identifier,Word16)] -> String
-getValueFromMap ident = show . snd . head . filter ((== ident) . fst)
+mapValues :: String -> M.Map Identifier Word16
+mapValues ls = mapValues' (M.empty, lines ls)
 
-
-mapValues :: String -> [(Identifier,Word16)]
-mapValues ls = mapValues' ([], lines ls)
-
--- TODO can't use fold because I'm changing the list as I go, but something like that must work?
-mapValues' :: ([(Identifier,Word16)],[String]) -> [(Identifier,Word16)]
+-- TODO can't use fold because I'm changing the list as I go, but there's probably a better way
+mapValues' :: (M.Map Identifier Word16,[String]) -> M.Map Identifier Word16
 mapValues' (result,[]) = result
 mapValues' (result,x:xs) = case mapValue x of
                             Nothing -> mapValues' (result, xs ++ [x])
-                            Just v  -> let newInputs = updateValues v xs
-                                       in mapValues' (v:result, newInputs)
+                            Just v  -> let mapWithNewValue = uncurry M.insert v result
+                                           updatedInputs = updateValues mapWithNewValue xs
+                                       in mapValues' (mapWithNewValue, updatedInputs)
 
 
 mapValue :: String -> Maybe (Identifier,Word16)
@@ -124,31 +123,30 @@ parseInput str = let parsers = [ parseJust, parseAnd, parseOr, parseLShift, pars
       parseNot :: String -> Maybe Word16
       parseNot s = complement <$> (readMaybe . last . splitOn "NOT " $ s)
 
-updateValues :: (Identifier,Word16) -> [String] -> [String]
-updateValues (id1,val) = map (unwords . updateIfMatch . words)
+updateValues :: M.Map Identifier Word16 -> [String] -> [String]
+updateValues vMap = map (unwords . map updateIfMatch . words)
   where
-    updateIfMatch :: [String] -> [String]
-    updateIfMatch = map (\id2 -> if id1 /= id2 then id2 else show val)
+    updateIfMatch :: String -> String
+    updateIfMatch var = case M.lookup var vMap of
+                        Nothing -> var
+                        Just v  -> show v
 
 --- part 2
 
-getValueWithStartValues :: Identifier -> String -> [(Identifier,Word16)] -> String
-getValueWithStartValues ident input = getValueFromMap ident . valueMapperWithStartValues input
+getValueWithStartValues :: Identifier -> String -> M.Map Identifier Word16 -> Maybe Word16
+getValueWithStartValues ident input = M.lookup ident . valueMapperWithStartValues input
 
-valueMapperWithStartValues :: String -> [(Identifier,Word16)] -> [(Identifier,Word16)]
-valueMapperWithStartValues str startVals = 
+valueMapperWithStartValues :: String -> M.Map Identifier Word16 -> M.Map Identifier Word16
+valueMapperWithStartValues str startVals =
   let unsetInputs = filterSetVals startVals str
-      inputsUpdatedWithStartValues = head $ map (`updateValues` unsetInputs) startVals
+      inputsUpdatedWithStartValues = updateValues startVals unsetInputs
   in mapValues' (startVals, inputsUpdatedWithStartValues)
 
-filterSetVals :: [(Identifier,Word16)] -> String -> [String]
-filterSetVals preSetVals = filter (not . alreadySet . assignedVar) . lines
+filterSetVals :: M.Map Identifier Word16 -> String -> [String]
+filterSetVals preSetVals = filter (flip M.notMember preSetVals . assignedVar) . lines
   where
     assignedVar :: String -> String
     assignedVar = last . splitOn " -> "
-
-    alreadySet :: Identifier -> Bool
-    alreadySet ident = any ((== ident) . fst) preSetVals
 
 
 -------------------------------------------------------------------------------
@@ -166,20 +164,21 @@ main = runTestTT $ TestList
     , parseInput "NOT 34"       ~?= Just 65501
     ]
   , TestLabel "getValue" $ TestList
-    [ getValue "d" testInput  ~?= "72"
-    , getValue "e" testInput  ~?= "507"
-    , getValue "f" testInput  ~?= "492"
-    , getValue "g" testInput  ~?= "114"
-    , getValue "h" testInput  ~?= "65412"
-    , getValue "i" testInput  ~?= "65079"
-    , getValue "x" testInput  ~?= "123"
-    , getValue "yz" testInput ~?= "456"
-    , getValue "z" testInput  ~?= "456"
+    [ getValue "d" testInput       ~?= Just 72
+    , getValue "e" testInput       ~?= Just 507
+    , getValue "f" testInput       ~?= Just 492
+    , getValue "g" testInput       ~?= Just 114
+    , getValue "h" testInput       ~?= Just 65412
+    , getValue "i" testInput       ~?= Just 65079
+    , getValue "x" testInput       ~?= Just 123
+    , getValue "yz" testInput      ~?= Just 456
+    , getValue "z" testInput       ~?= Just 456
+    , getValue "invalid" testInput ~?= Nothing
     ]
 
   , TestLabel "getValueWithStartValues" $ TestList
-    [ getValueWithStartValues "b" "a -> b\n10 -> a" [("a",11)] ~?= "11"
-    , getValueWithStartValues "x" testInput [("x",1000)]       ~?= "1000"
+    [ getValueWithStartValues "b" "a -> b\n10 -> a" (M.singleton "a" 11) ~?= Just 11
+    , getValueWithStartValues "x" testInput (M.singleton "x" 1000)       ~?= Just 1000
     ]
   ]
 
