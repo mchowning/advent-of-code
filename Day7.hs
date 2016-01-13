@@ -32,6 +32,8 @@ mapValues :: String -> M.Map Identifier Word16
 mapValues ls = mapValues' (M.empty, lines ls)
 
 -- TODO can't use fold because I'm changing the list as I go, but there's probably a better way
+-- This algorithm only works if it is possible to solve every assignment, otherwise
+-- it will just infinitely loop
 mapValues' :: (M.Map Identifier Word16,[String]) -> M.Map Identifier Word16
 mapValues' (result,[]) = result
 mapValues' (result,x:xs) = case mapValue x of

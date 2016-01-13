@@ -7,10 +7,12 @@ import Data.Maybe
 import Test.HUnit
 import Text.Printf
 
+import qualified Data.Set as S
+
 results :: IO ()
-results = do input <- readFile "day9_input.txt"
-             printResult 1 . head . getSortedDistances $ input
-             printResult 2 . last . getSortedDistances $ input
+results = do sortedDistances <- getSortedDistances <$> readFile "day9_input.txt"
+             printResult 1 (head sortedDistances)
+             printResult 2 (last sortedDistances)
   where
     printResult :: Int -> Int -> IO ()
     printResult = printf "result %d: %d\n"
@@ -21,31 +23,41 @@ data Route = Route { start    :: String
                    } deriving (Eq, Show)
 
 type Location = String
+type TripLeg = (Location, Location)
 
--- travel to all possible destinations
+-- distances for all possible trips
 getSortedDistances :: String -> [Int]
-getSortedDistances input = let routes = parseRoutes input
-                               allTrips = permutations . allLocations $ routes
-                               -- TODO has to be a better way that (map fromJust . filter isJust)
-                           in map fromJust . filter isJust . sort . map (getTripDistance routes) $ allTrips
+getSortedDistances input =
+  let routes = parseRoutes input
+      allPossibleTrips = permutations . S.toList . allLocations $ routes
+  in sort . mapMaybe (getTripDistance routes) $ allPossibleTrips
 
-getTripDistance :: [Route] -> [Location] -> Maybe Int
-getTripDistance rs ls = let distances = map legDistance tripLegs
-                        in if Nothing `elem` distances then Nothing else Just (sum . map fromJust $ distances)
+allLocations :: [Route] -> S.Set Location
+allLocations = foldr addRouteLocations S.empty
   where
-    tripLegs :: [(Location,Location)]
-    tripLegs = map (\(x:y:_) -> (x,y)) . filter ((>1) . length) . tails $ ls
+    addRouteLocations ::  Route -> S.Set Location -> S.Set Location
+    addRouteLocations (Route l1 l2 _) = S.insert l1 . S.insert l2
 
-    legDistance :: (Location,Location) -> Maybe Int
-    legDistance lsTup = distance <$> uncurry (getRoute rs) lsTup
+-- Using sequence so total distance is Nothing if any leg distance is Nothing
+getTripDistance :: [Route] -> [Location] -> Maybe Int
+getTripDistance rts locs = sum <$> sequence legDistances
+  where
+    legDistances :: [Maybe Int]
+    legDistances = map legDistance tripLegs
 
-allLocations :: [Route] -> [Location]
-allLocations = nub . foldr (\(Route s e _) acc -> s:e:acc) []
+    tripLegs :: [TripLeg]
+    -- tripLegs = map (\(x:y:_) -> (x,y)) . filter ((>1) . length) . tails $ locs
+    tripLegs = mapMaybe getPair (tails locs)
 
-getRoute :: [Route] -> Location -> Location -> Maybe Route
-getRoute rs l1 l2 = case filter routeMatches rs of
-                      []      -> Nothing
-                      matches -> Just (head matches)
+    getPair :: [a] -> Maybe (a,a)
+    getPair (x:y:_) = Just (x,y)
+    getPair _       = Nothing
+
+    legDistance :: TripLeg -> Maybe Int
+    legDistance leg = distance <$> getRouteForLeg rts leg
+
+getRouteForLeg :: [Route] -> TripLeg -> Maybe Route
+getRouteForLeg rs (l1,l2) = listToMaybe $ filter routeMatches rs
   where
     routeMatches :: Route -> Bool
     routeMatches (Route r1 r2 _) = all (`elem` [l1,l2]) [r1,r2]
@@ -69,19 +81,21 @@ main = runTestTT $ TestList
               \\nstart2 to finish2 = 143" ~?= [ Route "start1" "finish1" 723
                                               , Route "start2" "finish2" 143]
 
-  , allLocations [ Route "1" "2" 0
-                 , Route "3" "4" 0
-                 , Route "1" "5" 0 ] ~?= ["1","2","3","4","5"] -- FIXME this should be some type of contains test
+  , let locationList = allLocations [ Route "1" "2" 0
+                                    , Route "3" "4" 0
+                                    , Route "1" "5" 0 ]
+        expectedLocations = ["1","2","3","4","5"]
+    in all (`elem` expectedLocations) locationList &&
+       length locationList == length expectedLocations ~? "should extract all locations from list of routes without duplicates"
 
-  , getRoute [ Route "1" "2" 0
-             , Route "3" "4" 0
-             , Route "1" "5" 0 ] "3" "4" ~?= Just (Route "3" "4" 0)
+  , getRouteForLeg [ Route "1" "2" 0
+                   , Route "3" "4" 0
+                   , Route "1" "5" 0 ] ("3","4") ~?= Just (Route "3" "4" 0)
 
-  , getRoute [ Route "1" "2" 0
-             , Route "3" "4" 0
-             , Route "1" "5" 0 ] "1" "3" ~?= Nothing
+  , getRouteForLeg [ Route "1" "2" 0 ] ("1","3") ~?= Nothing
 
   , getTripDistance_test
+  , getTripDistance [] ["1", "2"] == Nothing ~? "missing routes should result in Nothing, not Just 0"
   , getShortestDistance_test
   ]
     where

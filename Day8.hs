@@ -7,11 +7,6 @@ import Text.Printf
 
 results :: IO ()
 results = do input <- readFile "day8_input.txt"
-             --printResult 1 (lines input !! 14)
-             --let testLine = lines input !! 14
-             --_ <- putStrLn testLine
-             --_ <- putStrLn . decode $ testLine
-             --_ <- putStrLn . encode . decode $ testLine
              printResult 1 (result1 input)
              printResult 2 (result2 input)
   where
