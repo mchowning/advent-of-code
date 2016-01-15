@@ -5,7 +5,6 @@ module Day5 where
 import Data.List
 import Test.HUnit
 import Text.Printf
---import Control.Monad
 
 results :: IO ()
 results = do input <- readFile "day5_input.txt"
@@ -26,23 +25,23 @@ passesAll reqs str = all ($ str) reqs
 --- part 1
 
 isNice1Reqs :: [String -> Bool]
-isNice1Reqs = [ contains3Vowels, hasDoubleLetters, noInvalidPairs ]
+isNice1Reqs = [ containsNVowels 3, hasDoubleLetters, noInvalidPairs ]
 
-contains3Vowels :: String -> Bool
--- contains3Vowels = (>2) . length . filter isVowel
-contains3Vowels = containsNVowels 3
+containsNVowels :: Int -> String -> Bool
+containsNVowels n = (>= n) . length . filter isVowel
   where
-    containsNVowels :: Int -> String -> Bool
-    containsNVowels n = (>= n) . length . filter isVowel
-
     isVowel :: Char -> Bool
-    isVowel = flip elem "aeiou"
+    isVowel = (`elem` "aeiou")
 
 hasDoubleLetters :: String -> Bool
 hasDoubleLetters = any ((>1) . length) . group
 
 noInvalidPairs :: String -> Bool
-noInvalidPairs str = not . any (`isInfixOf` str) $ ["ab","cd","pq","xy"]
+noInvalidPairs str = not $ any (`isInfixOf` str) ["ab","cd","pq","xy"]
+-- noInvalidPairs str = none (`isInfixOf` str) ["ab","cd","pq","xy"]
+--   where
+--     none :: (a -> Bool) -> [a] -> Bool
+--     none f = not . any f
 
 --- part 2
 
@@ -50,21 +49,12 @@ isNice2Reqs :: [String -> Bool]
 isNice2Reqs = [ hasTwoPairs, hasSpacedRepeat ]
 
 hasTwoPairs :: String -> Bool
-hasTwoPairs (x:y:ys) = isInfixOf [x,y] ys || hasTwoPairs (y:ys)
+hasTwoPairs (x:y:ys) = [x,y] `isInfixOf` ys || hasTwoPairs (y:ys)
 hasTwoPairs _ = False
--- hasTwoPairs ls = any (uncurry isInfixOf . splitAt 2 . flip drop ls) [0..(length ls - 4)]
--- hasTwoPairs ls = any (uncurry isInfixOf . splitAt 2) . filter ((>3) . length) $ tails ls
--- hasTwoPairs = foldr hasTwoPairs' False . tails
---   where
---     hasTwoPairs' :: String -> Bool -> Bool
---     hasTwoPairs' _ True     = True
---     hasTwoPairs' (x:y:ys) _ = [x,y] `isInfixOf` ys
---     hasTwoPairs' _ _        = False
 
 hasSpacedRepeat :: String -> Bool
 hasSpacedRepeat ls = let spacedPairs = zip ls (drop 2 ls)
                      in any (uncurry (==)) spacedPairs
-
 
 -------------
 --- Tests ---
@@ -78,7 +68,7 @@ tests = runTestTT $ TestList [ numPassTests
                              , passesAllTests
                              , noInvalidPairsTests
                              , hasDoubleLettersTests
-                             , contains3VowelsTests
+                             , containsNVowelsTests
                              , hasTwoPairsTests
                              , hasSpacedRepeatTests
                              ]                   
@@ -100,11 +90,11 @@ passesAllTests = TestLabel "passesAll" $ TestList
   , not (passesAll [elem 'a',elem 'c'] "ab")  ~? "must pass both predicates"
   ]
 
-contains3VowelsTests :: Test
-contains3VowelsTests = TestLabel "contains3VowelsTests" $ TestList
-  [ contains3Vowels "ajkaaa"     ~? "True if 4 vowels"
-  , contains3Vowels "ajkei"      ~? "True if 3 vowels"
-  , not (contains3Vowels "ajki") ~? "False if 3 vowels"
+containsNVowelsTests :: Test
+containsNVowelsTests = TestLabel "contains3VowelsTests" $ TestList
+  [ containsNVowels 3 "ajkaaa"     ~? "True if 4 vowels"
+  , containsNVowels 3 "ajkei"      ~? "True if 3 vowels"
+  , not (containsNVowels 3 "ajki") ~? "False if 3 vowels"
   ]
 
 noInvalidPairsTests :: Test
