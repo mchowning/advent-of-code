@@ -1,4 +1,4 @@
-import Day1.{LeftTurn, RightTurn}
+import Day1._
 import org.scalatest.FunSuite
 
 class Day1Spec extends FunSuite {
@@ -18,4 +18,15 @@ class Day1Spec extends FunSuite {
   test("parses multiple moves") {
     assert(Day1.parseMoves("R1, L3, R2") == List((RightTurn, 1), (LeftTurn, 3), (RightTurn, 2)))
   }
+
+  test("updates direction based on turn") {
+     assert(Day1.updateDirection(North, RightTurn) == East)
+     assert(Day1.updateDirection(North, LeftTurn) == West)
+     assert(Day1.updateDirection(East, RightTurn) == South)
+     assert(Day1.updateDirection(East, LeftTurn) == North)
+     assert(Day1.updateDirection(South, RightTurn) == West)
+     assert(Day1.updateDirection(South, LeftTurn) == East)
+     assert(Day1.updateDirection(West, RightTurn) == North)
+     assert(Day1.updateDirection(West, LeftTurn) == South)
+   }
 }
