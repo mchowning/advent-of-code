@@ -7,6 +7,13 @@ object Day1 {
 
   type Move = (Turn, Int)
 
+  def parseMoves(moves: String): List[Move] = {
+    moves.split(",")
+      .map(_.trim)
+      .map(parseMove)
+      .toList
+  }
+
   def parseMove(move: String): Move = {
     val turn = move.head match {
       case 'R' => RightTurn
