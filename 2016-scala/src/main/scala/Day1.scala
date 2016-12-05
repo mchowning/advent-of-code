@@ -11,7 +11,10 @@ object Day1 {
   object South extends Direction
   object West extends Direction
 
+  type Position = (Direction, Int, Int)
   type Move = (Turn, Int)
+
+  val startingPosition: Position = (North, 0, 0)
 
   def parseMoves(moves: String): List[Move] = {
     moves.split(",")
@@ -41,4 +44,11 @@ object Day1 {
     case (West,  LeftTurn)  => South
   }
 
+  def getFinalPosition(moves: String): Position = {
+    (startingPosition /: parseMoves(moves)) { (pos, move) =>
+      val (direction, x, y) = pos
+      val (turn, distance) = move
+      (updateDirection(direction, turn), x, y)
+    }
+  }
 }
