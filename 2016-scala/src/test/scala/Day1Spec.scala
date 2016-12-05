@@ -30,9 +30,10 @@ class Day1Spec extends FunSuite {
      assert(Day1.updateDirection(West, LeftTurn) == South)
    }
 
-  test("updates initial position based on turn") {
+  test("updates initial position based on turns") {
     def getDirection(pos: Position): Direction = pos match { case (p, _, _) => p }
     assert(getDirection(Day1.getFinalPosition("R1")) == East)
     assert(getDirection(Day1.getFinalPosition("L1")) == West)
+    assert(getDirection(Day1.getFinalPosition("L1, R1, R1, R1")) == South)
   }
 }
