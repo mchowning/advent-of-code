@@ -5,6 +5,12 @@ object Day1 {
   object RightTurn extends Turn
   object LeftTurn extends Turn
 
+  sealed trait Direction
+  object North extends Direction
+  object East extends Direction
+  object South extends Direction
+  object West extends Direction
+
   type Move = (Turn, Int)
 
   def parseMoves(moves: String): List[Move] = {
@@ -22,6 +28,17 @@ object Day1 {
     }
     val distance = move.tail.toInt
     (turn, distance)
+  }
+
+  def updateDirection(direction: Direction, turn: Turn): Direction =  (direction, turn) match {
+    case (North, RightTurn) => East
+    case (North, LeftTurn)  => West
+    case (East,  RightTurn) => South
+    case (East,  LeftTurn)  => North
+    case (South, RightTurn) => West
+    case (South, LeftTurn)  => East
+    case (West,  RightTurn) => North
+    case (West,  LeftTurn)  => South
   }
 
 }
