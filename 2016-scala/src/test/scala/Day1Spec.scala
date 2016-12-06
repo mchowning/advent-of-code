@@ -81,6 +81,10 @@ class Day1Spec extends FreeSpec {
                                                               Day1.parseMoves("R8, R4, R4, R8"))
         assert(firstRepeatPosition == (4, 0))
       }
+      "determine the distance to the first position visited twice in a series of moves" in {
+        val distanceToFirstRepeatPosition = Day1.getDistanceToFirstRepeatCoordinates("R8, R4, R4, R8")
+        assert(distanceToFirstRepeatPosition == 4)
+      }
     }
   }
 }
