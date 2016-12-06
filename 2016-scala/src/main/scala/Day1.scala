@@ -77,8 +77,8 @@ object Day1 {
    }
 
   def getFinalPositionDistance(moves: String): Int = {
-    val (_, (x, y)) = getFinalPosition(moves)
-    Math.abs(x) + Math.abs(y)
+    val (_, coords) = getFinalPosition(moves)
+    distanceFromStartTo(coords)
   }
 
   def getFirstRepeatCoordinates(startPos: Position, moves: List[Move]): (Int, Int) = {
@@ -97,7 +97,12 @@ object Day1 {
   }
 
   def getDistanceToFirstRepeatCoordinates(moves: String): Int = {
-    val (x,y) = getFirstRepeatCoordinates(startingPosition, parseMoves(moves))
-    Math.abs(x) + Math.abs(y)
+    val coords= getFirstRepeatCoordinates(startingPosition, parseMoves(moves))
+    distanceFromStartTo(coords)
   }
+
+  private def distanceFromStartTo(coordinates: Coordinates): Int =  coordinates match {
+    case (x, y) => Math.abs(x) + Math.abs(y)
+  }
+
 }
