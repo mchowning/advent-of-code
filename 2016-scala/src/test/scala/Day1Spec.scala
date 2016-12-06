@@ -57,11 +57,21 @@ class Day1Spec extends FreeSpec {
       val input = io.Source.fromInputStream(stream).mkString
       assert(Day1.getFinalPositionDistance(input) == 307)
     }
-    "can determine all positions visited during a move" in {
+    "can determine all positions visited during" - {
       val startPosition = (North, 0, 0)
-      assert(Day1.getVisitedPositions(startPosition, parseMove("R2")) == List((East, 1, 0),
-                                                                              (East, 2, 0)))
-      assert(Day1.getVisitedPositions(startPosition, parseMove("L1")) == List((West, -1, 0)))
+      "a move" in {
+        assert(Day1.getVisitedPositions(startPosition, Day1.parseMove("R2")) == List((East, 1, 0),
+                                                                                (East, 2, 0)))
+        assert(Day1.getVisitedPositions(startPosition, Day1.parseMove("L1")) == List((West, -1, 0)))
+      }
+      "a series of moves" in {
+        assert(Day1.getVisitedPositions(startPosition, Day1.parseMoves("R2, L1")) == List((East, 1, 0),
+                                                                                          (East, 2, 0),
+                                                                                          (North, 2, 1)))
+        assert(Day1.getVisitedPositions(startPosition, Day1.parseMoves("L2, L1")) == List((West, -1, 0),
+                                                                                          (West, -2, 0),
+                                                                                          (South, -2, -1)))
+      }
     }
   }
 }
