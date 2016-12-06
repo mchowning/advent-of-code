@@ -48,13 +48,24 @@ object Day1 {
     (startingPosition /: parseMoves(moves)) { (pos, move) =>
       val (direction, x, y) = pos
       val (turn, distance) = move
-      val updatedDirection: Direction = updateDirection(direction, turn)
-      updatedDirection match {
-        case North => (updatedDirection, x           , y + distance)
-        case South => (updatedDirection, x           , y - distance)
-        case East => (updatedDirection , x + distance, y)
-        case West => (updatedDirection , x - distance, y)
-      }
+      val updatedDirection = updateDirection(direction, turn)
+      getPosition(x, y, updatedDirection, distance)
+    }
+  }
+
+  def getVisitedPositions(startPos: Position, move: Move): List[Position] = {
+    val (direction, x, y) = startPos
+    val (turn, distance) = move
+    val updatedDirection = updateDirection(direction, turn)
+    for (i <- (1 to distance).toList) yield getPosition(x, y, updatedDirection, i)
+  }
+
+  def getPosition(x: Int, y: Int, direction: Direction, distance: Int): Position = {
+    direction match {
+      case North => (direction, x           , y + distance)
+      case South => (direction, x           , y - distance)
+      case East =>  (direction, x + distance, y)
+      case West =>  (direction, x - distance, y)
     }
   }
 
