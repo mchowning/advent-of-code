@@ -33,16 +33,17 @@ object Day1 {
     (turn, distance)
   }
 
-  def updateDirection(direction: Direction, turn: Turn): Direction =  (direction, turn) match {
-    case (North, RightTurn) => East
-    case (North, LeftTurn)  => West
-    case (East,  RightTurn) => South
-    case (East,  LeftTurn)  => North
-    case (South, RightTurn) => West
-    case (South, LeftTurn)  => East
-    case (West,  RightTurn) => North
-    case (West,  LeftTurn)  => South
-  }
+  def updateDirection(direction: Direction, turn: Turn): Direction =
+    (direction, turn) match {
+      case (North, RightTurn) => East
+      case (North, LeftTurn)  => West
+      case (East,  RightTurn) => South
+      case (East,  LeftTurn)  => North
+      case (South, RightTurn) => West
+      case (South, LeftTurn)  => East
+      case (West,  RightTurn) => North
+      case (West,  LeftTurn)  => South
+    }
 
   def getFinalPosition(moves: String): Position = {
     (startingPosition /: parseMoves(moves)) { (pos, move) =>
@@ -63,17 +64,16 @@ object Day1 {
   def getVisitedPositions(startPos: Position, moves: List[Move]): List[Position] = {
     (List(startPos) /: moves) { (posList, move) =>
       posList ::: getVisitedPositions(posList.last, move)
-    }.tail // drop starting position from list
+    }.tail // drop starting position
   }
 
-  def getPosition(x: Int, y: Int, direction: Direction, distance: Int): Position = {
+  def getPosition(x: Int, y: Int, direction: Direction, distance: Int): Position =
     direction match {
       case North => (direction, x           , y + distance)
       case South => (direction, x           , y - distance)
       case East =>  (direction, x + distance, y)
       case West =>  (direction, x - distance, y)
-    }
-  }
+   }
 
   def getFinalPositionDistance(moves: String): Int = {
     val (_, x, y) = getFinalPosition(moves)
