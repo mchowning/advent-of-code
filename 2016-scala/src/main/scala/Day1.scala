@@ -95,4 +95,9 @@ object Day1 {
       .head
       .last
   }
+
+  def getDistanceToFirstRepeatCoordinates(moves: String): Int = {
+    val (x,y) = getFirstRepeatCoordinates(startingPosition, parseMoves(moves))
+    Math.abs(x) + Math.abs(y)
+  }
 }
