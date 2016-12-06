@@ -61,9 +61,11 @@ class Day1Spec extends FreeSpec {
       val startPosition = (North, (0, 0))
       "determine all positions visited during" - {
         "a move" in {
-          assert(Day1.getVisitedPositions(startPosition, Day1.parseMove("R2")) == List((East, (1, 0)),
-                                                                                       (East, (2, 0))))
-          assert(Day1.getVisitedPositions(startPosition, Day1.parseMove("L1")) == List((West, (-1, 0))))
+          assert(Day1.getVisitedPositions(startPosition, Day1.parseMove("R2")) ==
+                 List((East, (1, 0)),
+                      (East, (2, 0))))
+          assert(Day1.getVisitedPositions(startPosition, Day1.parseMove("L1")) ==
+                 List((West, (-1, 0))))
         }
         "a series of moves" in {
           assert(Day1.getVisitedPositions(startPosition, Day1.parseMoves("R2, L1")) ==
@@ -76,15 +78,14 @@ class Day1Spec extends FreeSpec {
                       (South, (-2, -1))))
         }
       }
-      "determine the first position visited twice in a series of moves" in {
-        val firstRepeatPosition = Day1.getFirstRepeatCoordinates(startingPosition,
-                                                              Day1.parseMoves("R8, R4, R4, R8"))
-        assert(firstRepeatPosition == (4, 0))
-      }
-      "determine the distance to the first position visited twice in a series of moves" in {
-        val distanceToFirstRepeatPosition = Day1.getDistanceToFirstRepeatCoordinates("R8, R4, R4, R8")
-        assert(distanceToFirstRepeatPosition == 4)
-      }
+    }
+    "can determine the first position visited twice in a series of moves" in {
+      val firstRepeatPosition = Day1.getFirstRepeatCoordinates(Day1.parseMoves("R8, R4, R4, R8"))
+      assert(firstRepeatPosition == (4, 0))
+    }
+    "can determine the distance to the first position visited twice in a series of moves" in {
+      val distanceToFirstRepeatPosition = Day1.getDistanceToFirstRepeatCoordinates("R8, R4, R4, R8")
+      assert(distanceToFirstRepeatPosition == 4)
     }
   }
 }

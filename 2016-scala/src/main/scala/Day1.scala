@@ -81,11 +81,11 @@ object Day1 {
     distanceFromStartTo(coords)
   }
 
-  def getFirstRepeatCoordinates(startPos: Position, moves: List[Move]): (Int, Int) = {
+  def getFirstRepeatCoordinates(moves: List[Move]): (Int, Int) = {
 
     def getCoordinates(pos: Position): Coordinates = pos match { case (_, (x, y)) => (x, y) }
 
-    getVisitedPositions(startPos, moves)
+    getVisitedPositions(startingPosition, moves)
       .map(getCoordinates)
       .inits
       .toList
@@ -97,7 +97,7 @@ object Day1 {
   }
 
   def getDistanceToFirstRepeatCoordinates(moves: String): Int = {
-    val coords= getFirstRepeatCoordinates(startingPosition, parseMoves(moves))
+    val coords= getFirstRepeatCoordinates(parseMoves(moves))
     distanceFromStartTo(coords)
   }
 
