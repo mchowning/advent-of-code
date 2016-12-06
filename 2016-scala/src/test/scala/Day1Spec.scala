@@ -31,7 +31,7 @@ class Day1Spec extends FreeSpec {
       assert(Day1.updateDirection(West, LeftTurn) == South)
     }
     "can update the direction of the initial position based on" - {
-      def getDirection(pos: Position): Direction = pos match { case (p, _, _) => p }
+      def getDirection(pos: Position): Direction = pos match {case (p, _, _) => p}
       "a move with a right turn" in {
         assert(getDirection(Day1.getFinalPosition("R1")) == East)
       }
@@ -57,20 +57,30 @@ class Day1Spec extends FreeSpec {
       val input = io.Source.fromInputStream(stream).mkString
       assert(Day1.getFinalPositionDistance(input) == 307)
     }
-    "can determine all positions visited during" - {
+    "with a starting position" - {
       val startPosition = (North, 0, 0)
-      "a move" in {
-        assert(Day1.getVisitedPositions(startPosition, Day1.parseMove("R2")) == List((East, 1, 0),
-                                                                                (East, 2, 0)))
-        assert(Day1.getVisitedPositions(startPosition, Day1.parseMove("L1")) == List((West, -1, 0)))
+      "determine all positions visited during" - {
+        "a move" in {
+          assert(Day1.getVisitedPositions(startPosition, Day1.parseMove("R2")) == List((East, 1, 0),
+                                                                                       (East, 2, 0)))
+          assert(Day1.getVisitedPositions(startPosition, Day1.parseMove("L1")) ==
+                 List((West, -1, 0)))
+        }
+        "a series of moves" in {
+          assert(Day1.getVisitedPositions(startPosition, Day1.parseMoves("R2, L1")) ==
+                 List((East, 1, 0),
+                      (East, 2, 0),
+                      (North, 2, 1)))
+          assert(Day1.getVisitedPositions(startPosition, Day1.parseMoves("L2, L1")) ==
+                 List((West, -1, 0),
+                      (West, -2, 0),
+                      (South, -2, -1)))
+        }
       }
-      "a series of moves" in {
-        assert(Day1.getVisitedPositions(startPosition, Day1.parseMoves("R2, L1")) == List((East, 1, 0),
-                                                                                          (East, 2, 0),
-                                                                                          (North, 2, 1)))
-        assert(Day1.getVisitedPositions(startPosition, Day1.parseMoves("L2, L1")) == List((West, -1, 0),
-                                                                                          (West, -2, 0),
-                                                                                          (South, -2, -1)))
+      "determine the first position visited twice in a series of moves" in {
+        val firstRepeatPosition = Day1.getFirstRepeatPosition(startingPosition,
+                                                              Day1.parseMoves("R8, R4, R4, R8"))
+        assert(firstRepeatPosition == (4, 0))
       }
     }
   }
