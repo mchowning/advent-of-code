@@ -48,4 +48,8 @@ class Day1Spec extends FunSuite {
   test("R5, L5, R5, R3 gives (South, 10, 2) final position") {
     assert(Day1.getFinalPosition("R5, L5, R5, R3") == (South, 10, 2))
   }
+
+  test("R2, L3 gives final position distance of 5") {
+    assert(Day1.getFinalPositionDistance("R2, L3") == 5)
+  }
 }
