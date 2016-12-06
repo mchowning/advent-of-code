@@ -1,3 +1,5 @@
+import java.io.InputStream
+
 import Day1._
 import org.scalatest.FunSuite
 
@@ -51,5 +53,19 @@ class Day1Spec extends FunSuite {
 
   test("R2, L3 gives final position distance of 5") {
     assert(Day1.getFinalPositionDistance("R2, L3") == 5)
+  }
+
+  test("R2, R2, R2 gives final position distance of 2") {
+    assert(Day1.getFinalPositionDistance("R2, R2, R2") == 2)
+  }
+
+  test("R5, L5, R5, R3 gives final position distance of 12") {
+     assert(Day1.getFinalPositionDistance("R5, L5, R5, R3") == 12)
+  }
+
+  test("actual test input gives final position distance of ___") {
+    val stream: InputStream = getClass.getResourceAsStream("input_day1")
+    val input = io.Source.fromInputStream(stream).mkString
+    assert(Day1.getFinalPositionDistance(input) == 307)
   }
 }
