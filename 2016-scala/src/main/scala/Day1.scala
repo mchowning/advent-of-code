@@ -11,10 +11,11 @@ object Day1 {
   object South extends Direction
   object West extends Direction
 
-  type Position = (Direction, Int, Int)
+  type Coordinates = (Int, Int)
+  type Position = (Direction, (Coordinates))
   type Move = (Turn, Int)
 
-  val startingPosition: Position = (North, 0, 0)
+  val startingPosition: Position = (North, (0, 0))
 
   def parseMoves(moves: String): List[Move] = {
     moves.split(",")
@@ -47,7 +48,7 @@ object Day1 {
 
   def getFinalPosition(moves: String): Position = {
     (startingPosition /: parseMoves(moves)) { (pos, move) =>
-      val (direction, x, y) = pos
+      val (direction, (x, y)) = pos
       val (turn, distance) = move
       val updatedDirection = updateDirection(direction, turn)
       getPosition(x, y, updatedDirection, distance)
@@ -55,7 +56,7 @@ object Day1 {
   }
 
   def getVisitedPositions(startPos: Position, move: Move): List[Position] = {
-    val (direction, x, y) = startPos
+    val (direction, (x, y)) = startPos
     val (turn, distance) = move
     val updatedDirection = updateDirection(direction, turn)
     for (i <- (1 to distance).toList) yield getPosition(x, y, updatedDirection, i)
@@ -69,19 +70,20 @@ object Day1 {
 
   def getPosition(x: Int, y: Int, direction: Direction, distance: Int): Position =
     direction match {
-      case North => (direction, x           , y + distance)
-      case South => (direction, x           , y - distance)
-      case East =>  (direction, x + distance, y)
-      case West =>  (direction, x - distance, y)
+      case North => (direction, (x           , y + distance))
+      case South => (direction, (x           , y - distance))
+      case East =>  (direction, (x + distance, y))
+      case West =>  (direction, (x - distance, y))
    }
 
   def getFinalPositionDistance(moves: String): Int = {
-    val (_, x, y) = getFinalPosition(moves)
+    val (_, (x, y)) = getFinalPosition(moves)
     Math.abs(x) + Math.abs(y)
   }
 
-  def getFirstRepeatPosition(startPos: Position, moves: List[Move]): (Int, Int) = {
-    def getCoordinates(pos: Position): (Int, Int) = pos match { case (_, x, y) => (x, y) }
+  def getFirstRepeatCoordinates(startPos: Position, moves: List[Move]): (Int, Int) = {
+
+    def getCoordinates(pos: Position): Coordinates = pos match { case (_, (x, y)) => (x, y) }
 
     getVisitedPositions(startPos, moves)
       .map(getCoordinates)
