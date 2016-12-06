@@ -87,5 +87,10 @@ class Day1Spec extends FreeSpec {
       val distanceToFirstRepeatPosition = Day1.getDistanceToFirstRepeatCoordinates("R8, R4, R4, R8")
       assert(distanceToFirstRepeatPosition == 4)
     }
+    "can solve part 2" in {
+      val stream: InputStream = getClass.getResourceAsStream("input_day1")
+      val input = io.Source.fromInputStream(stream).mkString
+      assert(getDistanceToFirstRepeatCoordinates(input) == 165)
+    }
   }
 }
