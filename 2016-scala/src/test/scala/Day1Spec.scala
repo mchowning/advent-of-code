@@ -36,4 +36,8 @@ class Day1Spec extends FunSuite {
     assert(getDirection(Day1.getFinalPosition("L1")) == West)
     assert(getDirection(Day1.getFinalPosition("L1, R1, R1, R1")) == South)
   }
+
+  test("R2, L3 gives (North, 2, 3) final position") {
+    assert(Day1.getFinalPosition("R2, L3") == (North, 2, 3))
+  }
 }
