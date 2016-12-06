@@ -79,4 +79,18 @@ object Day1 {
     val (_, x, y) = getFinalPosition(moves)
     Math.abs(x) + Math.abs(y)
   }
+
+  def getFirstRepeatPosition(startPos: Position, moves: List[Move]): (Int, Int) = {
+    def getCoordinates(pos: Position): (Int, Int) = pos match { case (_, x, y) => (x, y) }
+
+    getVisitedPositions(startPos, moves)
+      .map(getCoordinates)
+      .inits
+      .toList
+      .reverse
+      .filter(_.length > 1)
+      .filter { xs => xs.init.contains(xs.last) }
+      .head
+      .last
+  }
 }
