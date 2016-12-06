@@ -48,7 +48,13 @@ object Day1 {
     (startingPosition /: parseMoves(moves)) { (pos, move) =>
       val (direction, x, y) = pos
       val (turn, distance) = move
-      (updateDirection(direction, turn), x, y)
+      val updatedDirection: Direction = updateDirection(direction, turn)
+      updatedDirection match {
+        case North => (updatedDirection, x           , y + distance)
+        case South => (updatedDirection, x           , y - distance)
+        case East => (updatedDirection , x + distance, y)
+        case West => (updatedDirection , x - distance, y)
+      }
     }
   }
 }
