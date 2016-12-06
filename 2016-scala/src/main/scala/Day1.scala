@@ -57,4 +57,9 @@ object Day1 {
       }
     }
   }
+
+  def getFinalPositionDistance(moves: String): Int = {
+    val (_, x, y) = getFinalPosition(moves)
+    Math.abs(x) + Math.abs(y)
+  }
 }
