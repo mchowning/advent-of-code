@@ -60,6 +60,12 @@ object Day1 {
     for (i <- (1 to distance).toList) yield getPosition(x, y, updatedDirection, i)
   }
 
+  def getVisitedPositions(startPos: Position, moves: List[Move]): List[Position] = {
+    (List(startPos) /: moves) { (posList, move) =>
+      posList ::: getVisitedPositions(posList.last, move)
+    }.tail // drop starting position from list
+  }
+
   def getPosition(x: Int, y: Int, direction: Direction, distance: Int): Position = {
     direction match {
       case North => (direction, x           , y + distance)
