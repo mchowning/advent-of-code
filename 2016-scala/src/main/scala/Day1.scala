@@ -1,4 +1,3 @@
-
 object Day1 {
 
   sealed trait Turn
@@ -18,20 +17,21 @@ object Day1 {
   val startingPosition: Position = (North, (0, 0))
 
   def parseMoves(moves: String): List[Move] = {
+
+    def parseSingleMove(move: String): Move = {
+      val turn = move.head match {
+        case 'R' => RightTurn
+        case 'L' =>  LeftTurn
+        case _   => throw new Exception("Move contains invalid Turn direction: should be 'R' or 'L'")
+      }
+      val distance = move.tail.toInt
+      (turn, distance)
+    }
+
     moves.split(",")
       .map(_.trim)
-      .map(parseMove)
+      .map(parseSingleMove)
       .toList
-  }
-
-  def parseMove(move: String): Move = {
-    val turn = move.head match {
-      case 'R' => RightTurn
-      case 'L' =>  LeftTurn
-      case _   => throw new Exception("Move contains invalid Turn direction: should be 'R' or 'L'")
-    }
-    val distance = move.tail.toInt
-    (turn, distance)
   }
 
   def updateDirection(direction: Direction, turn: Turn): Direction =
@@ -46,8 +46,8 @@ object Day1 {
       case (West,  LeftTurn)  => South
     }
 
-  def getFinalPosition(moves: String): Position = {
-    (startingPosition /: parseMoves(moves)) { (pos, move) =>
+  def getFinalPosition(moves: List[Move]): Position = {
+    (startingPosition /: moves) { (pos, move) =>
       val (direction, (x, y)) = pos
       val (turn, distance) = move
       val updatedDirection = updateDirection(direction, turn)
@@ -55,20 +55,21 @@ object Day1 {
     }
   }
 
-  def getVisitedPositions(startPos: Position, move: Move): List[Position] = {
-    val (direction, (x, y)) = startPos
-    val (turn, distance) = move
-    val updatedDirection = updateDirection(direction, turn)
-    for (i <- (1 to distance).toList) yield getPosition(x, y, updatedDirection, i)
-  }
+  def getVisitedPositions(moves: List[Move]): List[Position] = {
 
-  def getVisitedPositions(startPos: Position, moves: List[Move]): List[Position] = {
-    (List(startPos) /: moves) { (posList, move) =>
-      posList ::: getVisitedPositions(posList.last, move)
+    def getPositionsVisitedDuringSingleMove(startPos: Position, move: Move): List[Position] = {
+      val (direction, (x, y)) = startPos
+      val (turn, distance) = move
+      val updatedDirection = updateDirection(direction, turn)
+      for (i <- (1 to distance).toList) yield getPosition(x, y, updatedDirection, i)
+    }
+
+    (List(startingPosition) /: moves) { (posList, move) =>
+      posList ::: getPositionsVisitedDuringSingleMove(posList.last, move)
     }.tail // drop starting position
   }
 
-  def getPosition(x: Int, y: Int, direction: Direction, distance: Int): Position =
+  private def getPosition(x: Int, y: Int, direction: Direction, distance: Int): Position =
     direction match {
       case North => (direction, (x           , y + distance))
       case South => (direction, (x           , y - distance))
@@ -77,32 +78,35 @@ object Day1 {
    }
 
   def getFinalPositionDistance(moves: String): Int = {
-    val (_, coords) = getFinalPosition(moves)
-    distanceFromStartTo(coords)
+
+    (parseMoves _
+       andThen getFinalPosition
+       andThen(_._2)
+       andThen distanceFromStartTo)(moves)
   }
 
   def getFirstRepeatCoordinates(moves: List[Move]): (Int, Int) = {
 
-    def getCoordinates(pos: Position): Coordinates = pos match { case (_, (x, y)) => (x, y) }
+    def getCoordinates(pos: Position): Coordinates = pos._2
 
-    getVisitedPositions(startingPosition, moves)
+    getVisitedPositions(moves)
       .map(getCoordinates)
       .inits
       .toList
-      .reverse
-      .filter(_.length > 1)
-      .filter { xs => xs.init.contains(xs.last) }
-      .head
-      .last
+      .reverse // order from shortest to longest
+      .drop(2) // first two have no duplicates because they have length 0 and 1
+      .filter { xs => xs.init.contains(xs.last) } // last element is the new element
+      .head // first list with repeat
+      .last // repeated element
   }
 
   def getDistanceToFirstRepeatCoordinates(moves: String): Int = {
-    val coords= getFirstRepeatCoordinates(parseMoves(moves))
-    distanceFromStartTo(coords)
+    (parseMoves _
+      andThen getFirstRepeatCoordinates
+      andThen distanceFromStartTo)(moves)
   }
 
   private def distanceFromStartTo(coordinates: Coordinates): Int =  coordinates match {
     case (x, y) => Math.abs(x) + Math.abs(y)
   }
-
 }
