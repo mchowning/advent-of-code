@@ -1,6 +1,7 @@
 import java.io.InputStream
 
 import org.scalatest.FreeSpec
+import util.PipeOps._
 
 class Day2Spec extends FreeSpec {
 
@@ -137,22 +138,23 @@ class Day2Spec extends FreeSpec {
       }
     }
     "alternative solves" - {
-      val input = Day2Alternative.getInput
+      val input = (getClass.getResourceAsStream("input_day2") |>
+                    io.Source.fromInputStream).getLines.toList
       "part 1" in {
-        val actual = Day2Alternative.followInstructions(Day2Alternative.PhoneFive)(input)
-        assert(actual == List(Day2Alternative.PhoneSix,
-                              Day2Alternative.PhoneFive,
-                              Day2Alternative.PhoneFive,
-                              Day2Alternative.PhoneFive,
-                              Day2Alternative.PhoneSix))
+        val actual = input |> Day2Alternative.parseInstructions(Day2Alternative.Phone.Five)
+        assert(actual == List(Day2Alternative.Phone.Six,
+                              Day2Alternative.Phone.Five,
+                              Day2Alternative.Phone.Five,
+                              Day2Alternative.Phone.Five,
+                              Day2Alternative.Phone.Six))
       }
       "part 2" in {
-        val actual = Day2Alternative.followInstructions(Day2Alternative.PottyFive)(input)
-        assert(actual == List(Day2Alternative.PottyC,
-                              Day2Alternative.PottyB,
-                              Day2Alternative.PottySeven,
-                              Day2Alternative.PottySeven,
-                              Day2Alternative.PottyNine))
+        val actual = input |> Day2Alternative.parseInstructions(Day2Alternative.Potty.Five)
+        assert(actual == List(Day2Alternative.Potty.C,
+                              Day2Alternative.Potty.B,
+                              Day2Alternative.Potty.Seven,
+                              Day2Alternative.Potty.Seven,
+                              Day2Alternative.Potty.Nine))
       }
     }
   }

@@ -1,9 +1,6 @@
 // Based on sleepynate's solution:
 // https://github.com/sleepynate/adventofcode/blob/master/src/main/scala/com/sleepynate/adventofcode/Day2.scala
 
-import scala.io.Source
-import util.PipeOps._
-
 object Day2Alternative {
 
   trait Key {
@@ -12,121 +9,126 @@ object Day2Alternative {
     def down:Key = this
     def left:Key = this
   }
-  case object PhoneOne extends Key {
-    override def right = PhoneTwo
-    override def down = PhoneFour
-  }
-  case object PhoneTwo extends Key {
-    override def right = PhoneThree
-    override def down = PhoneFive
-    override def left = PhoneOne
-  }
-  case object PhoneThree extends Key {
-    override def down = PhoneSix
-    override def left = PhoneTwo
-  }
-  case object PhoneFour extends Key {
-    override def up = PhoneOne
-    override def right = PhoneFive
-    override def down = PhoneSeven
-  }
-  case object PhoneFive extends Key {
-    override def up = PhoneTwo
-    override def right = PhoneSix
-    override def down = PhoneEight
-    override def left = PhoneFour
-  }
-  case object PhoneSix extends Key {
-    override def up = PhoneThree
-    override def down = PhoneNine
-    override def left = PhoneFive
-  }
-  case object PhoneSeven extends Key {
-    override def up = PhoneFour
-    override def right = PhoneEight
-  }
-  case object PhoneEight extends Key {
-    override def up = PhoneFive
-    override def right = PhoneNine
-    override def left = PhoneSeven
-  }
-  case object PhoneNine extends Key {
-    override def up = PhoneSix
-    override def left = PhoneEight
-  }
-  case object PottyOne extends Key {
-    override def down: Key = PottyThree
-  }
-  case object PottyTwo extends Key {
-    override def right: Key = PottyThree
-    override def down: Key = PottySix
-  }
-  case object PottyThree extends Key {
-    override def up: Key = PottyOne
-    override def right: Key = PottyFour
-    override def down: Key = PottySeven
-    override def left: Key = PottyTwo
-  }
-  case object PottyFour extends Key {
-    override def down: Key = PottyEight
-    override def left: Key = PottyThree
-  }
-  case object PottyFive extends Key {
-    override def right: Key = PottySix
-  }
-  case object PottySix extends Key {
-    override def up: Key = PottyTwo
-    override def right: Key = PottySeven
-    override def down: Key = PottyA
-    override def left: Key = PottyFive
-  }
-  case object PottySeven extends Key {
-    override def up: Key = PottyThree
-    override def right: Key = PottyEight
-    override def down: Key = PottyB
-    override def left: Key = PottySix
-  }
-  case object PottyEight extends Key {
-    override def up: Key = PottyFour
-    override def right: Key = PottyNine
-    override def down: Key = PottyC
-    override def left: Key = PottySeven
-  }
-  case object PottyNine extends Key {
-    override def left: Key = PottyEight
-  }
-  case object PottyA extends Key {
-    override def up: Key = PottySix
-    override def right: Key = PottyB
-  }
-  case object PottyB extends Key {
-    override def up: Key = PottySeven
-    override def right: Key = PottyC
-    override def down: Key = PottyD
-    override def left: Key = PottyA
-  }
-  case object PottyC extends Key {
-    override def up: Key = PottyEight
-    override def left: Key = PottyB
-  }
-  case object PottyD extends Key {
-    override def up: Key = PottyB
-  }
 
-  def getInput:List[String] = (getClass.getResourceAsStream("input_day2") |>
-                               Source.fromInputStream).getLines.toList
-
-  def followInstructions(start: Key)(input: List[String]) =
-    input.scanLeft(start) { case (k, s) => followInstructionsLine(k, s) }.tail
-
-  def followInstructionsLine(starting: Key, instructions: String) = {
-    instructions.foldLeft(starting) { (k: Key, c: Char) =>
-      c match {
-        case 'U' => k.up
-        case 'R' => k.right
-        case 'D' => k.down
-        case 'L' => k.left
-      }
+  case object Phone {
+    case object One extends Key {
+      override def right = Two
+      override def down = Four
     }
+    case object Two extends Key {
+      override def right = Three
+      override def down = Five
+      override def left = One
+    }
+    case object Three extends Key {
+      override def down = Six
+      override def left = Two
+    }
+    case object Four extends Key {
+      override def up = One
+      override def right = Five
+      override def down = Seven
+    }
+    case object Five extends Key {
+      override def up = Two
+      override def right = Six
+      override def down = Eight
+      override def left = Four
+    }
+    case object Six extends Key {
+      override def up = Three
+      override def down = Nine
+      override def left = Five
+    }
+    case object Seven extends Key {
+      override def up = Four
+      override def right = Eight
+    }
+    case object Eight extends Key {
+      override def up = Five
+      override def right = Nine
+      override def left = Seven
+    }
+    case object Nine extends Key {
+      override def up = Six
+      override def left = Eight
+    }
+  }
+
+  case object Potty {
+    case object One extends Key {
+      override def down: Key = Three
+    }
+    case object Two extends Key {
+      override def right: Key = Three
+      override def down: Key = Six
+    }
+    case object Three extends Key {
+      override def up: Key = One
+      override def right: Key = Four
+      override def down: Key = Seven
+      override def left: Key = Two
+    }
+    case object Four extends Key {
+      override def down: Key = Eight
+      override def left: Key = Three
+    }
+    case object Five extends Key {
+      override def right: Key = Six
+    }
+    case object Six extends Key {
+      override def up: Key = Two
+      override def right: Key = Seven
+      override def down: Key = A
+      override def left: Key = Five
+    }
+    case object Seven extends Key {
+      override def up: Key = Three
+      override def right: Key = Eight
+      override def down: Key = B
+      override def left: Key = Six
+    }
+    case object Eight extends Key {
+      override def up: Key = Four
+      override def right: Key = Nine
+      override def down: Key = C
+      override def left: Key = Seven
+    }
+    case object Nine extends Key {
+      override def left: Key = Eight
+    }
+    case object A extends Key {
+      override def up: Key = Six
+      override def right: Key = B
+    }
+    case object B extends Key {
+      override def up: Key = Seven
+      override def right: Key = C
+      override def down: Key = D
+      override def left: Key = A
+    }
+    case object C extends Key {
+      override def up: Key = Eight
+      override def left: Key = B
+    }
+    case object D extends Key {
+      override def up: Key = B
+    }
+  }
+
+  def parseInstructions(start: Key)(listOfInstructionLines: List[String]) = {
+
+    def keyMove(key: Key, c: Char) = c match {
+      case 'U' => key.up
+      case 'R' => key.right
+      case 'D' => key.down
+      case 'L' => key.left
+    }
+
+    def followLineOfInstructions(starting: Key, singleLineOfInstructions: String) =
+      singleLineOfInstructions.foldLeft(starting)(keyMove)
+
+    listOfInstructionLines.scanLeft(start)(followLineOfInstructions)
+                          .tail // drop starting key
   }
 }
