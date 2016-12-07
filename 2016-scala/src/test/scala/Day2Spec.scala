@@ -1,3 +1,5 @@
+import java.io.InputStream
+
 import org.scalatest.FreeSpec
 
 class Day2Spec extends FreeSpec {
@@ -53,6 +55,12 @@ class Day2Spec extends FreeSpec {
       "gets multiple digits" in {
         assert(Day2.getDigits(seriesOfMoves) == 1985)
       }
+    }
+    "solves part 1" in {
+      val stream: InputStream = getClass.getResourceAsStream("input_day2")
+      val input = io.Source.fromInputStream(stream).mkString
+      val inputList = input.lines.toList
+      assert(Day2.getDigits(inputList) == 65556)
     }
   }
 }
