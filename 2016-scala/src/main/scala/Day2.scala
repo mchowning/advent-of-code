@@ -22,8 +22,8 @@ object Day2 {
   type Coordinate = (Int, Int)
 
   def moveToCoordinate(coordinate: Coordinate,
-                            direction: Char,
-                            isValidCoord: Coordinate => Boolean): Coordinate = {
+                       direction: Char,
+                       isValidCoord: Coordinate => Boolean): Coordinate = {
 
     val (x,y) = coordinate
     val newCoordinate = direction match {
@@ -37,6 +37,9 @@ object Day2 {
 
   def moveToPart1Coordinate(coordinate: Coordinate, direction: Char): Coordinate =
     moveToCoordinate(coordinate, direction, validCoordPart1)
+
+  def moveToPart2Coordinate(coordinate: Coordinate, direction: Char): Coordinate =
+    moveToCoordinate(coordinate, direction, validCoordPart2)
 
   private def validCoordPart1(coordinate: Coordinate): Boolean = coordinate match {
     case (x,y) => x >= 0 &&
@@ -58,15 +61,26 @@ object Day2 {
     (coordinate /: directions) { (coord, d) => moveToPart1Coordinate(coord, d) }
   }
 
+  def moveToPart2Coordinate(coordinate: Coordinate, directions: String): Coordinate = {
+    (coordinate /: directions) { (coord, d) => moveToPart2Coordinate(coord, d) } // TODO duplication
+  }
+
   def getPart1Digit(coordinate: Coordinate): Int = {
     val (x,y) = coordinate
     (y * 3) + x + 1
   }
 
-  def getPart1Coordinates(moves: List[String]): List[Coordinate] = {
-    moves.scanLeft((1,1))(moveToPart1Coordinate)
+  private def getCoordinates(moves: List[String],
+                             mover: (Coordinate, String) => Coordinate,
+                             startCoordinate: Coordinate): List[Coordinate] =
+    moves.scanLeft(startCoordinate)(mover)
          .tail
-  }
+
+  def getPart1Coordinates(moves: List[String]): List[Coordinate] =
+    getCoordinates(moves, moveToPart1Coordinate, (1,1))
+
+  def getPart2Coordinates(moves: List[String]): List[Coordinate] =
+    getCoordinates(moves, moveToPart2Coordinate, (0,2))
 
   def getPart1Digits(moves: List[String]): String = {
     getPart1Coordinates(moves)
@@ -74,7 +88,25 @@ object Day2 {
     .mkString
   }
 
+  def getPart2Key(coordinate: Coordinate): Char = coordinate match {
+    case (2,0) => '1'
+    case (1,1) => '2'
+    case (2,1) => '3'
+    case (3,1) => '4'
+    case (0,2) => '5'
+    case (1,2) => '6'
+    case (2,2) => '7'
+    case (3,2) => '8'
+    case (4,2) => '9'
+    case (1,3) => 'A'
+    case (2,3) => 'B'
+    case (3,3) => 'C'
+    case (2,4) => 'D'
+  }
+
   def getPart2Keys(moves: List[String]): String = {
-    ""
+    getPart2Coordinates(moves)
+      .map(getPart2Key)
+      .mkString
   }
 }

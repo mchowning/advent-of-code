@@ -95,9 +95,9 @@ class Day2Spec extends FreeSpec {
       "gets multiple digits" in {
         assert(Day2.getPart1Digits(seriesOfMoves) == "1985")
       }
-//      "handles part 2 keyboard layout" in {
-//        assert(Day2.getPart2Keys(seriesOfMoves) == "5DB3")
-//      }
+      "handles part 2 keyboard layout" in {
+        assert(Day2.getPart2Keys(seriesOfMoves) == "5DB3")
+      }
     }
     "solves part 1" in {
       val stream: InputStream = getClass.getResourceAsStream("input_day2")
