@@ -1,3 +1,5 @@
+import java.io.InputStream
+
 import org.scalatest.{FreeSpec, Matchers}
 
 class Day3Spec extends FreeSpec with Matchers {
@@ -16,8 +18,14 @@ class Day3Spec extends FreeSpec with Matchers {
       Day3.parseTriangle("  810  679   10   ") shouldBe (810, 679, 10)
     }
     "counts number valid" in {
-      val list = List((1,1,1), (2,2,3), (3,1,5), (1,3,5), (3,5,1))
+      val list = List("  1 1 1  ", "  2 2 3", "3 1 5  ", "1 3 5", "3 5 1")
       Day3.numValid(list) shouldBe 2
+    }
+    "solves part 1" in {
+      val stream: InputStream = getClass.getResourceAsStream("input_day3.txt")
+      val input = io.Source.fromInputStream(stream).mkString
+      val inputList = input.lines.toList
+      Day3.numValid(inputList) shouldBe 869
     }
   }
 }
