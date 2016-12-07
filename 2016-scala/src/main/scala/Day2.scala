@@ -40,4 +40,11 @@ object Day2 {
     moves.scanLeft((1,1))(moveToCoordinate)
          .tail
   }
+
+  def getDigits(moves: List[String]): Int = {
+    getCoordinates(moves)
+      .map(getDigit)
+      .mkString
+      .toInt
+  }
 }

@@ -42,17 +42,17 @@ class Day2Spec extends FreeSpec {
       assert(Day2.getDigit((1,2)) == 8)
       assert(Day2.getDigit((2,2)) == 9)
     }
-    "gets multiple digits from series of moves" in {
-      val actual: List[(Int, Int)] = Day2.getCoordinates(List("ULL",
-                                                              "RRDDD",
-                                                              "LURDL",
-                                                              "UUUUD"))
-      val expected = List((0, 0),
-                          (2, 2),
-                          (1, 2),
-                          (1, 1))
-      assert(actual == expected)
+    "from a series of moves" - {
+      val seriesOfMoves = List("ULL", "RRDDD", "LURDL", "UUUUD")
+      "gets multiple coordinates" in {
+        assert(Day2.getCoordinates(seriesOfMoves) == List((0, 0),
+                                                          (2, 2),
+                                                          (1, 2),
+                                                          (1, 1)))
+      }
+      "gets multiple digits" in {
+        assert(Day2.getDigits(seriesOfMoves) == 1985)
+      }
     }
-
   }
 }
