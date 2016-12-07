@@ -99,11 +99,16 @@ class Day2Spec extends FreeSpec {
         assert(Day2.getPart2Keys(seriesOfMoves) == "5DB3")
       }
     }
-    "solves part 1" in {
+    "solves" - {
       val stream: InputStream = getClass.getResourceAsStream("input_day2")
       val input = io.Source.fromInputStream(stream).mkString
       val inputList = input.lines.toList
-      assert(Day2.getPart1Digits(inputList) == "65556")
+      "part 1" in {
+        assert(Day2.getPart1Digits(inputList) == "65556")
+      }
+      "part 2" in {
+        assert(Day2.getPart2Keys(inputList) == "CB779")
+      }
     }
   }
 }
