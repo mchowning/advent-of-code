@@ -1,4 +1,4 @@
-import org.scalatest.{Matchers, FreeSpec}
+import org.scalatest.{FreeSpec, Matchers}
 
 class Day3Spec extends FreeSpec with Matchers {
 
@@ -14,6 +14,10 @@ class Day3Spec extends FreeSpec with Matchers {
     }
     "parses line of input" in {
       Day3.parseTriangle("  810  679   10   ") shouldBe (810, 679, 10)
+    }
+    "counts number valid" in {
+      val list = List((1,1,1), (2,2,3), (3,1,5), (1,3,5), (3,5,1))
+      Day3.numValid(list) shouldBe 2
     }
   }
 }

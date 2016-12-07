@@ -15,4 +15,6 @@ object Day3 {
                 .map(_.toInt)
     (array(0), array(1), array(2))
   }
+
+  def numValid(triangles: List[Triangle]): Int = triangles.count(isValidTriangle)
 }
