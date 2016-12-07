@@ -21,14 +21,9 @@ object Day2 {
 
   type Coordinate = (Int, Int)
 
-  def moveToPart1Coordinate(coordinate: Coordinate, direction: Char): Coordinate = {
-
-    def validCoord(coordinate: Coordinate): Boolean = coordinate match {
-      case (x,y) => x >= 0 &&
-                      y >= 0 &&
-                      x < part1KeypadSize &&
-                      y < part1KeypadSize
-    }
+  def moveToCoordinate(coordinate: Coordinate,
+                            direction: Char,
+                            isValidCoord: Coordinate => Boolean): Coordinate = {
 
     val (x,y) = coordinate
     val newCoordinate = direction match {
@@ -37,7 +32,26 @@ object Day2 {
       case 'D' => (x              , y + 1)
       case 'L' => (x - 1, y              )
     }
-    if (validCoord(newCoordinate)) newCoordinate else coordinate
+    if (isValidCoord(newCoordinate)) newCoordinate else coordinate
+  }
+
+  def moveToPart1Coordinate(coordinate: Coordinate, direction: Char): Coordinate =
+    moveToCoordinate(coordinate, direction, validCoordPart1)
+
+  private def validCoordPart1(coordinate: Coordinate): Boolean = coordinate match {
+    case (x,y) => x >= 0 &&
+                  y >= 0 &&
+                  x < part1KeypadSize &&
+                  y < part1KeypadSize
+  }
+
+  def validCoordPart2(coordinate: Coordinate): Boolean = coordinate match {
+    case (x,0) => x == 2
+    case (x,1) => x > 0 && x < 4
+    case (x,2) => x >= 0 && x <= 4
+    case (x,3) => x > 0 && x < 4
+    case (x,4) => x == 2
+    case _     => false
   }
 
   def moveToPart1Coordinate(coordinate: Coordinate, directions: String): Coordinate = {
@@ -54,9 +68,13 @@ object Day2 {
          .tail
   }
 
-  def getDigits(moves: List[String]): String = {
+  def getPart1Digits(moves: List[String]): String = {
     getPart1Coordinates(moves)
     .map(getPart1Digit)
     .mkString
+  }
+
+  def getPart2Keys(moves: List[String]): String = {
+    ""
   }
 }

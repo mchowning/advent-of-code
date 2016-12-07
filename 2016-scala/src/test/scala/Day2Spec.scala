@@ -44,6 +44,46 @@ class Day2Spec extends FreeSpec {
       assert(Day2.getPart1Digit((1,2)) == 8)
       assert(Day2.getPart1Digit((2,2)) == 9)
     }
+    "determines valid coordinates for part 2" in {
+
+      assert(!Day2.validCoordPart2((0,0)))
+      assert(!Day2.validCoordPart2((1,0)))
+      assert(Day2.validCoordPart2((2,0)))
+      assert(!Day2.validCoordPart2((3,0)))
+      assert(!Day2.validCoordPart2((4,0)))
+      assert(!Day2.validCoordPart2((2,-1)))
+
+      assert(!Day2.validCoordPart2((-1,1)))
+      assert(!Day2.validCoordPart2((0,1)))
+      assert(Day2.validCoordPart2((1,1)))
+      assert(Day2.validCoordPart2((2,1)))
+      assert(Day2.validCoordPart2((3,1)))
+      assert(!Day2.validCoordPart2(4,1))
+      assert(!Day2.validCoordPart2(5,1))
+
+      assert(!Day2.validCoordPart2((2,-1)))
+      assert(Day2.validCoordPart2((2,0)))
+      assert(Day2.validCoordPart2((2,1)))
+      assert(Day2.validCoordPart2((2,2)))
+      assert(Day2.validCoordPart2((2,3)))
+      assert(Day2.validCoordPart2((2,4)))
+      assert(!Day2.validCoordPart2((2,5)))
+
+      assert(!Day2.validCoordPart2((3,-1)))
+      assert(!Day2.validCoordPart2((3,0)))
+      assert(Day2.validCoordPart2((3,1)))
+      assert(Day2.validCoordPart2((3,2)))
+      assert(Day2.validCoordPart2((3,3)))
+      assert(!Day2.validCoordPart2((3,4)))
+      assert(!Day2.validCoordPart2((3,5)))
+
+      assert(!Day2.validCoordPart2((4,0)))
+      assert(!Day2.validCoordPart2((4,1)))
+      assert(Day2.validCoordPart2((4,2)))
+      assert(!Day2.validCoordPart2((4,3)))
+      assert(!Day2.validCoordPart2((4,4)))
+      assert(!Day2.validCoordPart2((5,2)))
+    }
     "from a series of moves" - {
       val seriesOfMoves = List("ULL", "RRDDD", "LURDL", "UUUUD")
       "gets multiple coordinates" in {
@@ -53,14 +93,17 @@ class Day2Spec extends FreeSpec {
                                                                (1, 1)))
       }
       "gets multiple digits" in {
-        assert(Day2.getDigits(seriesOfMoves) == "1985")
+        assert(Day2.getPart1Digits(seriesOfMoves) == "1985")
       }
+//      "handles part 2 keyboard layout" in {
+//        assert(Day2.getPart2Keys(seriesOfMoves) == "5DB3")
+//      }
     }
     "solves part 1" in {
       val stream: InputStream = getClass.getResourceAsStream("input_day2")
       val input = io.Source.fromInputStream(stream).mkString
       val inputList = input.lines.toList
-      assert(Day2.getDigits(inputList) == "65556")
+      assert(Day2.getPart1Digits(inputList) == "65556")
     }
   }
 }
