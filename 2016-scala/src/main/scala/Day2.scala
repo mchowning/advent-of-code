@@ -24,4 +24,9 @@ object Day2 {
   def move(coordinate: Coordinate, directions: String): Coordinate = {
     (coordinate /: directions) { (coord, d) => move(coord, d) }
   }
+
+  def getDigit(coordinate: Coordinate): Int = {
+    val (x,y) = coordinate
+    ((2-y) * 3) + x + 1
+  }
 }

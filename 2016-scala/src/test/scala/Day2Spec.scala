@@ -31,5 +31,16 @@ class Day2Spec extends FreeSpec {
       assert(Day2.move((2,0), "LURDL") == (1,0))
       assert(Day2.move((1,0), "UUUUD") == (1,1))
     }
+    "converts position to digit" in {
+      assert(Day2.getDigit((0,0)) == 7)
+      assert(Day2.getDigit((1,0)) == 8)
+      assert(Day2.getDigit((2,0)) == 9)
+      assert(Day2.getDigit((0,1)) == 4)
+      assert(Day2.getDigit((1,1)) == 5)
+      assert(Day2.getDigit((2,1)) == 6)
+      assert(Day2.getDigit((0,2)) == 1)
+      assert(Day2.getDigit((1,2)) == 2)
+      assert(Day2.getDigit((2,2)) == 3)
+    }
   }
 }
