@@ -25,5 +25,11 @@ class Day2Spec extends FreeSpec {
       assert(Day2.move((2,2), 'U') == (2,2))
       assert(Day2.move((2,2), 'R') == (2,2))
     }
+    "handles multiple moves" in {
+      assert(Day2.move((1,1), "ULL") == (0,2))
+      assert(Day2.move((0,2), "RRDDD") == (2,0))
+      assert(Day2.move((2,0), "LURDL") == (1,0))
+      assert(Day2.move((1,0), "UUUUD") == (1,1))
+    }
   }
 }
