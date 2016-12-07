@@ -1,3 +1,5 @@
+import util.PipeOps._
+
 object Day1 {
 
   sealed trait Turn
@@ -78,15 +80,15 @@ object Day1 {
    }
 
   def getFinalPositionDistance(moves: String): Int = {
-
-    (parseMoves _
-       andThen getFinalPosition
-       andThen(_._2)
-       andThen distanceFromStartTo)(moves)
+    def getCoordinates(position:Position): Coordinates = position._2
+    moves |>
+      parseMoves |>
+      getFinalPosition |>
+      getCoordinates |>
+      distanceFromStartTo
   }
 
-  def getFirstRepeatCoordinates(moves: List[Move]): (Int, Int) = {
-
+  def getFirstRepeatCoordinates(moves: List[Move]): Coordinates = {
     def getCoordinates(pos: Position): Coordinates = pos._2
 
     getVisitedPositions(moves)
@@ -101,12 +103,13 @@ object Day1 {
   }
 
   def getDistanceToFirstRepeatCoordinates(moves: String): Int = {
-    (parseMoves _
-      andThen getFirstRepeatCoordinates
-      andThen distanceFromStartTo)(moves)
+    moves |>
+      parseMoves |>
+      getFirstRepeatCoordinates |>
+      distanceFromStartTo
   }
 
-  private def distanceFromStartTo(coordinates: Coordinates): Int =  coordinates match {
+  private def distanceFromStartTo(coordinates: Coordinates): Int = coordinates match {
     case (x, y) => Math.abs(x) + Math.abs(y)
   }
 }
