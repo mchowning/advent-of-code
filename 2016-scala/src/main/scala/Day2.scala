@@ -13,7 +13,7 @@ object Day2 {
 
   type Coordinate = (Int, Int)
 
-  def move(coordinate: Coordinate, direction: Char): Coordinate = {
+  def moveToCoordinate(coordinate: Coordinate, direction: Char): Coordinate = {
 
     def maxLimit(i: Int): Int = Math.min(i, keypadSize - 1)
     def minLimit(i: Int): Int = Math.max(i, 0)
@@ -27,12 +27,17 @@ object Day2 {
     }
   }
 
-  def move(coordinate: Coordinate, directions: String): Coordinate = {
-    (coordinate /: directions) { (coord, d) => move(coord, d) }
+  def moveToCoordinate(coordinate: Coordinate, directions: String): Coordinate = {
+    (coordinate /: directions) { (coord, d) => moveToCoordinate(coord, d) }
   }
 
   def getDigit(coordinate: Coordinate): Int = {
     val (x,y) = coordinate
     (y * 3) + x + 1
+  }
+
+  def getCoordinates(moves: List[String]): List[Coordinate] = {
+    moves.scanLeft((1,1))(moveToCoordinate)
+         .tail
   }
 }
