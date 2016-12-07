@@ -1,3 +1,4 @@
+import util.PipeOps._
 
 object Day3 {
 
@@ -9,13 +10,33 @@ object Day3 {
                     b + c > a
   }
 
-  def parseTriangle(s: String): Triangle = {
-    val array = s.split(' ')
-                .filter(!_.isEmpty)
-                .map(_.toInt)
-    (array(0), array(1), array(2))
+  def parseLine(s: String): List[Int] = s.split(' ')
+                                          .filter(!_.isEmpty)
+                                          .map(_.toInt)
+                                          .toList
+
+  def parseTriangleFromList(array: List[Int]): Triangle = array match { case List(a,b,c) => (a,b,c) }
+
+  def parseTriangleFromLine(s: String): Triangle = {
+    s |> parseLine |> parseTriangleFromList
   }
 
-  def numValid(lines: List[String]): Int = lines.map(parseTriangle)
-                                                .count(isValidTriangle)
+  def parseTrianglesInColumns(lines: List[String]): List[Triangle] = {
+    lines.map(parseLine)
+     .grouped(3)
+     .flatMap(_.transpose)
+     .map(parseTriangleFromList)
+     .toList
+  }
+
+
+  def numValidPart1(lines: List[String]): Int = {
+    lines.map(parseTriangleFromLine)
+      .count(isValidTriangle)
+  }
+
+  def numValidPart2(lines: List[String]): Int = {
+    parseTrianglesInColumns(lines)
+      .count(isValidTriangle)
+  }
 }

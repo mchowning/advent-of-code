@@ -1,7 +1,5 @@
-import java.io.InputStream
-
 import Day1._
-import org.scalatest.{Matchers, FreeSpec}
+import org.scalatest.{FreeSpec, Matchers}
 
 class Day1Spec extends FreeSpec with Matchers {
 
@@ -50,11 +48,6 @@ class Day1Spec extends FreeSpec with Matchers {
       Day1.getFinalPositionDistance("R2, R2, R2") shouldBe 2
       Day1.getFinalPositionDistance("R5, L5, R5, R3") shouldBe 12
     }
-    "can solve part 1 of the problem" in {
-      val stream: InputStream = getClass.getResourceAsStream("input_day1.txt")
-      val input = io.Source.fromInputStream(stream).mkString
-      Day1.getFinalPositionDistance(input) shouldBe 307
-    }
     "with a starting position determine all positions visited during a series of moves" in {
        Day1.getVisitedPositions(Day1.parseMoves("R2, L1")) shouldBe  List((East, (1, 0)),
                                                                           (East, (2, 0)),
@@ -71,10 +64,14 @@ class Day1Spec extends FreeSpec with Matchers {
       val distanceToFirstRepeatPosition = Day1.getDistanceToFirstRepeatCoordinates("R8, R4, R4, R8")
       distanceToFirstRepeatPosition shouldBe 4
     }
-    "can solve part 2" in {
-      val stream: InputStream = getClass.getResourceAsStream("input_day1.txt")
-      val input = io.Source.fromInputStream(stream).mkString
-      getDistanceToFirstRepeatCoordinates(input) shouldBe 165
+    "can solve part" - {
+      val input = TestUtils.getString("input_day1.txt")
+      "in part 1" in {
+        Day1.getFinalPositionDistance(input) shouldBe 307
+      }
+      "in part 2" in {
+        Day1.getDistanceToFirstRepeatCoordinates(input) shouldBe 165
+      }
     }
   }
 }

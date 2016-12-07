@@ -1,6 +1,4 @@
-import java.io.InputStream
-
-import org.scalatest.{Matchers, FreeSpec}
+import org.scalatest.{FreeSpec, Matchers}
 import util.PipeOps._
 
 class Day2Spec extends FreeSpec with Matchers {
@@ -126,35 +124,35 @@ class Day2Spec extends FreeSpec with Matchers {
       }
     }
 
-    "solves" - {
-      val stream: InputStream = getClass.getResourceAsStream("input_day2.txt")
-      val input = io.Source.fromInputStream(stream).mkString
-      val inputList = input.lines.toList
-      "part 1" in {
-        Day2.getPart1Digits(inputList) shouldBe "65556"
+    "using test input" - {
+      val input = TestUtils.getLines("input_day2.txt")
+      "original implementation can solve" - {
+        "part 1" in {
+          Day2.getPart1Digits(input) shouldBe "65556"
+        }
+        "part 2" in {
+          Day2.getPart2Keys(input) shouldBe "CB779"
+        }
       }
-      "part 2" in {
-        Day2.getPart2Keys(inputList) shouldBe "CB779"
-      }
-    }
-    "alternative solves" - {
-      val input = (getClass.getResourceAsStream("input_day2.txt") |>
-                    io.Source.fromInputStream).getLines.toList
-      "part 1" in {
-        val actual = input |> Day2Alternative.parseInstructions(Day2Alternative.Phone.Five)
-        actual shouldBe List(Day2Alternative.Phone.Six,
-                             Day2Alternative.Phone.Five,
-                             Day2Alternative.Phone.Five,
-                             Day2Alternative.Phone.Five,
-                             Day2Alternative.Phone.Six)
-      }
-      "part 2" in {
-        val actual = input |> Day2Alternative.parseInstructions(Day2Alternative.Potty.Five)
-        actual shouldBe List(Day2Alternative.Potty.C,
-                             Day2Alternative.Potty.B,
-                             Day2Alternative.Potty.Seven,
-                             Day2Alternative.Potty.Seven,
-                             Day2Alternative.Potty.Nine)
+
+      "alternative implementation can solve" - {
+        val input = TestUtils.getLines("input_day2.txt")
+        "part 1" in {
+          val actual = input |> Day2Alternative.parseInstructions(Day2Alternative.Phone.Five)
+          actual shouldBe List(Day2Alternative.Phone.Six,
+                               Day2Alternative.Phone.Five,
+                               Day2Alternative.Phone.Five,
+                               Day2Alternative.Phone.Five,
+                               Day2Alternative.Phone.Six)
+        }
+        "part 2" in {
+          val actual = input |> Day2Alternative.parseInstructions(Day2Alternative.Potty.Five)
+          actual shouldBe List(Day2Alternative.Potty.C,
+                               Day2Alternative.Potty.B,
+                               Day2Alternative.Potty.Seven,
+                               Day2Alternative.Potty.Seven,
+                               Day2Alternative.Potty.Nine)
+        }
       }
     }
   }
