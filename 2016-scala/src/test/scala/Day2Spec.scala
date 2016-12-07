@@ -136,5 +136,24 @@ class Day2Spec extends FreeSpec {
         assert(Day2.getPart2Keys(inputList) == "CB779")
       }
     }
+    "alternative solves" - {
+      val input = Day2Alternative.getInput
+      "part 1" in {
+        val actual = Day2Alternative.followInstructions(Day2Alternative.PhoneFive)(input)
+        assert(actual == List(Day2Alternative.PhoneSix,
+                              Day2Alternative.PhoneFive,
+                              Day2Alternative.PhoneFive,
+                              Day2Alternative.PhoneFive,
+                              Day2Alternative.PhoneSix))
+      }
+      "part 2" in {
+        val actual = Day2Alternative.followInstructions(Day2Alternative.PottyFive)(input)
+        assert(actual == List(Day2Alternative.PottyC,
+                              Day2Alternative.PottyB,
+                              Day2Alternative.PottySeven,
+                              Day2Alternative.PottySeven,
+                              Day2Alternative.PottyNine))
+      }
+    }
   }
 }
