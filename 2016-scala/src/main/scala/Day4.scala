@@ -4,7 +4,7 @@ case class Room(encryptedName: String, sectorId: Int, checksum: String)
 
 object RoomParser extends RegexParsers {
 
-  def name: Parser[String] = """[a-z\-]+""".r ^^ { _.toString.replace("-", "") }
+  def name: Parser[String] = """[a-z\-]+""".r ^^ { _.toString.init }
   def number: Parser[Int] = """[0-9]*""".r ^^ {_.toInt }
   def checksum: Parser[String] = "[" ~> """\w*""".r <~ "]" ^^ { _.toString }
 
@@ -24,6 +24,7 @@ object Day4 extends RegexParsers {
     val fullChecksum = room.encryptedName
                                .groupBy(identity)
                                .values
+                               .filter(_.head != '-')
                                .toList
                                .groupBy(_.length)
                                .toSeq
