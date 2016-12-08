@@ -9,44 +9,49 @@ case class Room(encryptedName: String, sectorId: Int, checksum: String) {
   }
 }
 
-
 object RoomParser extends RegexParsers {
 
-  def name: Parser[String] = """[a-z\-]+""".r ^^ { _.toString.init }
-  def number: Parser[Int] = """[0-9]*""".r ^^ {_.toInt }
-  def checksum: Parser[String] = "[" ~> """\w*""".r <~ "]" ^^ { _.toString }
+  private def name: Parser[String] = """[a-z\-]+""".r ^^ { _.toString.init }
+  private def number: Parser[Int] = """[0-9]*""".r ^^ {_.toInt }
+  private def checksum: Parser[String] = "[" ~> """\w*""".r <~ "]" ^^ { _.toString }
 
-  def full: Parser[Room] = name ~ number ~ checksum ^^ {
+  private def full: Parser[Room] = name ~ number ~ checksum ^^ {
     case name ~ number ~ checksum => new Room(name, number, checksum)
   }
+
+  def parseString(s: String): Room = parse(full, s).get
 }
 
-object Day4 extends RegexParsers {
-
-  def parseRoom(s: String): Room = {
-    RoomParser.parse(RoomParser.full, s).get
-  }
+object Day4 {
 
   def getExpectedChecksum(room: Room): String = {
 
-    val fullChecksum = room.encryptedName
-                               .groupBy(identity)
-                               .values
-                               .filter(_.head != '-')
-                               .toList
-                               .groupBy(_.length)
-                               .toSeq
-                               .sortBy(_._1)
-                               .reverse
-                               .flatMap(_._2.sorted.map(_.head))
-                               .mkString
+    def characterFrequencies(s: String): Map[Int, Set[Char]] =
+     s.groupBy(identity)
+       .mapValues(_.length)
+       .groupBy(_._2)
+       .mapValues(_.keySet)
 
-    fullChecksum.substring(0, Math.min(fullChecksum.length, 5))
+    def limitToChecksumLength(fullChecksum: String): String = {
+      val maxChecksumLength = 5
+      fullChecksum.substring(0, Math.min(fullChecksum.length,
+                                         maxChecksumLength))
+    }
+
+    val charactersSortedByFrequencyThenLetter = characterFrequencies(room.encryptedName)
+                                                 .toSeq
+                                                 .sortBy(_._1)
+                                                 .reverse
+                                                 .flatMap(_._2.toSeq.sorted)
+                                                 .filter(_ != '-')
+                                                 .mkString
+
+    limitToChecksumLength(charactersSortedByFrequencyThenLetter)
   }
 
   def hasValidChecksum(room: Room): Boolean = room.checksum == getExpectedChecksum(room)
 
-  def getRoomsWithValidChecksums(strings: List[String]): List[Room] = strings.map(parseRoom)
+  def getRoomsWithValidChecksums(strings: List[String]): List[Room] = strings.map(RoomParser.parseString)
                                                                         .filter(hasValidChecksum)
 
   def shiftLetter(num: Int)(c: Char): Char = {
