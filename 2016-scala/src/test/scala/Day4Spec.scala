@@ -1,3 +1,4 @@
+import util.PipeOps._
 import org.scalatest.{FreeSpec, Matchers}
 
 class Day4Spec extends FreeSpec with Matchers {
@@ -28,11 +29,8 @@ class Day4Spec extends FreeSpec with Matchers {
       Day4.hasValidChecksum(Day4.parseRoom("a-b-c-d-e-f-g-h-987[abcdef]")) shouldBe false
     }
     "solves part 1" in {
-      val expected = TestUtils.getLines("input_day4.txt")
-                       .map(Day4.parseRoom)
-                       .filter(Day4.hasValidChecksum)
-                       .map(_.sectorId)
-                       .sum
+      val rooms = TestUtils.getLines("input_day4.txt") |> Day4.getRoomsWithValidChecksums
+      val expected = rooms.map(_.sectorId).sum
       expected shouldBe 361724
     }
   }

@@ -37,4 +37,7 @@ object Day4 extends RegexParsers {
   }
 
   def hasValidChecksum(room: Room): Boolean = room.checksum == getExpectedChecksum(room)
+
+  def getRoomsWithValidChecksums(strings: List[String]): List[Room] = strings.map(parseRoom)
+                                                                        .filter(hasValidChecksum)
 }
