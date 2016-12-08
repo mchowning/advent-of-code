@@ -34,4 +34,6 @@ object Day4 extends RegexParsers {
 
     fullChecksum.substring(0, Math.min(fullChecksum.length, 5))
   }
+
+  def hasValidChecksum(room: Room): Boolean = room.checksum == getExpectedChecksum(room)
 }
