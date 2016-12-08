@@ -40,4 +40,10 @@ object Day4 extends RegexParsers {
 
   def getRoomsWithValidChecksums(strings: List[String]): List[Room] = strings.map(parseRoom)
                                                                         .filter(hasValidChecksum)
+
+  def shiftLetter(num: Int)(c: Char): Char = {
+    if (c == '-') ' ' else {
+      ((c - 'a' + num) % 26 + 'a').toChar
+    }
+  }
 }

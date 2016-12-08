@@ -33,5 +33,15 @@ class Day4Spec extends FreeSpec with Matchers {
       val expected = rooms.map(_.sectorId).sum
       expected shouldBe 361724
     }
+    "shifts letter" in {
+      Day4.shiftLetter(0)('a')   shouldBe 'a'
+      Day4.shiftLetter(1)('a')   shouldBe 'b'
+      Day4.shiftLetter(2)('a')   shouldBe 'c'
+      Day4.shiftLetter(26)('a')  shouldBe 'a'
+      Day4.shiftLetter(27)('a')  shouldBe 'b'
+      Day4.shiftLetter(343)('q') shouldBe 'v'
+      Day4.shiftLetter(343)('z') shouldBe 'e'
+      Day4.shiftLetter(343)('-') shouldBe ' '
+    }
   }
 }
