@@ -1,6 +1,14 @@
 import scala.util.parsing.combinator.RegexParsers
 
-case class Room(encryptedName: String, sectorId: Int, checksum: String)
+case class Room(encryptedName: String, sectorId: Int, checksum: String) {
+
+  def decryptedName: String = {
+    encryptedName
+      .map(Day4.shiftLetter(sectorId))
+      .replace('-', ' ')
+  }
+}
+
 
 object RoomParser extends RegexParsers {
 

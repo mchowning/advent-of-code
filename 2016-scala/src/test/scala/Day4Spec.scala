@@ -43,5 +43,8 @@ class Day4Spec extends FreeSpec with Matchers {
       Day4.shiftLetter(343)('z') shouldBe 'e'
       Day4.shiftLetter(343)('-') shouldBe ' '
     }
+    "decrypts name" in {
+      Day4.parseRoom("qzmt-zixmtkozy-ivhz-343[aaaa]").decryptedName shouldBe "very encrypted name"
+    }
   }
 }
