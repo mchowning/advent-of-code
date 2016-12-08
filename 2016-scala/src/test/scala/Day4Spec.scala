@@ -5,9 +5,16 @@ class Day4Spec extends FreeSpec with Matchers {
   "Day4 can" - {
     "parse Room" in {
       val parsedRoom = Day4.parseRoom("aaaaa-bbb-z-y-x-123[abxyz]")
-      parsedRoom.encryptedName shouldBe "aaaaa-bbb-z-y-x"
+      parsedRoom.encryptedName shouldBe "aaaaabbbzyx"
       parsedRoom.sectorId shouldBe 123
       parsedRoom.checksum shouldBe "abxyz"
+    }
+    "generates expected checksum" in {
+      Day4.getExpectedChecksum(Day4.parseRoom("aaaaa-bbb-z-123[abc]")) shouldBe "abz"
+      Day4.getExpectedChecksum(Day4.parseRoom("a-bbb-zz-123[abc]")) shouldBe "bza"
+      Day4.getExpectedChecksum(Day4.parseRoom("z-bbb-aa-123[abc]")) shouldBe "baz"
+      Day4.getExpectedChecksum(Day4.parseRoom("aaaaa-bbb-z-y-x-123[abxyz]")) shouldBe "abxyz"
+      Day4.getExpectedChecksum(Day4.parseRoom("a-b-c-d-e-f-g-h-987[abcde]")) shouldBe "abcde"
     }
   }
 }
