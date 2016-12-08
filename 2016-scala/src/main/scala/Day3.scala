@@ -4,6 +4,16 @@ object Day3 {
 
   type Triangle = (Int, Int, Int)
 
+  //def isValidTriangle(triangle: Triangle): Boolean = {
+  //  val triangleSidesAsList = triangle match {case (a, b, c) => List(a, b, c)}
+  //  triangleSidesAsList
+  //    .combinations(2)
+  //    .forall { twoSides =>
+  //      val thirdSide = triangleSidesAsList.diff(twoSides).head
+  //      twoSides.sum > thirdSide
+  //    }
+  //}
+
   def isValidTriangle(triangle: Triangle): Boolean = triangle match {
     case (a,b,c) => a + b > c &&
                     a + c > b &&
