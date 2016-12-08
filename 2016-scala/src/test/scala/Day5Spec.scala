@@ -1,0 +1,14 @@
+import org.scalatest.{FreeSpec, Matchers}
+
+class Day5Spec extends FreeSpec with Matchers {
+
+  val inputPart1 = "abbhdwsy"
+
+  "Day5" - {
+    "can get md5 hash" in {
+      Day5.md5("abc3231929") shouldBe "00000155F8105DFF7F56EE10FA9B9ABD"
+      Day5.md5("abc5017308") shouldBe "000008F82C5B3924A1ECBEBF60344E00"
+      Day5.md5("abc5278568") shouldBe "00000F9A2C309875E05C5A5D09F1B8C4"
+    }
+  }
+}
