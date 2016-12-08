@@ -46,5 +46,11 @@ class Day4Spec extends FreeSpec with Matchers {
     "decrypts name" in {
       Day4.parseRoom("qzmt-zixmtkozy-ivhz-343[aaaa]").decryptedName shouldBe "very encrypted name"
     }
+    "solves part 2" in {
+      val rooms = TestUtils.getLines("input_day4.txt") |> Day4.getRoomsWithValidChecksums
+      val northPoleObjectStorage = rooms.filter(_.decryptedName == "northpole object storage")
+                                        .head
+      northPoleObjectStorage.sectorId shouldBe 482
+    }
   }
 }
