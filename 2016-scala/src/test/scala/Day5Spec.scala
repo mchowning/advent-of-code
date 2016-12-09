@@ -25,6 +25,16 @@ class Day5Spec extends FreeSpec with Matchers {
                                                           "004728CB6167C20592C4F9B681630C8C",
                                                           "0029840BEE223B0229715192ED9DDEF5")
     }
+    "find subsequent hashes with prefix" - {
+      val subject = new Day5("abc")
+      "easy example" in {
+        subject.getFirstNHashesWithPrefix("00", 1).head shouldBe "0034E0923CC38887A57BD7B1D4F953DF"
+      }
+      "tough examples" ignore {
+        subject.getFirstNHashesWithPrefix("00000", 2) shouldBe List("00000155F8105DFF7F56EE10FA9B9ABD",
+                                                                    "000008F82C5B3924A1ECBEBF60344E00")
+      }
+    }
     "solve part 1" ignore {
       new Day5(testInputPrefix).getPart1Password shouldBe "801B56A7"
     }
