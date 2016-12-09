@@ -1,9 +1,7 @@
 import java.security.MessageDigest
 import util.PipeOps._
 
-object Day5 {
-
-  val inputPrefix = "abbhdwsy"
+class Day5(inputPrefix: String) {
 
   type Md5Hash = String
 
