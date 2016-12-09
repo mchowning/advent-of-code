@@ -38,10 +38,19 @@ class Day5Spec extends FreeSpec with Matchers {
     "solve part 1" ignore {
       new Day5(testInputPrefix).getPart1Password shouldBe "801B56A7"
     }
-    "extracts part 2 password from list of hashes" in {
-      new Day5("").getPart2Password(List("000003A",
-                                         "000001R",
-                                         "0000025aaa")) shouldBe "R5A"
+    "extracts part 2 password from list of hashes" - {
+      val subject = new Day5("")
+      "with a straightforward case" in {
+        subject.getPart2Password(List("000003A",
+                                      "000001R",
+                                      "0000025aaa")) shouldBe "R5A"
+      }
+      "by taking first result for a position" in {
+        subject.getPart2Password(List("000003A",
+                                      "000001R",
+                                      "0000025",
+                                      "000001T")) shouldBe "R5A"
+      }
     }
   }
 }

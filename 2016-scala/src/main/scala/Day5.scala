@@ -36,6 +36,10 @@ class Day5(inputPrefix: String) {
     }
 
     hashes.map(processHash)
+      .groupBy(_._1)
+      .values
+      .map(_.head)
+      .toSeq
       .sortBy(_._1)
       .map(_._2)
       .mkString
