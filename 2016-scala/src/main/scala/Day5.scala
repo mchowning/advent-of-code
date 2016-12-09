@@ -27,4 +27,17 @@ class Day5(inputPrefix: String) {
       .map(_.charAt(5))
       .mkString
   }
+
+  def getPart2Password(hashes: List[Md5Hash]): String = {
+    def processHash(hash: Md5Hash): (Int, Char) = {
+      val index = hash.charAt(5).toInt
+      val char = hash.charAt(6)
+      (index, char)
+    }
+
+    hashes.map(processHash)
+      .sortBy(_._1)
+      .map(_._2)
+      .mkString
+  }
 }
