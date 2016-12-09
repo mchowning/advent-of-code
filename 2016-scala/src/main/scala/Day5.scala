@@ -21,4 +21,10 @@ class Day5(inputPrefix: String) {
       .filter(_.startsWith(hashPrefix))
       .take(numToTake)
       .toList
+
+  def getPart1Password: String = {
+    getFirstNHashesWithPrefix("00000", 8)
+      .map(_.charAt(5))
+      .mkString
+  }
 }

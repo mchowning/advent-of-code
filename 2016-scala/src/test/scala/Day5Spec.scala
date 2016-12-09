@@ -25,5 +25,8 @@ class Day5Spec extends FreeSpec with Matchers {
                                                           "004728CB6167C20592C4F9B681630C8C",
                                                           "0029840BEE223B0229715192ED9DDEF5")
     }
+    "solve part 1" ignore {
+      new Day5(testInputPrefix).getPart1Password shouldBe "801B56A7"
+    }
   }
 }
