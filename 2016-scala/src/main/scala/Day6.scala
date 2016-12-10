@@ -1,9 +1,14 @@
 
 object Day6 {
 
-  def getPart1Message(lines: List[String]): String = {
+  def getPart1Message(lines: List[String]): String = getMessage(lines, getMostCommonChar)
+
+
+  def getPart2Message(lines: List[String]): String = getMessage(lines, getLeastCommonChar)
+
+  private def getMessage(lines: List[String], f: (List[Char] => Char)): String = {
     lines.transpose
-      .map(getMostCommonChar)
+      .map(f)
       .mkString
   }
 
