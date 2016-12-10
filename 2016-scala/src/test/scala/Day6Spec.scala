@@ -4,7 +4,7 @@ class Day6Spec extends FreeSpec with Matchers {
 
   "Day6" - {
     "for part 1" - {
-      "gets the most common character from a list" in {
+      "gets the MOST common character from a list" in {
         Day6.getMostCommonChar("aba".toList) shouldBe 'a'
         Day6.getMostCommonChar("aab".toList) shouldBe 'a'
         Day6.getMostCommonChar("abbc".toList) shouldBe 'b'
@@ -31,6 +31,13 @@ class Day6Spec extends FreeSpec with Matchers {
       }
       "solves challenge" in {
         Day6.getPart1Message(TestUtils.getLines("input_day6.txt")) shouldBe "qzedlxso"
+      }
+    }
+    "for part 2" - {
+      "gets the LEAST common character froma list" in {
+        Day6.getLeastCommonChar("aba".toList) shouldBe 'b'
+        Day6.getLeastCommonChar("aab".toList) shouldBe 'b'
+        Day6.getLeastCommonChar("abbcc".toList) shouldBe 'a'
       }
     }
   }
