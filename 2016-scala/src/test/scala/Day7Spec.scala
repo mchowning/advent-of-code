@@ -18,5 +18,10 @@ class Day7Spec extends FreeSpec with Matchers {
         Day7.isAbba("askldjfabbaaljsfk") shouldBe true
       }
     }
+    "checks IP for TLS support" - {
+      "when there is no abba" in {
+        Day7.supportsTLS("asdb[fjkl]jklas") shouldBe false
+      }
+    }
   }
 }

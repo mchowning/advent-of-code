@@ -1,6 +1,8 @@
 
 object Day7 {
 
+  def supportsTLS(input: String): Boolean = false
+
   def isAbba(input: String): Boolean = {
     input.sliding(4)
       .exists(abbaCheck)
