@@ -2,8 +2,8 @@
 object Day7 {
 
   def supportsTLS(input: String): Boolean = {
-    val Array(preBracket, bracketed, _) =  input.split("[\\[\\]]")
-    isAbba(preBracket) && !isAbba(bracketed)
+    val Array(preBrackets, bracketed, postBrackets) =  input.split("[\\[\\]]")
+    (isAbba(preBrackets) || isAbba(postBrackets)) && !isAbba(bracketed)
   }
 
   def isAbba(input: String): Boolean = {
