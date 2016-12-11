@@ -3,7 +3,7 @@ import org.scalatest.{Matchers, FreeSpec}
 class Day7Spec extends FreeSpec with Matchers {
 
   "Day 7" - {
-    "checks for abba" - {
+    "checks for ABBA" - {
       "in simple 4-character cases" in {
         Day7.isAbba("abba") shouldBe true
         Day7.isAbba("dxxd") shouldBe true

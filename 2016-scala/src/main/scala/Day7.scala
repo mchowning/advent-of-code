@@ -3,16 +3,15 @@ object Day7 {
 
   def supportsTLS(input: String): Boolean = {
 
-    val divided = input.split("[\\[\\]]")
+    val (unBracketed, bracketed) = input.split("[\\[\\]]")
       .zipWithIndex
       .foldRight(List[String](), List[String]()) {  (indexed, acc) =>
-        val (everyOtherFromFirst, everyOtherFromSecond) = acc
+        val (unBracketed, bracketed) = acc
         val (letters, index) = indexed
-        if (index % 2 == 0) (letters :: everyOtherFromFirst, everyOtherFromSecond)
-        else (everyOtherFromFirst, letters :: everyOtherFromSecond)
+        if (index % 2 == 0) (letters :: unBracketed, bracketed)
+        else (unBracketed, letters :: bracketed)
       }
 
-    val (unBracketed, bracketed) = if (input.head == '[') divided.swap else divided
     unBracketed.exists(isAbba) && !bracketed.exists(isAbba)
   }
 
