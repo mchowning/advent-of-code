@@ -8,5 +8,8 @@ class Day7Spec extends FreeSpec with Matchers {
       Day7.isAbba("abcd") shouldBe false
       Day7.isAbba("abcc") shouldBe false
     }
+    "returns false if letters just repeated" in {
+      Day7.isAbba("aaaa") shouldBe false
+    }
   }
 }
