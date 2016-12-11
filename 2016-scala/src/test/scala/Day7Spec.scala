@@ -23,9 +23,22 @@ class Day7Spec extends FreeSpec with Matchers {
       "when there is no abba" in {
         Day7.supportsTLS("asdb[fjkl]jklas") shouldBe false
       }
-      "when there is abba in initial section" in {
-        Day7.supportsTLS("abba[fjkl]jklas") shouldBe true
-        Day7.supportsTLS("laal[fjkl]jklas") shouldBe true
+      "when there is abba in initial section" - {
+        "and nowhere else" in {
+          Day7.supportsTLS("abba[fjkl]jklas") shouldBe true
+          Day7.supportsTLS("laal[fjkl]jklas") shouldBe true
+        }
+      }
+      "when there is abba in middle section" - {
+        "and nowhere else" in {
+          Day7.supportsTLS("lkja[rnnr]jklas") shouldBe false
+        }
+        "and in first section" in {
+          Day7.supportsTLS("abba[nwwn]jklas") shouldBe false
+        }
+        "and in last section" in {
+          Day7.supportsTLS("lkaj[ekke]laal") shouldBe false
+        }
       }
     }
   }

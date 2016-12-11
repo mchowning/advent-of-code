@@ -1,7 +1,10 @@
 
 object Day7 {
 
-  def supportsTLS(input: String): Boolean = isAbba(input)
+  def supportsTLS(input: String): Boolean = {
+    val Array(preBracket, bracketed, _) =  input.split("[\\[\\]]")
+    isAbba(preBracket) && !isAbba(bracketed)
+  }
 
   def isAbba(input: String): Boolean = {
     input.sliding(4)
