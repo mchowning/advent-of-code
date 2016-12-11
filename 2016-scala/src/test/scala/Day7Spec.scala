@@ -41,6 +41,12 @@ class Day7Spec extends FreeSpec with Matchers {
       "when there is abba in post-brackets section and nowhere else" in {
         Day7.supportsTLS("asdf[asdfg]leel") shouldBe true
       }
+      "when there are multiple brackets" in {
+        Day7.supportsTLS("abba[sdlkfj]ajsl[abba]lkjl") shouldBe false
+      }
+    }
+    "solves part 1" in {
+      TestUtils.getLines("input_day7.txt").count(Day7.supportsTLS) shouldBe 110
     }
   }
 }
