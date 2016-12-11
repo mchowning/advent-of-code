@@ -6,6 +6,7 @@ class Day7Spec extends FreeSpec with Matchers {
     "checks for abba" - {
       "in simple 4-character cases" in {
         Day7.isAbba("abba") shouldBe true
+        Day7.isAbba("dxxd") shouldBe true
         Day7.isAbba("abcd") shouldBe false
         Day7.isAbba("abcc") shouldBe false
       }
@@ -21,6 +22,10 @@ class Day7Spec extends FreeSpec with Matchers {
     "checks IP for TLS support" - {
       "when there is no abba" in {
         Day7.supportsTLS("asdb[fjkl]jklas") shouldBe false
+      }
+      "when there is abba in initial section" in {
+        Day7.supportsTLS("abba[fjkl]jklas") shouldBe true
+        Day7.supportsTLS("laal[fjkl]jklas") shouldBe true
       }
     }
   }
