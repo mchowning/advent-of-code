@@ -17,6 +17,13 @@ object Day7 {
       }
   }
 
+  //def separateBracketed(s: String): (List[String], List[String]) = {
+  //  val regex = """\[(\w+)\]""".r
+  //  val inBrackets = regex.findAllIn(s).map { s => val regex(group) = s; group }
+  //  val notInBrackets = regex.split(s)
+  //  (notInBrackets.toList, inBrackets.toList)
+  //}
+
   def isAbba(input: String): Boolean = {
     input.sliding(4)
       .exists(abbaCheck)
