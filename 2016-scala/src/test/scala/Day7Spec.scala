@@ -57,6 +57,11 @@ class Day7Spec extends FreeSpec with Matchers {
         Day7.getAba("zzbzz") shouldBe List("zbz")
         Day7.getAba("zzbzzglg") shouldBe List("zbz", "glg")
       }
+      "separates bracketed from unbracketed" in {
+        val (unBracketed, bracketed) = Day7.separateBracketed("aaa[b]ccc[dddd]ee")
+        unBracketed should contain only ("aaa", "ccc", "ee")
+        bracketed should contain only ("b", "dddd")
+      }
     }
   }
 }
