@@ -25,4 +25,11 @@ object Day7 {
     val (front, end) = input.splitAt(2)
     front == end.reverse && front != end
   }
+
+  def getAba(input: String): List[String] = {
+    input
+      .sliding(3)
+      .filter { s => s.charAt(0) == s.charAt(2) && s.charAt(0) != s.charAt(1) }
+      .toList
+  }
 }
