@@ -32,6 +32,10 @@ object Day7 {
     input
       .sliding(3)
       .filter { s => s.charAt(0) == s.charAt(2) && s.charAt(0) != s.charAt(1) }
+      //.filter(_.toList match {
+      //          case c0 :: c1 :: c2 :: Nil => c0 == c2 && c0 != c1
+      //          case _ => throw new UnknownError // should never hit, but kills the warning
+      //        })
       .toList
   }
 
