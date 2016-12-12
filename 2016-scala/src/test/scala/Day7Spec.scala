@@ -22,32 +22,32 @@ class Day7Spec extends FreeSpec with Matchers {
       }
       "checks IP for TLS support" - {
         "when there is no abba" in {
-          Day7.supportsTLS("asdb[fjkl]jklas") shouldBe false
+          Day7.isTlsSupported("asdb[fjkl]jklas") shouldBe false
         }
         "when there is abba in pre-brackets section and nowhere else" in {
-          Day7.supportsTLS("abba[fjkl]jklas") shouldBe true
-          Day7.supportsTLS("laal[fjkl]jklas") shouldBe true
+          Day7.isTlsSupported("abba[fjkl]jklas") shouldBe true
+          Day7.isTlsSupported("laal[fjkl]jklas") shouldBe true
         }
         "when there is abba in middle section" - {
           "and nowhere else" in {
-            Day7.supportsTLS("lkja[rnnr]jklas") shouldBe false
+            Day7.isTlsSupported("lkja[rnnr]jklas") shouldBe false
           }
           "and in first section" in {
-            Day7.supportsTLS("abba[nwwn]jklas") shouldBe false
+            Day7.isTlsSupported("abba[nwwn]jklas") shouldBe false
           }
           "and in last section" in {
-            Day7.supportsTLS("lkaj[ekke]laal") shouldBe false
+            Day7.isTlsSupported("lkaj[ekke]laal") shouldBe false
           }
         }
         "when there is abba in post-brackets section and nowhere else" in {
-          Day7.supportsTLS("asdf[asdfg]leel") shouldBe true
+          Day7.isTlsSupported("asdf[asdfg]leel") shouldBe true
         }
         "when there are multiple brackets" in {
-          Day7.supportsTLS("abba[sdlkfj]ajsl[abba]lkjl") shouldBe false
+          Day7.isTlsSupported("abba[sdlkfj]ajsl[abba]lkjl") shouldBe false
         }
       }
       "solves part 1" in {
-        TestUtils.getLines("input_day7.txt").count(Day7.supportsTLS) shouldBe 110
+        TestUtils.getLines("input_day7.txt").count(Day7.isTlsSupported) shouldBe 110
       }
     }
     "for part 2" - {
@@ -61,6 +61,17 @@ class Day7Spec extends FreeSpec with Matchers {
         val (unBracketed, bracketed) = Day7.separateBracketed("aaa[b]ccc[dddd]ee")
         unBracketed should contain only ("aaa", "ccc", "ee")
         bracketed should contain only ("b", "dddd")
+      }
+      "checks for SSL support" - {
+        "when SSL is supported" in {
+          Day7.isSslSupported("aba[bab]xyz") shouldBe true
+        }
+        "when no bab" in {
+          Day7.isSslSupported("xyx[xyx]xyx") shouldBe false
+        }
+        "when there are extraneous aba" in {
+          Day7.isSslSupported("zazbz[bzb]cdb") shouldBe true
+        }
       }
     }
   }
