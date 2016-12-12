@@ -73,6 +73,9 @@ class Day7Spec extends FreeSpec with Matchers {
           Day7.isSslSupported("zazbz[bzb]cdb") shouldBe true
         }
       }
+      "solves part 2" in {
+        TestUtils.getLines("input_day7.txt").count(Day7.isSslSupported) shouldBe 242
+      }
     }
   }
 }
