@@ -42,17 +42,30 @@ class Day8Spec extends FreeSpec with Matchers {
     }
     "can rotate" - {
       val with00on = Day8.turnOn(input)(0,0)
-      val from00 = Day8.rotateRow(with00on) _
       "row" in {
+        val from00 = Day8.rotateRow(with00on) _
         from00(0, 1) shouldBe List(List (false, true, false),
-                                                      List.fill (3) (false),
-                                                      List.fill (3) (false) )
+                                   List.fill (3) (false),
+                                   List.fill (3) (false))
         from00(0, 2) shouldBe List (List (false, false, true),
-                                                       List.fill (3) (false),
-                                                       List.fill (3) (false) )
+                                    List.fill (3) (false),
+                                    List.fill (3) (false))
         from00(0, 3) shouldBe List (List (true, false, false),
-                                                       List.fill (3) (false),
-                                                       List.fill (3) (false) )
+                                    List.fill (3) (false),
+                                    List.fill (3) (false))
+      }
+      "col" in {
+        val from00 = Day8.rotateCol(with00on) _
+        from00(0, 1) shouldBe List (List.fill (3) (false),
+                                    List(true, false, false),
+                                    List.fill (3) (false))
+        from00(0, 2) shouldBe List (List.fill (3) (false),
+                                    List.fill (3) (false),
+                                    List(true, false, false))
+        from00(0, 3) shouldBe List(List (true, false, false),
+                                   List.fill (3) (false),
+                                   List.fill (3) (false))
+
       }
     }
   }

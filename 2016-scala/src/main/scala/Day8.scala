@@ -23,4 +23,7 @@ object Day8 {
 
     (m /: (0 until distance)) { (m1,_) => rotateRowOnePlace(m1, row)}
   }
+
+  def rotateCol(m: Matrix)(col: Int, distance: Int): Matrix =
+    rotateRow(m.transpose)(col, distance).transpose
 }
