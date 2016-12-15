@@ -74,7 +74,7 @@ object Day8 {
   def printMatrix(m: Matrix) = {
     m.foreach { ls => {
         val visibleList = ls.map { b => if (b) '*' else '.' }
-        print(visibleList.mkString + '\n')
+        println(visibleList.mkString)
       }
     }
   }
