@@ -39,33 +39,51 @@ class Day8Spec extends FreeSpec with Matchers {
                                              List.fill(3)(false),
                                              List.fill(3)(false))
       }
+      "from text" in {
+        Day8.parse(input)("rect 2x2") shouldBe List(List(true, true, false),
+                                                    List(true, true, false),
+                                                    List.fill(3)(false))
+      }
     }
     "can rotate" - {
       val with00on = Day8.turnOn(input)(0,0)
-      "row" in {
-        val from00 = Day8.rotateRow(with00on) _
-        from00(0, 1) shouldBe List(List (false, true, false),
-                                   List.fill (3) (false),
-                                   List.fill (3) (false))
-        from00(0, 2) shouldBe List (List (false, false, true),
-                                    List.fill (3) (false),
-                                    List.fill (3) (false))
-        from00(0, 3) shouldBe List (List (true, false, false),
-                                    List.fill (3) (false),
-                                    List.fill (3) (false))
+      "row" - {
+        "from parsed input" in {
+          val from00 = Day8.rotateRow(with00on) _
+          from00(0, 1) shouldBe List(List(false, true, false),
+                                     List.fill(3)(false),
+                                     List.fill(3)(false))
+          from00(0, 2) shouldBe List(List(false, false, true),
+                                     List.fill(3)(false),
+                                     List.fill(3)(false))
+          from00(0, 3) shouldBe List(List(true, false, false),
+                                     List.fill(3)(false),
+                                     List.fill(3)(false))
+        }
+        "from text" in {
+          Day8.parse(with00on)("rotate column x=0 by 2") shouldBe List(List.fill(3)(false),
+                                                                       List.fill(3)(false),
+                                                                       List(true, false, false))
+        }
       }
-      "col" in {
-        val from00 = Day8.rotateCol(with00on) _
-        from00(0, 1) shouldBe List (List.fill (3) (false),
-                                    List(true, false, false),
-                                    List.fill (3) (false))
-        from00(0, 2) shouldBe List (List.fill (3) (false),
-                                    List.fill (3) (false),
-                                    List(true, false, false))
-        from00(0, 3) shouldBe List(List (true, false, false),
-                                   List.fill (3) (false),
-                                   List.fill (3) (false))
-
+      "col" - {
+        "from parsed input" in {
+          val from00 = Day8.rotateCol(with00on) _
+          from00(0, 1) shouldBe List(List.fill(3)(false),
+                                     List(true, false, false),
+                                     List.fill(3)(false))
+          from00(0, 2) shouldBe List(List.fill(3)(false),
+                                     List.fill(3)(false),
+                                     List(true, false, false))
+          from00(0, 3) shouldBe List(List(true, false, false),
+                                     List.fill(3)(false),
+                                     List.fill(3)(false))
+        }
+        "from text" in {
+          Day8.parse(with00on)("rotate row y=0 by 1") shouldBe List(List(false, true, false),
+                                                                    List.fill(3)(false),
+                                                                    List.fill(3)(false))
+        }
       }
     }
   }
