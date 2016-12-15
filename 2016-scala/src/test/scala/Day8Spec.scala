@@ -115,7 +115,7 @@ class Day8Spec extends FreeSpec with Matchers {
       val matrixFromInstructions = Day8.followInstructions(testMatrix)(testInstructions)
       "part 1" in {
         val numActivated = matrixFromInstructions
-          .map(_.count(_ == true))
+          .map(_.count(identity))
           .sum
         numActivated shouldBe 123
       }
