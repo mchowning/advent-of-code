@@ -1,4 +1,4 @@
-import org.scalatest.{Matchers, FreeSpec}
+import org.scalatest.{FreeSpec, Matchers}
 
 class Day8Spec extends FreeSpec with Matchers {
 
@@ -109,13 +109,20 @@ class Day8Spec extends FreeSpec with Matchers {
                                                                                            List(false, true, false))
       }
     }
-    "solves part 1" in {
+    "solves" - {
       val testMatrix = List.fill(6)(List.fill(50)(false)) // 6 tall, 50 wide
       val testInstructions = TestUtils.getLines("input_day8.txt")
-      val numActivated = Day8.followInstructions(testMatrix)(testInstructions)
-        .map(_.count(_ == true))
-        .sum
-      numActivated shouldBe 123
+      val matrixFromInstructions = Day8.followInstructions(testMatrix)(testInstructions)
+      "part 1" in {
+        val numActivated = matrixFromInstructions
+          .map(_.count(_ == true))
+          .sum
+        numActivated shouldBe 123
+      }
+      "part 2" in {
+        Day8.printMatrix(matrixFromInstructions)
+        // should print a barely readable graphic output of the display with 'AFBUPZBJPS'
+      }
     }
   }
 }

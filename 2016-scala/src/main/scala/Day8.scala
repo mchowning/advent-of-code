@@ -70,4 +70,12 @@ object Day8 {
   def followInstructions(m: Matrix)(ls: List[String]): Matrix = {
     (m /: ls) { (m1, s) => parse(m1)(s) }
   }
+
+  def printMatrix(m: Matrix) = {
+    m.foreach { ls => {
+        val visibleList = ls.map { b => if (b) '*' else '.' }
+        print(visibleList.mkString + '\n')
+      }
+    }
+  }
 }
