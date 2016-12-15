@@ -66,4 +66,8 @@ object Day8 {
       case _ => throw new UnknownError("Parse failed to match case. This should never happen.")
     }
   }
+
+  def followInstructions(m: Matrix)(ls: List[String]): Matrix = {
+    (m /: ls) { (m1, s) => parse(m1)(s) }
+  }
 }

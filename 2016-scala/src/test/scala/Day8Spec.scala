@@ -46,7 +46,7 @@ class Day8Spec extends FreeSpec with Matchers {
       }
     }
     "can rotate" - {
-      val with00on = Day8.turnOn(input)(0,0)
+      val with00on = Day8.turnOn(input)(0, 0)
       "row" - {
         "from parsed input" in {
           val from00 = Day8.rotateRow(with00on) _
@@ -85,6 +85,37 @@ class Day8Spec extends FreeSpec with Matchers {
                                                                     List.fill(3)(false))
         }
       }
+    }
+    "follows instructions" - {
+      "with rect 1x1" in {
+        val emptyMatrix = List.fill(3)(List.fill(3)(false))
+        Day8.followInstructions(emptyMatrix)(List("rect 1x1")) shouldBe List(List(true, false, false),
+                                                                             List.fill(3)(false),
+                                                                             List.fill(3)(false))
+      }
+      "with rect 1x1, and rotate row y=0 by 1" in {
+        val emptyMatrix = List.fill(3)(List.fill(3)(false))
+        Day8.followInstructions(emptyMatrix)(List("rect 1x1",
+                                                  "rotate row y=0 by 1")) shouldBe List(List(false, true, false),
+                                                                                        List.fill(3)(false),
+                                                                                        List.fill(3)(false))
+      }
+      "with rect 1x1, rotate row y=0 by 1, and rotate column x=1 by 2" in {
+        val emptyMatrix = List.fill(3)(List.fill(3)(false))
+        Day8.followInstructions(emptyMatrix)(List("rect 1x1",
+                                                  "rotate row y=0 by 1",
+                                                  "rotate column x=1 by 2")) shouldBe List(List.fill(3)(false),
+                                                                                           List.fill(3)(false),
+                                                                                           List(false, true, false))
+      }
+    }
+    "solves part 1" in {
+      val testMatrix = List.fill(6)(List.fill(50)(false)) // 6 tall, 50 wide
+      val testInstructions = TestUtils.getLines("input_day8.txt")
+      val numActivated = Day8.followInstructions(testMatrix)(testInstructions)
+        .map(_.count(_ == true))
+        .sum
+      numActivated shouldBe 123
     }
   }
 }
