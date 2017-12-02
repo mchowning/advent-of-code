@@ -1,28 +1,36 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import qualified Data.Map.Strict    as Map
+import qualified Data.Map.Lazy      as Map
+import qualified Data.Text          as T
+import qualified Data.Text.IO       as TIO
 import           Lib
 import           System.Environment
+import           Turtle
+import           Turtle.Format
 
-import qualified Day1               as Day1
+import qualified Day1
+import qualified Day2
 import           DayData
+
+-- TODO parse a specific Part1/Part2 type from the second parameter?
 
 main :: IO ()
 main = do
-  args <- getArgs
-  if null args
-    then putStrLn "must pass the argument day"
-    else let arg = read (head args)
-         -- TODO use actual parser
-         -- TODO handle the two exercises per day
-         in if Map.member arg exercises
-              -- TODO use String interpolation
-              then putStrLn $ concat [ "Running the exercise for Day #"
-                                     , show arg
-                                     ,  " with result: "
-                                     , part1 $ (Map.!) exercises arg
-                                     ]
-              else putStrLn $ "No exercises for Day #" ++ show arg
+  (day, part) <- options "Advent of Code 2017 Exercise script" parser
+  if Map.member day exercises
+    then let result = T.pack (runExercise day part)
+         in TIO.putStrLn $ format ("Running "%d%"-"%d%", with result: "%s%"") day part result
+    else TIO.putStrLn $ format ("No exercises for Day #"%d%"") day
 
-exercises :: Map.Map Integer DayResult
-exercises = Map.fromList [ (1, Day1.result)]
+parser :: Parser (Int, Int)
+parser = (,) <$> argInt "day" "The day of the exercise "
+             <*> argInt "part" "The part of the day's exercise to run"
+
+runExercise :: Int -> Int -> String
+runExercise day part = let partFunction = if part == 1 then part1 else part2
+                       in partFunction $ (Map.!) exercises day
+
+exercises :: Map.Map Int DayResult
+exercises = Map.fromList [ (1, Day1.result)
+                         , (2, Day2.result) ]
