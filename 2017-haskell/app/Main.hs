@@ -25,10 +25,6 @@ main = do
   if Map.member day exercises
     then do result <- runExercise day part
             TIO.putStrLn $ format ("Running "%d%"-"%d%", with result: "%s%"") day part (T.pack result)
-
-
-    -- then let result = T.pack (runExercise day part)
-    --      in TIO.putStrLn $ format ("Running "%d%"-"%d%", with result: "%s%"") day part result
     else TIO.putStrLn $ format ("No exercises for Day #"%d%"") day
 
 parser :: Parser (Int, Int)
