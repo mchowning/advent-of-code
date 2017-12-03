@@ -1,35 +1,66 @@
 module Day2 where
 
 import           Control.Applicative (liftA2)
-import           DayData
+import           Data.List           (tails)
+import           Data.Maybe          (fromJust, isJust)
+import           Data.Monoid         ((<>))
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
+import           DayData
+
 result :: IO Day
-result = liftA2 Day (show <$> result1) (show <$> result2)
+result = liftA2 Day (applyAlgo result1Algo) (applyAlgo result2Algo)
 
-result1 :: IO Integer
-result1 = do
-  content <- readFile "src/input_day2.txt"
-  return . checksum . parseIntegers $ content
+applyAlgo :: (String -> Integer) -> IO Result
+applyAlgo f = show . f <$> input
 
-result2 :: IO Integer
-result2 = undefined
+input :: IO String
+input = readFile "src/input_day2.txt"
+
+result1Algo :: String -> Integer
+result1Algo = part1Checksum . parseIntegers
+
+result2Algo :: String -> Integer
+result2Algo = part2Checksum . parseIntegers
 
 parseIntegers :: String -> [[Integer]]
 parseIntegers = map (map read . words) . lines
 
-checksum :: [[Integer]] -> Integer
-checksum = sum . map rowChecksum
+part1Checksum :: [[Integer]] -> Integer
+part1Checksum = sum . map rowPart1Checksum
 
-rowChecksum :: [Integer] -> Integer
-rowChecksum ls = maximum ls - minimum ls
+rowPart1Checksum :: [Integer] -> Integer
+rowPart1Checksum ls = maximum ls - minimum ls
+
+part2Checksum :: [[Integer]] -> Integer
+part2Checksum = sum . map evenlyDivisibleResult
+
+evenlyDivisibleResult :: [Integer] -> Integer
+evenlyDivisibleResult = fromJust . foldr helper Nothing . allPairs
+  where
+    allPairs ls = [(x,y) | x <- ls, y <- ls, x < y]
+    -- allPairs ls = [(x,y) | (x:ys) <- tails ls, y <- ys]
+    helper (x,y) acc = if isJust acc
+                         then acc
+                         else resultIfEvenDivide x y
+
+    -- TODO if I could insure that n1 was always greater than n2 then I could avoid the greater/lesser logic
+    resultIfEvenDivide :: Integer -> Integer -> Maybe Integer
+    resultIfEvenDivide n1 n2 = let greater = max n1 n2
+                                   lesser = min n1 n2
+                              in if greater `mod` lesser == 0
+                                   then Just (greater `div` lesser)
+                                   else Nothing
 
 tests :: IO ()
 tests = defaultMain $ testGroup "Tests"
   [ parseIntegersTests
-  , rowChecksumTests
-  , checksumTests
+  , rowPart1ChecksumTests
+  , part1ChecksumTests
+  , evenlyDivisibleResultTests
+  , result2AlgoTests
+  , resultTests
   ]
   where
     parseIntegersTests = testGroup "parseIntegers"
@@ -40,16 +71,19 @@ tests = defaultMain $ testGroup "Tests"
                                           \2 4 6 8" @?= [ [5,1,9,5]
                                                         , [7,5,3]
                                                         , [2,4,6,8]] ]
-    rowChecksumTests = testGroup "rowChecksum"
-      [ testCase "[1,4]" $ rowChecksum [1,4] @?= 3
-      , testCase "[1,1,2,2,2,4,100]" $ rowChecksum [1,1,2,2,2,4,100] @?= 99 ]
-    checksumTests = testGroup "checksum"
-      [ testCase "[[5,1,9,5],[7,5,3],[2,4,6,8]]" $ checksum [[5,1,9,5],[7,5,3],[2,4,6,8]] @?= 18 ]
-
-
-
-
-
-      -- [ result2Algo "[[5,9,2,8][9,4,7,3][3,8,6,5]]" $ result2Algo [ [5,9,2,8]
-      --                                                       , [9,4,7,3]
-      --                                                       , [3,8,6,5]] @?= 9 ]
+    rowPart1ChecksumTests = testGroup "rowChecksum"
+      [ testCase "[1,4]" $ rowPart1Checksum [1,4] @?= 3
+      , testCase "[1,1,2,2,2,4,100]" $ rowPart1Checksum [1,1,2,2,2,4,100] @?= 99 ]
+    part1ChecksumTests = testGroup "checksum"
+      [ testCase "[[5,1,9,5],[7,5,3],[2,4,6,8]]" $ part1Checksum [[5,1,9,5],[7,5,3],[2,4,6,8]] @?= 18 ]
+    evenlyDivisibleResultTests = testGroup "evenlyDivisibleResult"
+      [ testCase "[5,9,2,8]" $ evenlyDivisibleResult [5,9,2,8] @?= 4 ]
+    result2AlgoTests = testGroup "result2Algo"
+      [ testCase "5 9 2 8\n\
+                 \9 4 7 3\n\
+                 \3 8 6 5" $ result2Algo "5 9 2 8\n\
+                                         \9 4 7 3\n\
+                                         \3 8 6 5" @?= 9 ]
+    resultTests = testGroup "results from input"
+      [ testCase "part 1" $ input >>= \i -> result1Algo i @?= 44670
+      , testCase "part 2" $ input >>= \i -> result2Algo i @?= 285 ]

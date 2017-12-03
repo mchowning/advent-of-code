@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+--{-# LANGUAGE LambdaCase #-}
 module Main where
 
 import qualified Data.Map.Lazy      as Map
@@ -15,22 +16,43 @@ import           DayData
 
 -- TODO parse a specific Part1/Part2 type from the second parameter?
 
+data Error = InvalidDay | InvalidPart
+
+
 main :: IO ()
 main = do
   (day, part) <- options "Advent of Code 2017 Exercise script" parser
   if Map.member day exercises
-    then let result = T.pack (runExercise day part)
-         in TIO.putStrLn $ format ("Running "%d%"-"%d%", with result: "%s%"") day part result
+    then do result <- runExercise day part
+            TIO.putStrLn $ format ("Running "%d%"-"%d%", with result: "%s%"") day part (T.pack result)
+
+
+    -- then let result = T.pack (runExercise day part)
+    --      in TIO.putStrLn $ format ("Running "%d%"-"%d%", with result: "%s%"") day part result
     else TIO.putStrLn $ format ("No exercises for Day #"%d%"") day
 
 parser :: Parser (Int, Int)
-parser = (,) <$> argInt "day" "The day of the exercise "
-             <*> argInt "part" "The part of the day's exercise to run"
+parser = (,) <$> argInt "day" "the day of an exercise: a number"
+             <*> argInt "part" "the part of the day's exercise to run: the number 1 or 2"
 
-runExercise :: Int -> Int -> String
+
+runExercise :: Int -> Int -> IO String
 runExercise day part = let partFunction = if part == 1 then part1 else part2
-                       in partFunction $ (Map.!) exercises day
+                       in do dayResult <- (Map.!) exercises day
+                             return (partFunction dayResult)
 
-exercises :: Map.Map Int DayResult
+exercises :: Map.Map Int (IO Day)
 exercises = Map.fromList [ (1, Day1.result)
                          , (2, Day2.result) ]
+
+-- getDay :: Int -> Either Error Day
+-- getDay = \case
+--   1 -> Right Day1.result
+--   2 -> Right Day2.result
+--   _ -> Left InvalidDay
+
+-- getPartFunc :: Int -> Either Error (Day -> Result)
+-- getPartFunc = \case
+--   1 -> Right part1
+--   2 -> Right part2
+--   _ -> Left InvalidPart
