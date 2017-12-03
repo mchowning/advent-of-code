@@ -10,8 +10,8 @@ import           Test.Tasty.HUnit
 
 import           DayData
 
-result :: DayResult
-result = DayResult (part1Alg input) (part2Alg input)
+result :: IO Day
+result = return $ Day (part1Alg input) (part2Alg input)
 
 part1Alg :: String -> Result
 part1Alg s = sumDigits $ filterForMatch s (rotateBy 1 s)
@@ -33,6 +33,7 @@ part2Alg s = let halfOfLength = length s `quot` 2
 
 filterForMatch :: String -> String -> String
 filterForMatch s1 s2 = mapMaybe checkForMatch $ zip s1 s2
+-- filterForMatch = (mapMaybe checkForMatch .) . zip
   where
     checkForMatch (a,b) = if a == b then Just a else Nothing
 
