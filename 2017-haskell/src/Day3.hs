@@ -1,17 +1,24 @@
+{-# LANGUAGE LambdaCase #-}
+
 module Day3 where
 
+import qualified Data.Map.Lazy    as M
+-- import           Debug.Trace      (trace)
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
 import           DayData
 
-result :: IO Day
-result = return $ Day undefined undefined
-
 type Level = Int
 type Distance = Integer
 type RemainingNum = Integer
 type TravelValue = Either Distance RemainingNum
+
+result :: IO Day
+result = return $ Day (show $ part1Algo input) (show $ part2Algo input)
+
+input :: Integer
+input = 277678
 
 part1Algo :: Integer -> Distance
 part1Algo 1 = 0
@@ -19,12 +26,12 @@ part1Algo n = fromLeft $ helper (n-1) 1
   where
     fromLeft :: TravelValue -> Distance
     fromLeft (Left a) = a
-    fromLeft _ = undefined
+    fromLeft _        = undefined
 
     helper :: RemainingNum -> Level -> TravelValue
     helper rn level =
       case processLevel level (Right rn) of
-        (Left a) -> Left (a + toInteger level)
+        (Left a)  -> Left (a + toInteger level)
         (Right b) -> helper b (level+1)
 
 processLevel :: Level -> TravelValue -> TravelValue
@@ -42,6 +49,55 @@ processSide level (Right number) =
 sideLength :: Level -> Integer
 sideLength = (*2) . toInteger
 
+-------------------------------------------------------------
+
+data Direction = East | North | West | South deriving (Eq, Show, Ord)
+type Coordinate = (Integer, Integer)
+data Position = Position Coordinate Direction deriving (Eq, Show, Ord)
+type Grid = M.Map Coordinate Integer
+
+turnLeft :: Direction -> Direction
+turnLeft = \case
+  East -> North
+  North -> West
+  West -> South
+  South -> East
+
+part2Algo :: Integer -> Integer
+part2Algo n = let startGrid = M.singleton (0,0) 1
+                  startPos = Position (0,0) East
+              in move n startGrid startPos
+
+move :: Integer -> Grid -> Position -> Integer
+move n grid position =
+  let (firstPrefPos@(Position firstPrefCoord _), secondPrefPos) = getPossibleMoves position
+      newPosition@(Position newCoords _) = if not (M.member firstPrefCoord grid) then firstPrefPos else secondPrefPos
+      valueForNextPosition = getValueForPosition newCoords grid
+      newGrid = M.insert newCoords valueForNextPosition grid
+  in if valueForNextPosition > n
+       then valueForNextPosition
+       else move n newGrid newPosition
+
+getValueForPosition :: Coordinate -> Grid -> Integer
+getValueForPosition (x,y) grid =
+  sum $ map (flip (M.findWithDefault 0) grid) [ (x+1, y-1)
+                                               , (x+1, y)
+                                               , (x+1, y+1)
+                                               , (x, y-1)
+                                               , (x, y+1)
+                                               , (x-1, y-1)
+                                               , (x-1, y)
+                                               , (x-1, y+1) ]
+
+getPossibleMoves :: Position -> (Position, Position)
+getPossibleMoves (Position (x,y) direction) =
+  case direction of
+    East  -> (Position (x, y+1) North, Position (x+1, y) East)
+    North -> (Position (x-1, y) West,  Position (x, y+1) North)
+    West  -> (Position (x, y-1) South, Position (x-1, y) West)
+    South -> (Position (x+1, y) East,  Position (x, y-1) South)
+
+-------------------------------------------------------------
 
 tests :: IO ()
 tests = defaultMain $ testGroup "Tests"
@@ -49,6 +105,7 @@ tests = defaultMain $ testGroup "Tests"
   , processSideTests
   , processLevelTests
   , part1AlgoTests
+  , part2AlgoTests
   ]
   where
     sideLengthTests = testGroup "sideLength"
@@ -78,6 +135,7 @@ tests = defaultMain $ testGroup "Tests"
     processLevelTests = testGroup "processLevel"
       [ testCase "any Left value" $ processLevel 1 (Left 9) @?= Left 9 -- quickcheck would be better
       , testCase "level 1, remaining 1" $ processLevel 1 (Right 1) @?= Left 0
+
       , testCase "level 1, remaining 2" $ processLevel 1 (Right 2) @?= Left 1
       , testCase "level 1, remaining 3" $ processLevel 1 (Right 3) @?= Left 0
       , testCase "level 1, remaining 4" $ processLevel 1 (Right 4) @?= Left 1
@@ -113,5 +171,10 @@ tests = defaultMain $ testGroup "Tests"
       , testCase "22" $ part1Algo 22 @?= 3
       , testCase "23" $ part1Algo 23 @?= 2
       , testCase "1024" $ part1Algo 1024 @?= 31
-      , testCase "277678" $ part1Algo 277678 @?= 475
-      ]
+      , testCase "277678" $ part1Algo 277678 @?= 475 ]
+    part2AlgoTests = testGroup "part2Algo"
+      [ testCase "4" $ part2Algo 4 @?= 5
+      , testCase "5" $ part2Algo 5 @?= 10
+      , testCase "10" $ part2Algo 10 @?= 11
+      , testCase "11" $ part2Algo 11 @?= 23
+      , testCase "input" $ part2Algo input @?= 279138 ]
