@@ -1,5 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
-
 module Day3 where
 
 import qualified Data.Map.Lazy    as M
@@ -12,7 +10,11 @@ import           DayData
 type Level = Int
 type Distance = Integer
 type RemainingNum = Integer
-type TravelValue = Either Distance RemainingNum
+-- type TravelValue = Either Distance RemainingNum
+
+data TravelValue = Result Distance
+                   | Remains RemainingNum
+                   deriving (Eq, Show)
 
 result :: IO Day
 result = return $ Day (show $ part1Algo input) (show $ part2Algo input)
@@ -25,72 +27,80 @@ part1Algo 1 = 0
 part1Algo n = fromLeft $ helper (n-1) 1
   where
     fromLeft :: TravelValue -> Distance
-    fromLeft (Left a) = a
+    fromLeft (Result a) = a
     fromLeft _        = undefined
 
     helper :: RemainingNum -> Level -> TravelValue
     helper rn level =
-      case processLevel level (Right rn) of
-        (Left a)  -> Left (a + toInteger level)
-        (Right b) -> helper b (level+1)
+      case processLevel level (Remains rn) of
+        (Result a)  -> Result (a + toInteger level)
+        (Remains b) -> helper b (level+1)
 
 processLevel :: Level -> TravelValue -> TravelValue
-processLevel _ tv@(Left _) = tv
-processLevel level tv = foldr (\_ tv' -> processSide level tv') tv ([1..4] :: [Int])
+processLevel _ tv@(Result _) = tv
+processLevel level tv = iterate (processSide level) tv !! 4
 
 processSide :: Level -> TravelValue -> TravelValue
-processSide _ tv@(Left _) = tv
-processSide level (Right number) =
+processSide _ tv@(Result _) = tv
+processSide level (Remains number) =
   let sLength = sideLength level
   in if number > sLength
-       then Right $ number - sLength
-       else Left $ abs(toInteger number - sLength `div` 2)
+       then Remains $ number - sLength
+       else Result $ abs(toInteger number - sLength `div` 2)
 
 sideLength :: Level -> Integer
 sideLength = (*2) . toInteger
 
 -------------------------------------------------------------
 
-data Direction = East | North | West | South deriving (Eq, Show, Ord)
 type Coordinate = (Integer, Integer)
+type SquareValue = Integer
+
+data Direction = East | North | West | South deriving (Eq, Show, Ord)
 data Position = Position Coordinate Direction deriving (Eq, Show, Ord)
-type Grid = M.Map Coordinate Integer
+type Grid = M.Map Coordinate SquareValue
 
-turnLeft :: Direction -> Direction
-turnLeft = \case
-  East -> North
-  North -> West
-  West -> South
-  South -> East
-
-part2Algo :: Integer -> Integer
+part2Algo :: SquareValue -> SquareValue
 part2Algo n = let startGrid = M.singleton (0,0) 1
                   startPos = Position (0,0) East
               in move n startGrid startPos
 
-move :: Integer -> Grid -> Position -> Integer
+move :: SquareValue -> Grid -> Position -> SquareValue
 move n grid position =
-  let (firstPrefPos@(Position firstPrefCoord _), secondPrefPos) = getPossibleMoves position
-      newPosition@(Position newCoords _) = if not (M.member firstPrefCoord grid) then firstPrefPos else secondPrefPos
-      valueForNextPosition = getValueForPosition newCoords grid
-      newGrid = M.insert newCoords valueForNextPosition grid
-  in if valueForNextPosition > n
-       then valueForNextPosition
-       else move n newGrid newPosition
+  let newPosition = chooseMove grid (getPossibleLeftSpiralMoves position)
+      valueForNewPosition = getValueForPosition newPosition grid
+  in if valueForNewPosition > n
+       then valueForNewPosition
+       else let newGrid = getGridWithPosition newPosition valueForNewPosition grid
+            in move n newGrid newPosition
 
-getValueForPosition :: Coordinate -> Grid -> Integer
-getValueForPosition (x,y) grid =
-  sum $ map (flip (M.findWithDefault 0) grid) [ (x+1, y-1)
-                                               , (x+1, y)
-                                               , (x+1, y+1)
-                                               , (x, y-1)
-                                               , (x, y+1)
-                                               , (x-1, y-1)
-                                               , (x-1, y)
-                                               , (x-1, y+1) ]
 
-getPossibleMoves :: Position -> (Position, Position)
-getPossibleMoves (Position (x,y) direction) =
+chooseMove :: Grid -> (Position, Position) -> Position
+chooseMove grid (p1, p2) = if alreadyCoveredPosition p1 grid then p2 else p1
+
+
+alreadyCoveredPosition :: Position -> Grid -> Bool
+alreadyCoveredPosition (Position coords _) = M.member coords
+
+
+getValueForPosition :: Position -> Grid -> SquareValue
+getValueForPosition (Position (x,y) _) grid =
+  sum $ map (flip (M.findWithDefault 0) grid) [ (x+1, y-1)      --  X X X
+                                              , (x+1, y)        --  X O X
+                                              , (x+1, y+1)      --  X X X
+                                              , (x, y-1)
+                                              , (x, y+1)
+                                              , (x-1, y-1)
+                                              , (x-1, y)
+                                              , (x-1, y+1) ]
+
+
+getGridWithPosition :: Position -> SquareValue -> Grid -> Grid
+getGridWithPosition (Position coords _) = M.insert coords
+
+
+getPossibleLeftSpiralMoves :: Position -> (Position, Position)
+getPossibleLeftSpiralMoves (Position (x,y) direction) =
   case direction of
     East  -> (Position (x, y+1) North, Position (x+1, y) East)
     North -> (Position (x-1, y) West,  Position (x, y+1) North)
@@ -114,37 +124,37 @@ tests = defaultMain $ testGroup "Tests"
       , testCase "3" $ sideLength 3 @?= 6
       ]
     processSideTests = testGroup "processSide"
-      [ testCase "any Left value" $ processSide 12 (Left 3) @?= Left 3 -- quickcheck would be better
-      -- , testCase "length 1, pos 0" $ processSide 1 (Right 0) @?= Right 0
-      , testCase "level 1, pos 1" $ processSide 1 (Right 1) @?= Left 0
-      , testCase "level 1, pos 2" $ processSide 1 (Right 2) @?= Left 1
-      , testCase "level 1, pos 100" $ processSide 1 (Right 100) @?= Right 98
-      , testCase "level 2, pos 1" $ processSide 2 (Right 1) @?= Left 1
-      , testCase "level 2, pos 2" $ processSide 2 (Right 2) @?= Left 0
-      , testCase "level 2, pos 3" $ processSide 2 (Right 3) @?= Left 1
-      , testCase "level 2, pos 4" $ processSide 2 (Right 4) @?= Left 2
-      , testCase "level 2, pos 5" $ processSide 2 (Right 5) @?= Right 1
-      , testCase "level 3, pos 1" $ processSide 3 (Right 1) @?= Left 2
-      , testCase "level 3, pos 2" $ processSide 3 (Right 2) @?= Left 1
-      , testCase "level 3, pos 3" $ processSide 3 (Right 3) @?= Left 0
-      , testCase "level 3, pos 4" $ processSide 3 (Right 4) @?= Left 1
-      , testCase "level 3, pos 5" $ processSide 3 (Right 5) @?= Left 2
-      , testCase "level 3, pos 6" $ processSide 3 (Right 6) @?= Left 3
-      , testCase "level 3, pos 7" $ processSide 3 (Right 7) @?= Right 1
+      [ testCase "any Result value" $ processSide 12 (Result 3) @?= Result 3 -- quickcheck would be better
+      -- , testCase "length 1, pos 0" $ processSide 1 (Remains 0) @?= Remains 0
+      , testCase "level 1, pos 1" $ processSide 1 (Remains 1) @?= Result 0
+      , testCase "level 1, pos 2" $ processSide 1 (Remains 2) @?= Result 1
+      , testCase "level 1, pos 100" $ processSide 1 (Remains 100) @?= Remains 98
+      , testCase "level 2, pos 1" $ processSide 2 (Remains 1) @?= Result 1
+      , testCase "level 2, pos 2" $ processSide 2 (Remains 2) @?= Result 0
+      , testCase "level 2, pos 3" $ processSide 2 (Remains 3) @?= Result 1
+      , testCase "level 2, pos 4" $ processSide 2 (Remains 4) @?= Result 2
+      , testCase "level 2, pos 5" $ processSide 2 (Remains 5) @?= Remains 1
+      , testCase "level 3, pos 1" $ processSide 3 (Remains 1) @?= Result 2
+      , testCase "level 3, pos 2" $ processSide 3 (Remains 2) @?= Result 1
+      , testCase "level 3, pos 3" $ processSide 3 (Remains 3) @?= Result 0
+      , testCase "level 3, pos 4" $ processSide 3 (Remains 4) @?= Result 1
+      , testCase "level 3, pos 5" $ processSide 3 (Remains 5) @?= Result 2
+      , testCase "level 3, pos 6" $ processSide 3 (Remains 6) @?= Result 3
+      , testCase "level 3, pos 7" $ processSide 3 (Remains 7) @?= Remains 1
       ]
     processLevelTests = testGroup "processLevel"
-      [ testCase "any Left value" $ processLevel 1 (Left 9) @?= Left 9 -- quickcheck would be better
-      , testCase "level 1, remaining 1" $ processLevel 1 (Right 1) @?= Left 0
+      [ testCase "any Result value" $ processLevel 1 (Result 9) @?= Result 9 -- quickcheck would be better
+      , testCase "level 1, remaining 1" $ processLevel 1 (Remains 1) @?= Result 0
 
-      , testCase "level 1, remaining 2" $ processLevel 1 (Right 2) @?= Left 1
-      , testCase "level 1, remaining 3" $ processLevel 1 (Right 3) @?= Left 0
-      , testCase "level 1, remaining 4" $ processLevel 1 (Right 4) @?= Left 1
-      , testCase "level 1, remaining 5" $ processLevel 1 (Right 5) @?= Left 0
-      , testCase "level 1, remaining 6" $ processLevel 1 (Right 6) @?= Left 1
-      , testCase "level 1, remaining 7" $ processLevel 1 (Right 7) @?= Left 0
-      , testCase "level 1, remaining 8" $ processLevel 1 (Right 8) @?= Left 1
-      , testCase "level 1, remaining 9" $ processLevel 1 (Right 9) @?= Right 1
-      , testCase "level 1, remaining 100" $ processLevel 1 (Right 100) @?= Right 92
+      , testCase "level 1, remaining 2" $ processLevel 1 (Remains 2) @?= Result 1
+      , testCase "level 1, remaining 3" $ processLevel 1 (Remains 3) @?= Result 0
+      , testCase "level 1, remaining 4" $ processLevel 1 (Remains 4) @?= Result 1
+      , testCase "level 1, remaining 5" $ processLevel 1 (Remains 5) @?= Result 0
+      , testCase "level 1, remaining 6" $ processLevel 1 (Remains 6) @?= Result 1
+      , testCase "level 1, remaining 7" $ processLevel 1 (Remains 7) @?= Result 0
+      , testCase "level 1, remaining 8" $ processLevel 1 (Remains 8) @?= Result 1
+      , testCase "level 1, remaining 9" $ processLevel 1 (Remains 9) @?= Remains 1
+      , testCase "level 1, remaining 100" $ processLevel 1 (Remains 100) @?= Remains 92
       ]
     part1AlgoTests = testGroup "part1Algo"
       [ testCase "1" $ part1Algo 1 @?= 0
