@@ -12,6 +12,7 @@ import           Turtle.Format
 
 import qualified Day1
 import qualified Day2
+import qualified Day3
 import           DayData
 
 -- TODO parse a specific Part1/Part2 type from the second parameter?
@@ -39,7 +40,9 @@ runExercise day part = let partFunction = if part == 1 then part1 else part2
 
 exercises :: Map.Map Int (IO Day)
 exercises = Map.fromList [ (1, Day1.result)
-                         , (2, Day2.result) ]
+                         , (2, Day2.result)
+                         , (3, Day3.result)
+                         ]
 
 -- getDay :: Int -> Either Error Day
 -- getDay = \case
