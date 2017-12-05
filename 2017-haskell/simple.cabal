@@ -25,11 +25,13 @@ library
                      , Day2
                      , Day3
                      , Day4
+                     , Day5
   build-depends:       base >= 4.7 && < 5
                      , containers >= 0.5
+                     , lens >= 4.15.4
                      , text >= 1.2
-                     , tasty == 0.11.3
-                     , tasty-hunit == 0.9.2
+                     , tasty >= 0.11.3
+                     , tasty-hunit >= 0.9.2
                      , Unique >= 0.4.7.1
   default-language:    Haskell2010
 

@@ -32,6 +32,8 @@ noDuplicates = allUnique . words
 noAnagrams :: String -> Bool
 noAnagrams = allUnique . map sort . words
 
+------------------------------------------------------------------
+
 tests :: IO ()
 tests = defaultMain $ testGroup "Tests"
   [ part1AlgoTest

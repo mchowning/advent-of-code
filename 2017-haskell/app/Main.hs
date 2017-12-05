@@ -13,6 +13,8 @@ import           Turtle.Format
 import qualified Day1
 import qualified Day2
 import qualified Day3
+import qualified Day4
+import qualified Day5
 import           DayData
 
 -- TODO parse a specific Part1/Part2 type from the second parameter?
@@ -42,6 +44,8 @@ exercises :: Map.Map Int (IO Day)
 exercises = Map.fromList [ (1, Day1.result)
                          , (2, Day2.result)
                          , (3, Day3.result)
+                         , (4, Day4.result)
+                         , (5, Day5.result)
                          ]
 
 -- getDay :: Int -> Either Error Day
