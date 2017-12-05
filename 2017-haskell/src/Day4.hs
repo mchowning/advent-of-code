@@ -1,4 +1,4 @@
-module Day4 where
+module Day4 (part1, part2) where
 
 import           Control.Applicative (liftA2)
 import           Data.Char           (isLower)
@@ -8,11 +8,11 @@ import           Data.List.Unique
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-import           DayData
+part1 :: IO Int
+part1 = part1Algo <$> input
 
-result :: IO Day
-result = liftA2 Day (show . part1Algo <$> input)
-                    (show . part2Algo <$> input)
+part2 :: IO Int
+part2 = part2Algo <$> input
 
 input :: IO String
 input = readFile "src/input_day4.txt"
@@ -42,10 +42,10 @@ tests = defaultMain $ testGroup "Tests"
   , noAnagramsTest
   ]
   where
-    part1AlgoTest = testCase "part1Algo test on input" $
+    part1AlgoTest = testCase "test part 1 algorithm" $
       do content <- input
          part1Algo content @?= 386
-    part2AlgoTest = testCase "part2Algo test on input" $
+    part2AlgoTest = testCase "test part 2 algorithm" $
       do content <- input
          part2Algo content @?= 208
     noDuplicatesTest = testGroup "noDuplicates"

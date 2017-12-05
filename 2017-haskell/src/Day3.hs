@@ -1,12 +1,9 @@
-module Day3 where
+module Day3 (part1, part2) where
 
 import qualified Data.Map.Lazy    as M
 import qualified Data.Set         as S
--- import           Debug.Trace      (trace)
 import           Test.Tasty
 import           Test.Tasty.HUnit
-
-import           DayData
 
 type Coordinate = (Integer, Integer)
 data Direction = East | North | West | South deriving (Eq, Show, Ord)
@@ -14,7 +11,6 @@ data Position = Position Coordinate Direction deriving (Eq, Show, Ord)
 
 -------------------------------------------------------------
 
-type Level = Int
 type Distance = Integer
 type RemainingNum = Integer
 data TravelValue = Result Distance
@@ -22,8 +18,11 @@ data TravelValue = Result Distance
                    deriving (Eq, Show)
 
 
-result :: IO Day
-result = return $ Day (show $ part1Algo input) (show $ part2Algo input)
+part1 :: Integer
+part1 = part1Algo input
+
+part2 :: Integer
+part2 = part2Algo input
 
 input :: Integer
 input = 277678
@@ -48,9 +47,6 @@ makeMove set goal pos@(Position coord _) =
       nextPosition = getNextLeftSpiralPosition (\c -> not $ S.member c set) pos
   in checkState nextSet (goal-1) nextPosition
 
-
-getSetWithPosition :: Position -> S.Set Coordinate -> S.Set Coordinate
-getSetWithPosition (Position coord _) = S.insert coord
 
 -- Less elegant, but faster
 
@@ -105,10 +101,10 @@ move n grid position =
 
 
 getNextLeftSpiralPosition :: (Coordinate -> Bool) -> Position -> Position
-getNextLeftSpiralPosition pred position = chooseMove pred (getPossibleLeftSpiralMoves position)
+getNextLeftSpiralPosition predicateF position = chooseMove (getPossibleLeftSpiralMoves position)
   where
-    chooseMove :: (Coordinate -> Bool) -> (Position, Position) -> Position
-    chooseMove pred (p1@(Position coord _), p2) = if pred coord then p1 else p2
+    chooseMove :: (Position, Position) -> Position
+    chooseMove (p1@(Position coord _), p2) = if predicateF coord then p1 else p2
 
 isGridCoordinateAvailable :: Grid -> Coordinate -> Bool
 isGridCoordinateAvailable grid coord = not (M.member coord grid)

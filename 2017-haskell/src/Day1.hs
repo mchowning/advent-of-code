@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Day1 (result) where
+module Day1 (part1, part2) where
 
 import           Data.Char        (digitToInt)
 import           Data.List        (inits, tails)
@@ -8,12 +8,13 @@ import qualified Data.Text        as T
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-import           DayData
+part1 :: String
+part1 = part1Alg input
 
-result :: IO Day
-result = return $ Day (part1Alg input) (part2Alg input)
+part2 :: String
+part2 = part2Alg input
 
-part1Alg :: String -> Result
+part1Alg :: String -> String
 part1Alg s = sumDigits $ filterForMatch s (rotateBy 1 s)
 
 sumDigits :: String -> String
@@ -26,7 +27,7 @@ rotateBy n s = let newBeginChars = reverse . take n . reverse $ s
 -- rotateBy n s = let allRotatations = reverse $ zipWith (++) (tails s) (inits s)
 --                in allRotatations !! n
 
-part2Alg :: String -> Result
+part2Alg :: String -> String
 part2Alg s = let halfOfLength = length s `quot` 2
                  halfRotation = rotateBy halfOfLength s
              in sumDigits (filterForMatch halfRotation s)

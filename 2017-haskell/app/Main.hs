@@ -1,26 +1,18 @@
 {-# LANGUAGE OverloadedStrings #-}
---{-# LANGUAGE LambdaCase #-}
 module Main where
 
 import qualified Data.Map.Lazy      as Map
 import qualified Data.Text          as T
 import qualified Data.Text.IO       as TIO
-import           Lib
-import           System.Environment
 import           Turtle
-import           Turtle.Format
 
 import qualified Day1
 import qualified Day2
 import qualified Day3
 import qualified Day4
 import qualified Day5
-import           DayData
 
--- TODO parse a specific Part1/Part2 type from the second parameter?
-
-data Error = InvalidDay | InvalidPart
-
+-- TODO pass time to run and use that to confirm running long parts?
 
 main :: IO ()
 main = do
@@ -36,26 +28,15 @@ parser = (,) <$> argInt "day" "the day of an exercise: a number"
 
 
 runExercise :: Int -> Int -> IO String
-runExercise day part = let partFunction = if part == 1 then part1 else part2
-                       in do dayResult <- (Map.!) exercises day
-                             return (partFunction dayResult)
+runExercise day part =
+  if part == 1
+     then fst $ (Map.!) exercises  day
+     else snd $ (Map.!)exercises day
 
-exercises :: Map.Map Int (IO Day)
-exercises = Map.fromList [ (1, Day1.result)
-                         , (2, Day2.result)
-                         , (3, Day3.result)
-                         , (4, Day4.result)
-                         , (5, Day5.result)
+exercises :: Map.Map Int (IO String, IO String)
+exercises = Map.fromList [ (1, (return Day1.part1, return Day1.part2))
+                         , (2, (show <$> Day2.part1, show <$> Day2.part2))
+                         , (3, (return (show Day3.part1), return (show Day3.part2)))
+                         , (4, (show <$> Day4.part1, show <$> Day4.part2))
+                         , (5, (show <$> Day5.part1, show <$> Day5.part2)) -- slow!
                          ]
-
--- getDay :: Int -> Either Error Day
--- getDay = \case
---   1 -> Right Day1.result
---   2 -> Right Day2.result
---   _ -> Left InvalidDay
-
--- getPartFunc :: Int -> Either Error (Day -> Result)
--- getPartFunc = \case
---   1 -> Right part1
---   2 -> Right part2
---   _ -> Left InvalidPart

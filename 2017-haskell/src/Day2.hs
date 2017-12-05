@@ -1,4 +1,4 @@
-module Day2 where
+module Day2 (part1, part2) where
 
 import           Control.Applicative (liftA2)
 import           Data.List           (tails)
@@ -7,22 +7,20 @@ import           Data.Monoid         ((<>))
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-import           DayData
+part1 :: IO Integer
+part1 = part1Algo <$> input
 
-result :: IO Day
-result = liftA2 Day (applyAlgo result1Algo) (applyAlgo result2Algo)
-
-applyAlgo :: (String -> Integer) -> IO Result
-applyAlgo f = show . f <$> input
+part2 :: IO Integer
+part2 = part2Algo <$> input
 
 input :: IO String
 input = readFile "src/input_day2.txt"
 
-result1Algo :: String -> Integer
-result1Algo = part1Checksum . parseIntegers
+part1Algo :: String -> Integer
+part1Algo = part1Checksum . parseIntegers
 
-result2Algo :: String -> Integer
-result2Algo = part2Checksum . parseIntegers
+part2Algo :: String -> Integer
+part2Algo = part2Checksum . parseIntegers
 
 parseIntegers :: String -> [[Integer]]
 parseIntegers = map (map read . words) . lines
@@ -59,7 +57,7 @@ tests = defaultMain $ testGroup "Tests"
   , rowPart1ChecksumTests
   , part1ChecksumTests
   , evenlyDivisibleResultTests
-  , result2AlgoTests
+  , part2AlgoTests
   , resultTests
   ]
   where
@@ -78,12 +76,12 @@ tests = defaultMain $ testGroup "Tests"
       [ testCase "[[5,1,9,5],[7,5,3],[2,4,6,8]]" $ part1Checksum [[5,1,9,5],[7,5,3],[2,4,6,8]] @?= 18 ]
     evenlyDivisibleResultTests = testGroup "evenlyDivisibleResult"
       [ testCase "[5,9,2,8]" $ evenlyDivisibleResult [5,9,2,8] @?= 4 ]
-    result2AlgoTests = testGroup "result2Algo"
+    part2AlgoTests = testGroup "result2Algo"
       [ testCase "5 9 2 8\n\
                  \9 4 7 3\n\
-                 \3 8 6 5" $ result2Algo "5 9 2 8\n\
+                 \3 8 6 5" $ part2Algo "5 9 2 8\n\
                                          \9 4 7 3\n\
                                          \3 8 6 5" @?= 9 ]
     resultTests = testGroup "results from input"
-      [ testCase "part 1" $ input >>= \i -> result1Algo i @?= 44670
-      , testCase "part 2" $ input >>= \i -> result2Algo i @?= 285 ]
+      [ testCase "part 1" $ input >>= \i -> part1Algo i @?= 44670
+      , testCase "part 2" $ input >>= \i -> part2Algo i @?= 285 ]
