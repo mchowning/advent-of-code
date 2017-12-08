@@ -12,7 +12,6 @@ import           Turtle.Pattern   (alphaNum, anyChar, decimal, match, plus,
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
--- 2964 is too low
 type Register = T.Text
 
 data Mod
@@ -55,8 +54,23 @@ part1 = part1Algo <$> input
 part1Algo :: [Instruction] -> Int
 part1Algo = foldr max (minBound :: Int) . updateAllValues
 
+part2 :: IO Int
+part2 = part2Algo <$> input
+
+part2Algo :: [Instruction] -> Int
+part2Algo ls = (M.!) (foldl processInstructionWithMax M.empty ls) "max"
+
 updateAllValues :: [Instruction] -> M.Map T.Text Int
 updateAllValues = foldl processInstruction M.empty
+
+processInstructionWithMax :: M.Map T.Text Int -> Instruction -> M.Map T.Text Int
+processInstructionWithMax m (Instruction u c) =
+  if processCondition m c
+    then let updatedMap = processUpdate m u
+             thisValue = M.findWithDefault 0 (updateReg u) updatedMap
+             prevMax = M.findWithDefault 0 "max" updatedMap
+         in M.insert "max" (max prevMax thisValue) updatedMap
+    else m
 
 processInstruction :: M.Map T.Text Int -> Instruction -> M.Map T.Text Int
 processInstruction m (Instruction u c) =
@@ -135,7 +149,13 @@ sampleInput =
   \c inc -20 if c == 10"
 
 tests :: IO ()
-tests = defaultMain $ testGroup "Day 8 Tests" [parseTests, processConditionTest, processInstructionTest, part1AlgoTest]
+tests = defaultMain $ testGroup "Day 8 Tests"
+  [ parseTests
+  , processConditionTest
+  , processInstructionTest
+  , part1AlgoTests
+  , part2AlgoTests
+  ]
   where
     parseTests =
       testGroup
@@ -149,4 +169,17 @@ tests = defaultMain $ testGroup "Day 8 Tests" [parseTests, processConditionTest,
       testCase "processCondition" $ processCondition M.empty (Condition "a" GreaterEqual 0) @? "should be true"
     processInstructionTest =
       testCase "processInstruction" $ updateAllValues (parseInstructions sampleInput) M.! "c" @?= -10
-    part1AlgoTest = testCase "part 1 algorithm" $ part1Algo (parseInstructions sampleInput) @?= 1
+    part1AlgoTests =
+      testGroup
+        "part 1 algorithm"
+        [ testCase "sample input" $ part1Algo (parseInstructions sampleInput) @?= 1
+        , testCase "real input" $ do
+            instructions <- input
+            part1Algo instructions @?= 4163
+        ]
+    part2AlgoTests = testGroup "part 2 algorithm"
+      [ testCase "sample input" $ part2Algo (parseInstructions sampleInput) @?= 10
+      , testCase "real input" $ do
+          instructions <- input
+          part2Algo instructions @?= 5347
+      ]
