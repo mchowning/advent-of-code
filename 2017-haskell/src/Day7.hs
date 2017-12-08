@@ -12,8 +12,6 @@ import           Test.Tasty.HUnit
 import           Turtle.Pattern   (Pattern, alphaNum, anyChar, between, digit,
                                    match, option, plus, sepBy1)
 
--- part 2 is 1275
-
 type Name = T.Text
 data Program = Program { name         :: Name
                        , heldPrograms :: [Name]

@@ -32,8 +32,8 @@ parser = (,) <$> argInt "day" "the day of an exercise: a number"
 runExercise :: Int -> Int -> IO String
 runExercise day part =
   if part == 1
-     then fst $ (Map.!) exercises  day
-     else snd $ (Map.!)exercises day
+     then fst $ (Map.!) exercises day
+     else snd $ (Map.!) exercises day
 
 exercises :: Map.Map Int (IO String, IO String)
 exercises = Map.fromList [ (1, (return Day1.part1, return Day1.part2))
