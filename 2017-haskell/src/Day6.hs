@@ -23,13 +23,18 @@ part2 = part2Algo <$> input
 part1Algo :: Bank -> Int
 part1Algo = roundsToDupliate St.empty
 
+part2Algo :: Bank -> Int
+part2Algo = lengthOfCycle []
+
+-- infiniteList :: Bank -> [Bank]
+-- infiniteList = appendToList []
+--   where
+--     appendToList bs b = appendToList (b : bs) (bankUpdate b)
+
 roundsToDupliate :: St.Set Bank -> Bank -> Int
 roundsToDupliate st b = if St.member b st
                            then St.size st
                            else roundsToDupliate (St.insert b st) (bankUpdate b)
-
-part2Algo :: Bank -> Int
-part2Algo = lengthOfCycle []
 
 lengthOfCycle :: [Bank] -> Bank -> Int
 lengthOfCycle bs b = if b `elem` bs
