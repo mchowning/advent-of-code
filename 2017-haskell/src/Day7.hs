@@ -10,7 +10,7 @@ import qualified Data.Text.IO     as TIO
 import           Test.Tasty
 import           Test.Tasty.HUnit
 import           Turtle.Pattern   (Pattern, alphaNum, anyChar, between, digit,
-                                   match, option, plus, sepBy1)
+                                   match, option, plus, sepBy1,decimal)
 
 type Name = T.Text
 data Program = Program { name         :: Name
@@ -103,14 +103,12 @@ parseProgram :: T.Text -> Maybe Program
 parseProgram = listToMaybe . match programPattern
 
 programPattern :: Pattern Program
-programPattern =
-  do n <- plus anyChar <* " "
-     -- rawD <- "(" *> plus digit <* ")"
-     rawD <- between "(" ")" (plus digit)
-     _ <- option " -> "
-     cs <- option (plus alphaNum `sepBy1` ", ")
-     let d = read (T.unpack rawD)
-     return (Program n cs d)
+programPattern = do
+  n <- plus anyChar <* " "
+  d <- between "(" ")" decimal
+  cs <- option " -> " *>
+        option (plus alphaNum `sepBy1` ", ")
+  return (Program n cs d)
 
 ---------------------------------------------------------------------------------
 
@@ -146,11 +144,13 @@ tests = defaultMain $ testGroup "Day 7 Tests"
     getRootProgramTests = testGroup "part 1 algorithm"
       [ testCase "sample input" $
           (name . getRootProgram . parsePrograms $ sampleInput) @?= "tknk"
-      , testCase "actual input" $ do content <- input
-                                     name (getRootProgram content) @?= "dgoocsw"
+      , testCase "actual input" $ do
+          content <- input
+          name (getRootProgram content) @?= "dgoocsw"
       ]
     part2AlgoTests = testGroup "part 2 algorithm"
       [ testCase "sample input" $ (part2Algo . parsePrograms $ sampleInput) @?= 60
-      , testCase "actual input" $ do content <- input
-                                     part2Algo content @?= 1275
+      , testCase "actual input" $ do
+          content <- input
+          part2Algo content @?= 1275
       ]

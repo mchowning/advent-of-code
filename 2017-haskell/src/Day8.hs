@@ -117,16 +117,16 @@ parseInstruction = head . match instructionPattern
       md <- plus alphaNum <* space
       n <- signed decimal <* space
       return $ Update reg (modMatch md) n
-    modMatch =
-      \case
-        "inc" -> Increment
-        "dec" -> Decrement
-        p -> error ("invalid modPattern: " ++ show p)
     conditionPattern = do
       reg <- "if " *> plus alphaNum <* space
       comp <- plus anyChar <* space
       n <- signed decimal
       return $ Condition reg (comparatorOf comp) n
+    modMatch =
+      \case
+        "inc" -> Increment
+        "dec" -> Decrement
+        p -> error ("invalid modPattern: " ++ show p)
     comparatorOf =
       \case
         "<" -> Less

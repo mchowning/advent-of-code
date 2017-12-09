@@ -13,6 +13,8 @@ import qualified Day4
 import qualified Day5
 import qualified Day6
 import qualified Day7
+import qualified Day8
+import qualified Day9
 
 -- TODO pass time to run and use that to confirm running long parts?
 
@@ -43,4 +45,6 @@ exercises = Map.fromList [ (1, (return Day1.part1, return Day1.part2))
                          , (5, (show <$> Day5.part1, show <$> Day5.part2)) -- slow!
                          , (6, (show <$> Day6.part1, show <$> Day6.part2)) -- slow!
                          , (7, (show <$> Day7.part1, show <$> Day7.part2)) -- slow!
+                         , (8, (show <$> Day8.part1, show <$> Day8.part2)) -- slow!
+                         , (9, (show <$> Day9.part1, show <$> Day9.part2)) -- slow!
                          ]
