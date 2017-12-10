@@ -33,6 +33,7 @@ library
   build-depends:       base >= 4.7 && < 5
                      , containers >= 0.5
                      , lens >= 4.15.4
+                     , mtl >= 2.2.1
                      , text >= 1.2
                      , tasty >= 0.11.3
                      , tasty-hunit >= 0.9.2

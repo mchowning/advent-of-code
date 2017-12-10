@@ -1,5 +1,6 @@
 module Day9 where
 
+import Control.Monad.State
 import Test.Tasty (defaultMain,testGroup)
 import Test.Tasty.HUnit (testCase,(@?=))
 
@@ -28,9 +29,7 @@ score level ls = let (group, remainingGroups) = getGroup ls
                      scoreForRemainingGroups = score level remainingGroups
                      in scoreForThisGroup + scoreForRemainingGroups
   where
-     getGroupContents xs
-       | length xs > 1 = init (tail xs)
-       | otherwise     = error $ "getGroupContents was called with an invalid group: " ++ show xs
+     getGroupContents xs = init (tail xs)
 
 getGroup :: String -> (String, String)
 getGroup ('{':xs) = let (subGroup, remaining) = getRestOfGroup xs
@@ -48,6 +47,13 @@ getGroup ('{':xs) = let (subGroup, remaining) = getRestOfGroup xs
 getGroup [] = ("", "")
 getGroup (_:xs) = getGroup xs
 
+
+removeIgnoreChars :: String -> String
+removeIgnoreChars (x:y:ys)
+  | x == '!' = removeIgnoreChars ys
+  | otherwise = x : removeIgnoreChars (y:ys)
+removeIgnoreChars x = x
+
 removeGarbage :: String -> String
 removeGarbage = collectNonGarbage
   where
@@ -60,28 +66,37 @@ removeGarbage = collectNonGarbage
       | x == '>'  = collectNonGarbage xs
       | otherwise = dropGarbage xs
     dropGarbage [] = []
-    
+
 countGarbage :: String -> Int
 countGarbage [] = 0
 countGarbage (x:xs)
   | x == '<' = let (n, rest) = countGarbage' xs
                in n + countGarbage rest
   | otherwise = countGarbage xs
-  where
-    countGarbage' :: String -> (Int, String)
-    countGarbage' [] = (0,[])
-    countGarbage' (y:ys)
-      | y == '>'  = (0, ys)
-      | otherwise = let (n, rest) = countGarbage' ys
-                    in (n+1, rest)
-    
-removeIgnoreChars :: String -> String
-removeIgnoreChars (x:y:ys)
-  | x == '!' = removeIgnoreChars ys
-  | otherwise = x : removeIgnoreChars (y:ys)
-removeIgnoreChars x = x
+  
+countGarbage' :: String -> (Int, String)
+countGarbage' [] = (0,[])
+countGarbage' (y:ys)
+  | y == '>'  = (0, ys)
+  | otherwise = let (n, rest) = countGarbage' ys
+                in (n+1, rest)
 
+-----------------------------------------------------------------------------------------------
 
+-- λ> runState (countGarbage'' "a<<>bc<a>d") (0, False)
+-- ("abcd",(2,False))
+countGarbage'' :: String -> State (Int, Bool) String
+countGarbage'' [] = return []
+countGarbage'' (y:ys) = do
+  (amountRemoved, wasGarbage) <- get
+  let isThisCharGarbage = wasGarbage || y == '<'
+      isNextCharGarbage = isThisCharGarbage && y /= '>'
+      shouldCount = wasGarbage && y /= '>'
+  put (if shouldCount then amountRemoved+1 else amountRemoved, isNextCharGarbage)
+  r <- countGarbage'' ys
+  return $ if isThisCharGarbage then r else y:r
+  
+  
 -----------------------------------------------------------------------------------------------
 
 tests :: IO ()
