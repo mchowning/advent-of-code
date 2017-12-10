@@ -3,8 +3,7 @@ module Day10 where
 
 --import qualified Text.Megaparsec as P
 --import qualified Text.Megaparsec.Char as P
-import Control.Monad.State
-import Data.List (reverse)
+import Data.List (reverse, foldl')
 import Turtle.Pattern (decimal, match, sepBy1)
 import Data.Text (Text)
 import Data.Text.IO as TIO
@@ -44,33 +43,31 @@ parse :: Text -> [Int]
 parse = head . match (decimal `sepBy1` ",")
 
 part1Algo :: Int -> [Int] -> [Int]
-part1Algo size lengths = let (_, (_,_,xs)) = runState (process lengths) (0,0,[0..(size-1)])
-                         in xs
-
-process ::  [Int] -> State (Int, Int, [Int]) [Int]
-process [] = return []
-process (lengthOf:ls) = do
-  tup <- get
-  let (startPos, skipSize, xs) = tup
-      newXs = reverseNext startPos lengthOf xs
-      newStartPos = (startPos + lengthOf + skipSize) `mod` length xs
-  put (newStartPos, 1 + skipSize, newXs)
-  process ls
+part1Algo size lengths =
+  let (_,_,xs) = foldl' helper (0, 0, [0..(size-1)]) lengths
+  in xs
+  where
+    helper (startPos, skipSize, acc) lengthOf =
+      let newXs = reverseNext startPos lengthOf acc
+          newStartPos = (startPos + lengthOf + skipSize) `mod` length acc
+      in (newStartPos, 1+skipSize, newXs)
 
 reverseNext :: Int -> Int -> [Int] -> [Int]
 reverseNext startAt lengthOf ls =
   if startAt + lengthOf < length ls
-  then let start = take startAt ls
-           mid = reverse . take lengthOf . drop startAt $ ls
-           end = drop (lengthOf + startAt) ls
-       in start ++ mid ++ end
-  else let end = take lengthOf . drop startAt $ ls
-           wrappedLength = startAt + lengthOf - length ls
-           start = take wrappedLength ls
-           reversed = reverse $ end ++ start
-           (newEnd, newStart) = splitAt (length ls - startAt) reversed
-           newMid = take (startAt - wrappedLength) (drop wrappedLength ls)
-       in newStart ++ newMid ++ newEnd
+  then
+    let start = take startAt ls
+        mid = reverse . take lengthOf . drop startAt $ ls
+        end = drop (lengthOf + startAt) ls
+    in start ++ mid ++ end
+  else
+    let end = take lengthOf . drop startAt $ ls
+        wrappedLength = (startAt + lengthOf) - length ls
+        start = take wrappedLength ls
+        reversed = reverse $ end ++ start
+        (newEnd, newStart) = splitAt (length ls - startAt) reversed
+        newMid = take (startAt - wrappedLength) (drop wrappedLength ls)
+    in newStart ++ newMid ++ newEnd
 
 -------------------------------------------------------------------------------
 
@@ -78,19 +75,15 @@ tests :: IO ()
 tests = defaultMain $ testGroup "Day 10 tests"
   [ reverseNextTests
   , part1AlgoTest
-  , part2AlgoTest
-  ]
+  , part2AlgoTest ]
   where
     reverseNextTests = testGroup "reverseNext"
       [ testCase "simple" $ reverseNext 1 2 [1..4] @?= [1,3,2,4]
       , testCase "wrap" $ reverseNext 3 2 [1..4] @?= [4,2,3,1]
-      , testCase "longer wrap" $ reverseNext 4 5 [1..6] @?= [1,6,5,4,3,2]
-      ]
+      , testCase "longer wrap" $ reverseNext 4 5 [1..6] @?= [1,6,5,4,3,2] ]
     part1AlgoTest = testGroup "part 1 algorithm"
       [ testCase "sample input" $ part1Algo 5 [3,4,1,5] @?= [3,4,2,1,0]
-      , testCase "real input" $ part1 >>= (@?= 13760)
-      ]
+      , testCase "real input" $ part1 >>= (@?= 13760) ]
     part2AlgoTest = testGroup "part 2 algorighm"
       [ testCase "sample input" $ part2Algo [3,4,1,5] @?= "933a4c80ba5da49858041c881c992e"
-      , testCase "actual input" $ part2 >>= (@?= "2da93395f1a6bb3472203252e3b17fe5")
-      ]
+      , testCase "actual input" $ part2 >>= (@?= "2da93395f1a6bb3472203252e3b17fe5") ]
