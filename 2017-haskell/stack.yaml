@@ -5,5 +5,6 @@ packages:
 - .
 extra-deps:
 - megaparsec-6.2.0
+- parser-combinators-0.2.1
 rebuild-ghc-options: true
 resolver: lts-9.14
