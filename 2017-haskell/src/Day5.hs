@@ -3,12 +3,14 @@ module Day5 (part1, part2) where
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
+import qualified Data.Vector as V
+
 -- Part 1 is 336905, this takes around 24s not compiled, 12s compiled
 -- Part 2 is 21985262, and took 33m compiled
 
 type Index = Int
-type ListModifierFunc = Index -> [Int] -> Maybe [Int]
-data JumpState = JumpState Index [Int]
+type ListModifierFunc = Index -> V.Vector Integer -> Maybe (V.Vector Integer)
+data JumpState = JumpState Index (V.Vector Integer)
                  deriving (Eq, Show)
 
 part1 :: IO Integer
@@ -17,13 +19,13 @@ part1 = part1Algo <$> input
 part2 :: IO Integer
 part2 = part2Algo <$> input
 
-part1Algo :: [Int] -> Integer
+part1Algo :: V.Vector Integer -> Integer
 part1Algo = countJumpsWithMod incrementListAtIndex
 
-part2Algo :: [Int] -> Integer
+part2Algo :: V.Vector Integer -> Integer
 part2Algo = countJumpsWithMod part2ModifyListAtIndex
 
-countJumpsWithMod :: ListModifierFunc -> [Int] -> Integer
+countJumpsWithMod :: ListModifierFunc -> V.Vector Integer -> Integer
 countJumpsWithMod f = countJumps f . Just . JumpState 0
 
 countJumps :: ListModifierFunc -> Maybe JumpState -> Integer
@@ -36,34 +38,34 @@ performJump f (JumpState index ls) =
      newList <- f index ls
      return $ JumpState newIndex newList
 
-incrementListAtIndex :: Index -> [Int] -> Maybe [Int]
+incrementListAtIndex :: Index -> V.Vector Integer -> Maybe (V.Vector Integer)
 incrementListAtIndex n ls
-  | isValidListIndex n ls = let (before, element:after) = splitAt n ls
-                            in Just $ before ++ (1 + element) : after
+  | isValidListIndex n ls = let (before, elementAndAfter) = V.splitAt n ls
+                            in Just $ before V.++ V.cons (1 + V.head elementAndAfter)  (V.tail elementAndAfter)
   | otherwise             = Nothing
 
-part2ModifyListAtIndex :: Index -> [Int] -> Maybe [Int]
+part2ModifyListAtIndex :: Index -> V.Vector Integer -> Maybe (V.Vector Integer)
 part2ModifyListAtIndex n ls
-  | isValidListIndex n ls = let (before, element:after) = splitAt n ls
-                                newElement = if element >= 3 then element - 1 else element + 1
-                            in Just $ before ++ newElement : after
+  | isValidListIndex n ls = let (before, elementAndAfter) = V.splitAt n ls
+                                newElement = if V.head elementAndAfter >= 3 then V.head elementAndAfter - 1 else V.head elementAndAfter + 1
+                            in Just $ before V.++ V.cons newElement (V.tail elementAndAfter)
   | otherwise             = Nothing
 
-getIndexForJumpFrom :: Index -> [Int] -> Maybe Index
+getIndexForJumpFrom :: Index -> V.Vector Integer -> Maybe Index
 getIndexForJumpFrom i ls =
   if isValidListIndex i ls
-     then let jump = ls !! i
-          in let newIndex = i + jump
+     then let jump = ls V.! i
+          in let newIndex = i + fromIntegral jump
              in if isValidListIndex newIndex ls
                    then Just newIndex
                    else Nothing
      else Nothing
 
-isValidListIndex :: Int -> [a] -> Bool
+isValidListIndex :: Int -> V.Vector Integer -> Bool
 isValidListIndex n ls = n >= 0 && n < length ls
 
-input :: IO [Int]
-input = (map read . lines) <$> readFile "src/input_day5.txt"
+input :: IO (V.Vector Integer)
+input = V.fromList . map read . lines <$> readFile "src/input_day5.txt"
 
 tests :: IO ()
 tests = defaultMain $ testGroup "Tests"
@@ -74,28 +76,28 @@ tests = defaultMain $ testGroup "Tests"
   , part2AlgoTest
   ]
   where
-    part1AlgoTest = testCase "part1 algorithm test" $ part1Algo [0,3,0,1,-3] @?= 5
-    part2AlgoTest = testCase "part2 algorithm test" $ part2Algo [0,3,0,1,-3] @?= 10
+    part1AlgoTest = testCase "part1 algorithm test" $ part1Algo (V.fromList [0,3,0,1,-3]) @?= 5
+    part2AlgoTest = testCase "part2 algorithm test" $ part2Algo (V.fromList [0,3,0,1,-3]) @?= 10
     incrementListAtIndexTests = testGroup "incrementListAtIndex"
-      [ testCase "0 index valid" $ incrementListAtIndex 0 [0..2] @?= Just [1,1,2]
-      , testCase "1 index valid" $ incrementListAtIndex 1 [0..2] @?= Just [0,2,2]
-      , testCase "2 index valid" $ incrementListAtIndex 2 [0..2] @?= Just [0,1,3]
-      , testCase "3 index not valid" $ incrementListAtIndex 3 [0..2] @?= Nothing
-      , testCase "-1 index not valid" $ incrementListAtIndex (-1) [0..2] @?= Nothing
+      [ testCase "0 index valid" $ incrementListAtIndex 0 (V.fromList [0..2]) @?= Just (V.fromList [1,1,2])
+      , testCase "1 index valid" $ incrementListAtIndex 1 (V.fromList [0..2]) @?= Just (V.fromList [0,2,2])
+      , testCase "2 index valid" $ incrementListAtIndex 2 (V.fromList [0..2]) @?= Just (V.fromList [0,1,3])
+      , testCase "3 index not valid" $ incrementListAtIndex 3 (V.fromList [0..2]) @?= Nothing
+      , testCase "-1 index not valid" $ incrementListAtIndex (-1) (V.fromList [0..2]) @?= Nothing
       ]
     getIndexForJumpFromTests = testGroup "getIndexForJumpFrom"
-      [ testCase "valid forward jump" $ getIndexForJumpFrom 0 ([3,-2,2,-3] :: [Int]) @?= Just 3
-      , testCase "invalid reverse jump" $ getIndexForJumpFrom 1 ([3,-2,2,-3] :: [Int]) @?= Nothing
-      , testCase "invalid forward jump" $ getIndexForJumpFrom 2 ([3,-2,2,-3] :: [Int]) @?= Nothing
-      , testCase "valid reverse jump" $ getIndexForJumpFrom 3 ([3,-2,2,-3] :: [Int]) @?= Just 0
+      [ testCase "valid forward jump" $ getIndexForJumpFrom 0 (V.fromList [3,-2,2,-3] :: V.Vector Integer) @?= Just 3
+      , testCase "invalid reverse jump" $ getIndexForJumpFrom 1 (V.fromList [3,-2,2,-3] :: V.Vector Integer) @?= Nothing
+      , testCase "invalid forward jump" $ getIndexForJumpFrom 2 (V.fromList [3,-2,2,-3] :: V.Vector Integer) @?= Nothing
+      , testCase "valid reverse jump" $ getIndexForJumpFrom 3 (V.fromList [3,-2,2,-3] :: V.Vector Integer) @?= Just 0
       ]
     performJumpTests = testGroup "getIndexForJumpFrom"
       [ testCase "valid forward jump" $
-          performJump incrementListAtIndex (JumpState 0 [3,-2,2,-3]) @?= Just (JumpState 3 [4,-2,2,-3])
+          performJump incrementListAtIndex (JumpState 0 (V.fromList [3,-2,2,-3])) @?= Just (JumpState 3 (V.fromList [4,-2,2,-3]))
       , testCase "invalid reverse jump" $
-          performJump incrementListAtIndex (JumpState 1 [3,-2,2,-3]) @?= Nothing
+          performJump incrementListAtIndex (JumpState 1 (V.fromList [3,-2,2,-3])) @?= Nothing
       , testCase "invalid forward jump" $
-          performJump incrementListAtIndex (JumpState 2 [3,-2,2,-3]) @?= Nothing
+          performJump incrementListAtIndex (JumpState 2 (V.fromList [3,-2,2,-3])) @?= Nothing
       , testCase "valid reverse jump" $
-          performJump incrementListAtIndex (JumpState 3 [3,-2,2,-3]) @?= Just (JumpState 0 [3,-2,2,-2])
+          performJump incrementListAtIndex (JumpState 3 (V.fromList [3,-2,2,-3])) @?= Just (JumpState 0 (V.fromList [3,-2,2,-2]))
       ]
