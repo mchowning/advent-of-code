@@ -42,17 +42,17 @@ runExercise day part =
      else snd $ (Map.!) exercises day
 
 exercises :: Map.Map Int (IO String, IO String)
-exercises = Map.fromList [ (1, (return Day1.part1, return Day1.part2))
-                         , (2, (show <$> Day2.part1, show <$> Day2.part2))
-                         , (3, (return (show Day3.part1), return (show Day3.part2)))
-                         , (4, (show <$> Day4.part1, show <$> Day4.part2))
-                         , (5, (show <$> Day5.part1, show <$> Day5.part2)) -- slow!
-                         , (6, (show <$> Day6.part1, show <$> Day6.part2))
-                         , (7, (show <$> Day7.part1, show <$> Day7.part2))
-                         , (8, (show <$> Day8.part1, show <$> Day8.part2))
-                         , (9, (show <$> Day9.part1, show <$> Day9.part2))
-                         , (10, (show <$> Day10.part1, show <$> Day10.part2))
-                         , (11, (show <$> Day11.part1, show <$> Day11.part2))
-                         , (12, (show <$> Day12.part1, show <$> Day12.part2))
-                         , (13, (show <$> Day13.part1, show <$> Day13.part2))
+exercises = Map.fromList [ (1,  (return Day1.part1,        return Day1.part2))
+                         , (2,  (show <$> Day2.part1,      show <$> Day2.part2))
+                         , (3,  (return (show Day3.part1), return (show Day3.part2)))
+                         , (4,  (show <$> Day4.part1,       show <$> Day4.part2))
+                         , (5,  (show <$> Day5.part1,       show <$> Day5.part2)) -- slow!
+                         , (6,  (show <$> Day6.part1,       show <$> Day6.part2))
+                         , (7,  (show <$> Day7.part1,       show <$> Day7.part2))
+                         , (8,  (show <$> Day8.part1,       show <$> Day8.part2))
+                         , (9,  (show <$> Day9.part1,       show <$> Day9.part2))
+                         , (10, (show <$> Day10.part1,      Day10.part2))
+                         , (11, (show <$> Day11.part1,      show <$> Day11.part2))
+                         , (12, (show <$> Day12.part1,      show <$> Day12.part2))
+                         , (13, (show <$> Day13.part1,      show <$> Day13.part2))
                          ]
