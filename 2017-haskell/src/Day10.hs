@@ -34,10 +34,16 @@ knotHash :: String -> String
 knotHash = makeDenseHash . part1Algo 256 . concat . replicate 64 . (++ [17, 31, 73, 47, 23]) . map ord
 
 makeDenseHash :: [Int] -> String
-makeDenseHash = concatMap (`showHex` "") . xor16
+makeDenseHash = concatMap getHex . xor16
   where
     xor16 :: [Int] -> [Int]
     xor16 = map (foldr1 xor) . chunksOf 16
+    
+    getHex :: Int -> String
+    getHex n
+      | n < 16    = '0' : showHex n ""
+      | otherwise = showHex n ""
+      
 
 parse :: Text -> [Int]
 parse = head . match (decimal `sepBy1` ",")
@@ -85,5 +91,8 @@ tests = defaultMain $ testGroup "Day 10 tests"
       [ testCase "sample input" $ part1Algo 5 [3,4,1,5] @?= [3,4,2,1,0]
       , testCase "real input" $ part1 >>= (@?= 13760) ]
     knotHashTest = testGroup "part 2 algorighm"
-      [ testCase "sample input" $ knotHash "3,4,1,5" @?= "933a4c80ba5da49858041c881c992e"
+      [ testCase "empty string" $ knotHash "" @?= "a2582a3a0e66e6e86e3812dcb672a272"
+      , testCase "AoC 2017" $ knotHash "AoC 2017" @?= "33efeb34ea91902bb2f59c9920caa6cd"
+      , testCase "1,2,3" $ knotHash "1,2,3" @?= "3efbe78a8d82f29979031a4aa0b16a9d"
+      , testCase "1,2,4" $ knotHash "1,2,4" @?= "63960835bcdc130f0b66d7ff4f6a5a8e"
       , testCase "actual input" $ part2 >>= (@?= "2da93395f1a6bb3472203252e3b17fe5") ]
