@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Day10 where
+module Day10 (part1, part2, knotHash)where
 
 --import qualified Text.Megaparsec as P
 --import qualified Text.Megaparsec.Char as P
@@ -22,16 +22,16 @@ part1 = do
   return (a*b)
 
 part2 :: IO String
-part2 = part2Algo <$> input2
+part2 = knotHash <$> input2
 
 input1 :: IO [Int]
 input1 = parse <$> TIO.readFile "src/input_day10.txt"
 
-input2 :: IO [Int]
-input2 = map ord <$> IO.readFile "src/input_day10.txt"
+input2 :: IO String
+input2 = IO.readFile "src/input_day10.txt"
 
-part2Algo :: [Int] -> String
-part2Algo = makeDenseHash . part1Algo 256 . concat . replicate 64 . (++ [17, 31, 73, 47, 23])
+knotHash :: String -> String
+knotHash = makeDenseHash . part1Algo 256 . concat . replicate 64 . (++ [17, 31, 73, 47, 23]) . map ord
 
 makeDenseHash :: [Int] -> String
 makeDenseHash = concatMap (`showHex` "") . xor16
@@ -75,7 +75,7 @@ tests :: IO ()
 tests = defaultMain $ testGroup "Day 10 tests"
   [ reverseNextTests
   , part1AlgoTest
-  , part2AlgoTest ]
+  , knotHashTest ]
   where
     reverseNextTests = testGroup "reverseNext"
       [ testCase "simple" $ reverseNext 1 2 [1..4] @?= [1,3,2,4]
@@ -84,6 +84,6 @@ tests = defaultMain $ testGroup "Day 10 tests"
     part1AlgoTest = testGroup "part 1 algorithm"
       [ testCase "sample input" $ part1Algo 5 [3,4,1,5] @?= [3,4,2,1,0]
       , testCase "real input" $ part1 >>= (@?= 13760) ]
-    part2AlgoTest = testGroup "part 2 algorighm"
-      [ testCase "sample input" $ part2Algo [3,4,1,5] @?= "933a4c80ba5da49858041c881c992e"
+    knotHashTest = testGroup "part 2 algorighm"
+      [ testCase "sample input" $ knotHash "3,4,1,5" @?= "933a4c80ba5da49858041c881c992e"
       , testCase "actual input" $ part2 >>= (@?= "2da93395f1a6bb3472203252e3b17fe5") ]
