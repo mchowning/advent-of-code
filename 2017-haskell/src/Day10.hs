@@ -1,8 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Day10 (part1, part2, knotHash)where
 
---import qualified Text.Megaparsec as P
---import qualified Text.Megaparsec.Char as P
 import Data.List (reverse, foldl')
 import Turtle.Pattern (decimal, match, sepBy1)
 import Data.Text (Text)

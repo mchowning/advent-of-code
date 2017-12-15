@@ -36,6 +36,7 @@ library
                  , Day12
                  , Day13
                  , Day14
+                 , Day15
   build-depends: base               >= 4.7 && < 5,
                  containers         >= 0.5,
                  grid               >= 7.8.9,
