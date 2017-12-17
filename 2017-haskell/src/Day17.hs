@@ -6,22 +6,36 @@ import Test.Tasty
 import Test.Tasty.HUnit
 import Data.List (foldl')
 
--- not 996
-input, numToInsert :: Int
-input = 345
-numToInsert = 2017
-part1, part2 :: Int
-part1 = part1Algorithm input numToInsert V.! 1
-part2 = undefined
+newtype Index = Index Int deriving Show
+newtype NumSteps = NumSteps Int deriving Show
 
-part1Algorithm :: Int -> Int -> V.Vector Int
-part1Algorithm forwardSteps numToInsert = foldl' (\acc n -> V.cons n (stepForwardN (1 + forwardSteps) acc)) (V.singleton 0) [1..numToInsert]
+input :: NumSteps
+input = NumSteps 345
+part1, part2 :: Int
+part1 = part1Algorithm input 2017 V.! 1
+part2 = let (n, _, _, _, _) = part2Algorithm (NumSteps 345) 50000000 in n
+
+part1Algorithm :: NumSteps -> Int -> V.Vector Int
+part1Algorithm (NumSteps forwardSteps) numToInsert = foldl' (\acc n -> V.cons n (stepForwardN (1 + forwardSteps) acc)) (V.singleton 0) [1..numToInsert]
 
 stepForwardN :: Int -> V.Vector Int -> V.Vector Int
 stepForwardN n v = iterate stepForward v !! n
 
 stepForward :: V.Vector Int -> V.Vector Int
 stepForward v = V.tail v `V.snoc` V.head v
+
+lastAfter0 :: (Int, Int, Index, NumSteps, Int) -> (Int, Int, Index, NumSteps, Int)
+lastAfter0 (lastAfter0Value, currentNumValue, Index index, NumSteps numSteps, length) =
+  let insertAfterPoint = (index + numSteps) `mod` length
+      newLastAfter0Value =
+        if insertAfterPoint == 0
+          then currentNumValue
+          else lastAfter0Value
+  in (newLastAfter0Value, 1 + currentNumValue, Index (1 + insertAfterPoint), NumSteps numSteps, 1 + length)
+  
+part2Algorithm :: NumSteps -> Int -> (Int, Int, Index, NumSteps, Int)
+part2Algorithm numSteps numDances = iterate lastAfter0 (-1, 1, Index 0, numSteps, 1) !! numDances
+
 
 -----------------------------------------------------------------------
 
