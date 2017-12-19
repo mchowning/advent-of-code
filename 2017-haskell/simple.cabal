@@ -48,6 +48,7 @@ library
                  monad-loops        >= 0.4.3,
                  mtl                >= 2.2.1,
                  parser-combinators >= 0.2.0,
+                 queue              >= 0.1.2,
                  split              >= 0.2.3.2,
                  text               >= 1.2,
                  tasty              >= 0.11.3,
