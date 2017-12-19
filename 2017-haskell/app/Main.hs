@@ -66,5 +66,5 @@ exercises = Map.fromList [ (1,  (return Day1.part1,         return Day1.part2))
                          , (16, (Day16.part1,               Day16.part2))
                          , (17, (return (show Day17.part1), return (show Day17.part2)))
                          , (18, (show <$> Day18.part1,      show <$> Day18.part2))
-                         , (19, (Day19.part1,               Day19.part2))
+                         , (19, (show <$> Day19.part1,      show <$> Day19.part2))
                          ]
