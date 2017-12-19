@@ -24,6 +24,7 @@ import qualified Day15
 import qualified Day16
 import qualified Day17
 import qualified Day18
+import qualified Day19
 
 -- TODO pass time to run and use that to confirm running long parts?
 
@@ -47,9 +48,9 @@ runExercise day part =
      else snd $ (Map.!) exercises day
 
 exercises :: Map.Map Int (IO String, IO String)
-exercises = Map.fromList [ (1,  (return Day1.part1,        return Day1.part2))
-                         , (2,  (show <$> Day2.part1,      show <$> Day2.part2))
-                         , (3,  (return (show Day3.part1), return (show Day3.part2)))
+exercises = Map.fromList [ (1,  (return Day1.part1,         return Day1.part2))
+                         , (2,  (show <$> Day2.part1,       show <$> Day2.part2))
+                         , (3,  (return (show Day3.part1),  return (show Day3.part2)))
                          , (4,  (show <$> Day4.part1,       show <$> Day4.part2))
                          , (5,  (show <$> Day5.part1,       show <$> Day5.part2)) -- slow!
                          , (6,  (show <$> Day6.part1,       show <$> Day6.part2))
@@ -65,4 +66,5 @@ exercises = Map.fromList [ (1,  (return Day1.part1,        return Day1.part2))
                          , (16, (Day16.part1,               Day16.part2))
                          , (17, (return (show Day17.part1), return (show Day17.part2)))
                          , (18, (show <$> Day18.part1,      show <$> Day18.part2))
+                         , (19, (Day19.part1,               Day19.part2))
                          ]
