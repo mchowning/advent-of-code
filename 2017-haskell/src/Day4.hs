@@ -1,7 +1,6 @@
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-missing-signatures #-}
 module Day4 (part1, part2) where
 
-import           Control.Applicative (liftA2)
-import           Data.Char           (isLower)
 import           Data.List
 import           Data.List.Unique
 

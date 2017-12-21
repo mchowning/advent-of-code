@@ -1,9 +1,7 @@
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-missing-signatures #-}
 module Day2 (part1, part2) where
 
-import           Control.Applicative (liftA2)
-import           Data.List           (tails)
 import           Data.Maybe          (fromJust, isJust)
-import           Data.Monoid         ((<>))
 import           Test.Tasty
 import           Test.Tasty.HUnit
 

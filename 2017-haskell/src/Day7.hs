@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-missing-signatures #-}
 module Day7 (part1, part2) where
 
 import           Data.List        (all, group, sort, sortBy, zip)
@@ -9,8 +10,8 @@ import qualified Data.Text        as T
 import qualified Data.Text.IO     as TIO
 import           Test.Tasty
 import           Test.Tasty.HUnit
-import           Turtle.Pattern   (Pattern, alphaNum, anyChar, between, digit,
-                                   match, option, plus, sepBy1,decimal)
+import           Turtle.Pattern   (Pattern, alphaNum, anyChar, between, decimal,
+                                   match, option, plus, sepBy1)
 
 type Name = T.Text
 data Program = Program { name         :: Name
@@ -38,7 +39,7 @@ part2Algo :: [Program] -> Int
 part2Algo ps=
   let levelWithImbalance = findLevelWithImbalance ps
       [outlier, goal] = sortByFrequency . map getWeight $ levelWithImbalance
-      nodeToAdjust = withWeight outlier levelWithImbalance 
+      nodeToAdjust = withWeight outlier levelWithImbalance
   in number (getProgram nodeToAdjust) + (goal - outlier)
     where
       withWeight w = head . filter ((== w) . getWeight)

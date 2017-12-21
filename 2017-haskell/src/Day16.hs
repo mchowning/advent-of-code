@@ -1,4 +1,5 @@
 {-# LANGUAGE ViewPatterns #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-missing-signatures #-}
 module Day16 (part1, part2) where
 
 import           Data.Void            (Void)
@@ -6,19 +7,15 @@ import           Data.Void            (Void)
 import           Control.Applicative  (some, (<|>))
 import           Data.Bits
 import           Data.Char            (chr, ord)
-import           Data.List            (sortBy,elemIndex)
+import           Data.List            (elemIndex, foldl')
+import qualified Data.Map.Strict      as M
 import           Data.Maybe           (fromJust)
-import           Data.Ord             (comparing)
-import qualified Data.Vector as V
+import qualified Data.Vector          as V
 import           Data.Word            (Word16)
 import           Test.Tasty
 import           Test.Tasty.HUnit
 import           Text.Megaparsec      (Parsec, parse, parseErrorPretty, sepBy)
 import           Text.Megaparsec.Char (char, digitChar, letterChar)
-import qualified Data.Map.Strict as M
-
-import           Data.List            (foldl')
-import           Debug.Trace
 
 data Move = Spin Int
           | Exchange Int Int

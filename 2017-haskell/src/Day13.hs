@@ -1,4 +1,5 @@
 {-# LANGUAGE MultiWayIf #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-missing-signatures #-}
 module Day13 (part1, part2) where
 
 import           Data.List            (sum)

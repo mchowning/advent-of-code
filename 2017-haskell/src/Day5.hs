@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-missing-signatures #-}
 module Day5 (part1, part2) where
 
 import           Test.Tasty

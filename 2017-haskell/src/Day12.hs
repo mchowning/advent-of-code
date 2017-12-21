@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-missing-signatures #-}
 module Day12 where
 
 import           Data.List            (nub)

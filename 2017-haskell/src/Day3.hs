@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-missing-signatures #-}
 module Day3 (part1, part2) where
 
 import qualified Data.Map.Lazy    as M
@@ -138,52 +139,7 @@ getPossibleLeftSpiralMoves (Position (x,y) direction) =
 
 tests :: IO ()
 tests = defaultMain $ testGroup "Tests"
-  [ part1AlgoTests
-  , part2AlgoTests
-  -- , sideLengthTests
-  -- , processSideTests
-  -- , processLevelTests
-  ]
-  where
-    sideLengthTests = testGroup "sideLength"
-    --   [ testCase "1" $ sideLength 1 @?= 2
-    --   , testCase "2" $ sideLength 2 @?= 4
-    --   , testCase "3" $ sideLength 3 @?= 6
-    --   ]
-    -- processSideTests = testGroup "processSide"
-    --   [ testCase "any Result value" $ processSide 12 (Result 3) @?= Result 3 -- quickcheck would be better
-    --   -- , testCase "length 1, pos 0" $ processSide 1 (Remains 0) @?= Remains 0
-    --   , testCase "level 1, pos 1" $ processSide 1 (Remains 1) @?= Result 0
-    --   , testCase "level 1, pos 2" $ processSide 1 (Remains 2) @?= Result 1
-    --   , testCase "level 1, pos 100" $ processSide 1 (Remains 100) @?= Remains 98
-    --   , testCase "level 2, pos 1" $ processSide 2 (Remains 1) @?= Result 1
-    --   , testCase "level 2, pos 2" $ processSide 2 (Remains 2) @?= Result 0
-    --   , testCase "level 2, pos 3" $ processSide 2 (Remains 3) @?= Result 1
-    --   , testCase "level 2, pos 4" $ processSide 2 (Remains 4) @?= Result 2
-    --   , testCase "level 2, pos 5" $ processSide 2 (Remains 5) @?= Remains 1
-    --   , testCase "level 3, pos 1" $ processSide 3 (Remains 1) @?= Result 2
-    --   , testCase "level 3, pos 2" $ processSide 3 (Remains 2) @?= Result 1
-    --   , testCase "level 3, pos 3" $ processSide 3 (Remains 3) @?= Result 0
-    --   , testCase "level 3, pos 4" $ processSide 3 (Remains 4) @?= Result 1
-    --   , testCase "level 3, pos 5" $ processSide 3 (Remains 5) @?= Result 2
-    --   , testCase "level 3, pos 6" $ processSide 3 (Remains 6) @?= Result 3
-    --   , testCase "level 3, pos 7" $ processSide 3 (Remains 7) @?= Remains 1
-    --   ]
-    -- processLevelTests = testGroup "processLevel"
-    --   [ testCase "any Result value" $ processLevel 1 (Result 9) @?= Result 9 -- quickcheck would be better
-    --   , testCase "level 1, remaining 1" $ processLevel 1 (Remains 1) @?= Result 0
-
-    --   , testCase "level 1, remaining 2" $ processLevel 1 (Remains 2) @?= Result 1
-    --   , testCase "level 1, remaining 3" $ processLevel 1 (Remains 3) @?= Result 0
-    --   , testCase "level 1, remaining 4" $ processLevel 1 (Remains 4) @?= Result 1
-    --   , testCase "level 1, remaining 5" $ processLevel 1 (Remains 5) @?= Result 0
-    --   , testCase "level 1, remaining 6" $ processLevel 1 (Remains 6) @?= Result 1
-    --   , testCase "level 1, remaining 7" $ processLevel 1 (Remains 7) @?= Result 0
-    --   , testCase "level 1, remaining 8" $ processLevel 1 (Remains 8) @?= Result 1
-    --   , testCase "level 1, remaining 9" $ processLevel 1 (Remains 9) @?= Remains 1
-    --   , testCase "level 1, remaining 100" $ processLevel 1 (Remains 100) @?= Remains 92
-    --   ]
-    part1AlgoTests = testGroup "part1Algo"
+  [ testGroup "part 1 algorithm"
       [ testCase "1" $ part1Algo 1 @?= 0
       , testCase "2" $ part1Algo 2 @?= 1
       , testCase "3" $ part1Algo 3 @?= 2
@@ -209,9 +165,10 @@ tests = defaultMain $ testGroup "Tests"
       , testCase "23" $ part1Algo 23 @?= 2
       , testCase "1024" $ part1Algo 1024 @?= 31
       , testCase "277678" $ part1Algo 277678 @?= 475 ]
-    part2AlgoTests = testGroup "part2Algo"
+  , testGroup "part 2 algorithm"
       [ testCase "4" $ part2Algo 4 @?= 5
       , testCase "5" $ part2Algo 5 @?= 10
       , testCase "10" $ part2Algo 10 @?= 11
       , testCase "11" $ part2Algo 11 @?= 23
       , testCase "input" $ part2Algo input @?= 279138 ]
+   ]

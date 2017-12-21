@@ -1,10 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-missing-signatures #-}
 module Day1 (part1, part2) where
 
 import           Data.Char        (digitToInt)
-import           Data.List        (inits, tails)
 import           Data.Maybe
-import qualified Data.Text        as T
 import           Test.Tasty
 import           Test.Tasty.HUnit
 

@@ -1,18 +1,17 @@
-{-# LANGUAGE LambdaCase, ViewPatterns #-}
+{-# LANGUAGE ViewPatterns #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-missing-signatures #-}
 module Day18 (part1, part2) where
 
+import qualified Data.Map.Strict            as M
+import qualified Data.Sequence              as S
+import qualified Data.Vector                as V
 import           Data.Void                  (Void)
 import           Test.Tasty
 import           Test.Tasty.HUnit
-import           Text.Megaparsec            (Parsec, optional, sepBy, some, try,
-                                             (<|>),parseErrorPretty,parse)
-import           Text.Megaparsec.Char       (char, digitChar, lowerChar,
-                                             newline, space1, string,eol)
-import           Text.Megaparsec.Char.Lexer (signed, decimal)
-import qualified Data.Map.Strict as M
-import Data.List (foldl')
-import qualified Data.Vector as V
-import qualified Data.Sequence as S
+import           Text.Megaparsec            (Parsec, parse, parseErrorPretty,
+                                             sepBy, (<|>))
+import           Text.Megaparsec.Char       (eol, lowerChar, space1, string)
+import           Text.Megaparsec.Char.Lexer (decimal, signed)
 
 type Register = Char
 type Value = Int
@@ -31,7 +30,7 @@ data FakeQueue = FakeQueue (S.Seq Value) Int Int
 data ValueSource = Literal Value
                  | Pointer Register
                  deriving Show
-                 
+
 data Instruction = Send             ValueSource
                  | Set              Register    ValueSource
                  | Add              Register    ValueSource
@@ -41,7 +40,7 @@ data Instruction = Send             ValueSource
                  | Receive          Register    --part2
                  | JumpGreaterThan0 ValueSource ValueSource
                  deriving Show
-                 
+
 -- 3188 is right for part 1
 -- 7112 too high for 1
 
@@ -52,7 +51,7 @@ part1 = do
   let updates = iterate (part1Update p) ([], M.empty, 0, False)
       (sentSounds,_,_,_) = head . dropWhile (\(_,_,_,isRecovered) -> not isRecovered) $ updates
   return (head sentSounds)
-  
+
 part2 = do
   p <- inputForPart2
   let (FakeQueue _ n _) = getQueueForProgram1 (part2Algorithm p)
@@ -74,22 +73,23 @@ part1Update p (ss, m, i, _) = case p V.! i of
     (getValue -> n)          -> if check > 0
                                   then (ss, m, i + fromIntegral n, False)
                                   else (ss, m, i+1, False)
+  Receive _                  -> error "invalid part 1 program: Receive" -- FIXME, shouldn't have to do this
  where
-   getValue (Literal n) = n
+   getValue (Literal n)        = n
    getValue (Pointer register) = M.findWithDefault 0 register m
-   
+
    updateValue reg op n = M.insert reg (M.findWithDefault 0 reg m `op` n) m
-    
+
 enqueue :: Value -> FakeQueue -> FakeQueue
-enqueue v (FakeQueue s amount id) = FakeQueue (v S.<| s) (1+amount) id
+enqueue v (FakeQueue s amount ident) = FakeQueue (v S.<| s) (1+amount) ident
 
 pop :: FakeQueue -> (Maybe Value, FakeQueue)
-pop m@(FakeQueue s amount id)
+pop m@(FakeQueue s amount ident)
   | S.null s  = (Nothing, m)
   | otherwise = let (s' S.:> i) = S.viewr s
-                    restMemory = FakeQueue s' amount id
+                    restMemory = FakeQueue s' amount ident
                 in (Just i, restMemory)
-                
+
 isEmpty :: FakeQueue -> Bool
 isEmpty (FakeQueue s _ _) = S.null s
 
@@ -112,7 +112,7 @@ process program ((activeInput, activeOutput), (activeMem, inactiveMem), (activeI
                                (inactiveMem, newActiveMem),
                                (inactiveIndex, newActiveIndex),
                                (inactiveIsLocked, newActiveIsLocked))
-          
+
 part2Update :: Program -> (Memory, FakeQueue, FakeQueue, Index) -> (Memory, FakeQueue, FakeQueue, Index, IsLocked)
 part2Update program (memory, input, output, index) = case program V.! index of
   Send       (getValue -> n) -> (memory, input, enqueue n output, 1+index, False)
@@ -129,10 +129,11 @@ part2Update program (memory, input, output, index) = case program V.! index of
     (getValue -> n)          -> if check > 0
                                   then (memory, input, output, index + fromIntegral n, False)
                                   else (memory, input, output, 1+index, False)
+  Recover _                  -> error "invalid Program for part 2: Recover" -- FIXME shouldn't have to do this
  where
-  getValue (Literal n) = n
+  getValue (Literal n)        = n
   getValue (Pointer register) = M.findWithDefault 0 register memory
-    
+
   updateValue reg op n = M.insert reg (M.findWithDefault 0 reg memory `op` n) memory
 
 ------------------------------------------------------------------
@@ -166,11 +167,11 @@ inputForPart2 =
                parseReceive <|>
                parseJumpGreaterThan
   parseReceive = Receive <$> (string "rcv " *> lowerChar)
-  
-    
+
+
 processEither (Left  e ) = error (parseErrorPretty e)
 processEither (Right rs) = rs
-  
+
 parseSend = Send <$> (string "snd " *> parseValueSource)
 parseSet = parseRegisterValue "set" Set
 parseAdd = parseRegisterValue "add" Add

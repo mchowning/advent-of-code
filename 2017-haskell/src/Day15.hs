@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-missing-signatures #-}
 module Day15 (part1, part2) where
 
 import           Data.Bits        ((.&.))

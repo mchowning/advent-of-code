@@ -1,10 +1,11 @@
 {-# LANGUAGE MultiWayIf    #-}
 {-# LANGUAGE TupleSections #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-missing-signatures #-}
 module Day19 (part1, part2) where
 
 import           Data.Char        (isAlpha)
 import qualified Data.DList       as D
-import           Data.Maybe       (fromJust, fromMaybe, isJust, isNothing)
+import           Data.Maybe       (fromJust, isNothing)
 import qualified Data.Vector      as V
 
 import           Test.Tasty
