@@ -42,6 +42,7 @@ library
                  , Day18
                  , Day19
                  , Day20
+                 , Day21
   build-depends: base               >= 4.7 && < 5,
                  containers         >= 0.5,
                  dlist              >= 0.8.0.3,
