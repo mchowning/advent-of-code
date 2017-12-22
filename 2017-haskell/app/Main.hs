@@ -27,8 +27,7 @@ import qualified Day18
 import qualified Day19
 import qualified Day20
 import qualified Day21
-
--- TODO pass time to run and use that to confirm running long parts?
+import qualified Day22
 
 main :: IO ()
 main = do
@@ -41,7 +40,6 @@ main = do
 parser :: Parser (Int, Int)
 parser = (,) <$> argInt "day" "the day of an exercise: a number"
              <*> argInt "part" "the part of the day's exercise to run: the number 1 or 2"
-
 
 runExercise :: Int -> Int -> IO String
 runExercise day part =
@@ -71,4 +69,5 @@ exercises = Map.fromList [ (1,  (return Day1.part1,         return Day1.part2))
                          , (19, (show <$> Day19.part1,      show <$> Day19.part2))
                          , (20, (show <$> Day20.part1,      show <$> Day20.part2))
                          , (21, (show <$> Day21.part1,      show <$> Day21.part2))
+                         , (22, (show <$> Day22.part1,      show <$> Day22.part2))
                          ]
