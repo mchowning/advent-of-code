@@ -28,6 +28,7 @@ import qualified Day19
 import qualified Day20
 import qualified Day21
 import qualified Day22
+import qualified Day23
 
 main :: IO ()
 main = do
@@ -70,4 +71,5 @@ exercises = Map.fromList [ (1,  (return Day1.part1,         return Day1.part2))
                          , (20, (show <$> Day20.part1,      show <$> Day20.part2))
                          , (21, (show <$> Day21.part1,      show <$> Day21.part2))
                          , (22, (show <$> Day22.part1,      show <$> Day22.part2))
+                         , (23, (show <$> Day23.part1,      show Day23.part2))
                          ]
