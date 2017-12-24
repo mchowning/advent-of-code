@@ -10,10 +10,8 @@ import           Text.Megaparsec.Char
 
 import           Test.Tasty
 import           Test.Tasty.HUnit
-import Data.List (transpose,groupBy,elemIndex)
+import Data.List (transpose)
 import qualified Data.Set as S
-
-import Debug.Trace
 
 newtype Pixel = Pixel { isOn :: Bool } deriving (Eq, Ord)
 type Graph = [[Pixel]]
