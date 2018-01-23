@@ -32,18 +32,10 @@ data ValueSource = Literal Value
                  deriving Show
 
 data Instruction = Send             ValueSource
-                 | Set              Register    ValueSource
-                 | Add              Register    ValueSource
-                 | Multiply         Register    ValueSource
-                 | Mod              Register    ValueSource
+                 | BinOp            (Value -> Value -> Value) Register ValueSource
                  | Recover          ValueSource --part1
                  | Receive          Register    --part2
                  | JumpGreaterThan0 ValueSource ValueSource
-                 deriving Show
-
--- 3188 is right for part 1
--- 7112 too high for 1
-
 
 part1, part2 :: IO Int
 part1 = do
@@ -63,10 +55,9 @@ part2 = do
 part1Update :: Program -> (PlayedSounds, Memory, Index, Bool) -> (PlayedSounds, Memory, Index, Bool)
 part1Update p (ss, m, i, _) = case p V.! i of
   Send       (getValue -> n) -> (n : ss, m, i+1, False)
-  Set      r (getValue -> n) -> (ss, M.insert r n m, i+1, False)
-  Add      r (getValue -> n) -> (ss, updateValue r (+) n, i+1, False)
-  Multiply r (getValue -> n) -> (ss, updateValue r (*) n, i+1, False)
-  Mod      r (getValue -> n) -> (ss, updateValue r mod n, i+1, False)
+  BinOp op r (getValue -> n) -> let newValue = M.findWithDefault 0 r m `op` n
+                                    updatedMap = M.insert r newValue m
+                                in (ss, updatedMap, i+1, False)
   Recover    (getValue -> n) -> (ss, m, i+1, n /= 0)
   JumpGreaterThan0
     (getValue -> check)
@@ -77,8 +68,6 @@ part1Update p (ss, m, i, _) = case p V.! i of
  where
    getValue (Literal n)        = n
    getValue (Pointer register) = M.findWithDefault 0 register m
-
-   updateValue reg op n = M.insert reg (M.findWithDefault 0 reg m `op` n) m
 
 enqueue :: Value -> FakeQueue -> FakeQueue
 enqueue v (FakeQueue s amount ident) = FakeQueue (v S.<| s) (1+amount) ident
@@ -101,7 +90,6 @@ part2Algorithm p = process p
                              (False, False))
 
 process :: Program -> ((FakeQueue, FakeQueue), (Memory, Memory), (Index, Index), (IsLocked, IsLocked))
---                    -> ((FakeQueue, FakeQueue), (Memory, Memory), (Index, Index), (IsLocked, IsLocked))
                     -> (FakeQueue, FakeQueue)
 process program ((activeInput, activeOutput), (activeMem, inactiveMem), (activeIndex, inactiveIndex), (activeIsLocked, inactiveIsLocked)) =
   if activeIsLocked && inactiveIsLocked
@@ -116,10 +104,9 @@ process program ((activeInput, activeOutput), (activeMem, inactiveMem), (activeI
 part2Update :: Program -> (Memory, FakeQueue, FakeQueue, Index) -> (Memory, FakeQueue, FakeQueue, Index, IsLocked)
 part2Update program (memory, input, output, index) = case program V.! index of
   Send       (getValue -> n) -> (memory, input, enqueue n output, 1+index, False)
-  Set      r (getValue -> n) -> (M.insert r n memory, input, output, 1+index, False)
-  Add      r (getValue -> n) -> (updateValue r (+) n, input, output, 1+index, False)
-  Multiply r (getValue -> n) -> (updateValue r (*) n, input, output, 1+index, False)
-  Mod      r (getValue -> n) -> (updateValue r mod n, input, output, 1+index, False)
+  BinOp op r (getValue -> n) -> let newValue = M.findWithDefault 0 r memory `op` n
+                                    updatedMap = M.insert r newValue memory
+                                in (updatedMap, input, output, 1+index, False)
   Receive  r                 -> if isEmpty input
                                   then (memory, input, output, index, True)
                                   else let (Just e, newInput) = pop input
@@ -133,8 +120,6 @@ part2Update program (memory, input, output, index) = case program V.! index of
  where
   getValue (Literal n)        = n
   getValue (Pointer register) = M.findWithDefault 0 register memory
-
-  updateValue reg op n = M.insert reg (M.findWithDefault 0 reg memory `op` n) memory
 
 ------------------------------------------------------------------
 
@@ -173,10 +158,10 @@ processEither (Left  e ) = error (parseErrorPretty e)
 processEither (Right rs) = rs
 
 parseSend = Send <$> (string "snd " *> parseValueSource)
-parseSet = parseRegisterValue "set" Set
-parseAdd = parseRegisterValue "add" Add
-parseMultiply = parseRegisterValue "mul" Multiply
-parseMod = parseRegisterValue "mod" Mod
+parseSet = parseRegisterValue "set" (BinOp (const id))
+parseAdd = parseRegisterValue "add" (BinOp (+))
+parseMultiply = parseRegisterValue "mul" (BinOp (*))
+parseMod = parseRegisterValue "mod" (BinOp mod)
 
 parseJumpGreaterThan = do
   _ <- string "jgz "
