@@ -27,9 +27,7 @@ sentKey = '-'
 data FakeQueue = FakeQueue (S.Seq Value) Int Int
                  deriving Show
 
-data ValueSource = Literal Value
-                 | Pointer Register
-                 deriving Show
+type ValueSource = Either Register Value
 
 data Instruction = Send             ValueSource
                  | BinOp            (Value -> Value -> Value) Register ValueSource
@@ -66,8 +64,8 @@ part1Update p (ss, m, i, _) = case p V.! i of
                                   else (ss, m, i+1, False)
   Receive _                  -> error "invalid part 1 program: Receive" -- FIXME, shouldn't have to do this
  where
-   getValue (Literal n)        = n
-   getValue (Pointer register) = M.findWithDefault 0 register m
+   getValue (Right n)        = n
+   getValue (Left register) = M.findWithDefault 0 register m
 
 enqueue :: Value -> FakeQueue -> FakeQueue
 enqueue v (FakeQueue s amount ident) = FakeQueue (v S.<| s) (1+amount) ident
@@ -118,8 +116,8 @@ part2Update program (memory, input, output, index) = case program V.! index of
                                   else (memory, input, output, 1+index, False)
   Recover _                  -> error "invalid Program for part 2: Recover" -- FIXME shouldn't have to do this
  where
-  getValue (Literal n)        = n
-  getValue (Pointer register) = M.findWithDefault 0 register memory
+  getValue (Left register) = M.findWithDefault 0 register memory
+  getValue (Right n)        = n
 
 ------------------------------------------------------------------
 
@@ -178,7 +176,7 @@ parseRegisterValue prefix i = do
   v <- parseValueSource
   return (i r v)
 
-parseValueSource = Pointer <$> lowerChar <|> Literal <$> signed mempty decimal
+parseValueSource = Left <$> lowerChar <|> Right <$> signed mempty decimal
 
 ------------------------------------------------------------------
 
