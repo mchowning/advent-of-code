@@ -7,4 +7,8 @@ stdenv.mkDerivation {
     pkgs.clojure
     pkgs.leiningen
   ];
+
+ shellHook = ''
+  emacs --daemon && emacsclient -c -a emacs &> /dev/null &
+  '';
 }
