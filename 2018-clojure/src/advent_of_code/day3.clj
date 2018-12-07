@@ -1,19 +1,24 @@
 (ns advent-of-code.day3
-  (:require [clojure.math.combinatorics :as combo]))
+  (:require [clojure.math.combinatorics :as combo]
+            [clojure.algo.generic.functor :refer [fmap]]
+            ;; :verbose
+))
 
 (def input
-  (clojure.string/split-lines
-   (slurp "input/day3.txt")))
+  (let
+   [parse-line (fn parse-line [line]
+                 (let [[_ n x y w h] (re-matches #"^#(\d*) @ (\d*),(\d*): (\d*)x(\d*)$" line)]
+                   {:num (read-string n)
+                    :x (read-string x)
+                    :y (read-string y)
+                    :w (read-string w)
+                    :h (read-string h)}))]
+    (map parse-line (clojure.string/split-lines
+                     (slurp "input/day3.txt")))))
 
-(defn parse-line [line]
-  (let [[_ n x y w h] (re-matches #"^#(\d*) @ (\d*),(\d*): (\d*)x(\d*)$" line)]
-    {:num (read-string n)
-     :x (read-string x)
-     :y (read-string y)
-     :w (read-string w)
-     :h (read-string h)}))
 
 ;; Part 1 ---------------------------------------------------------------------------------
+
 
 (defn get-coords [dict]
   (let [dim-range #(range %1 (+ %1 %2))]
@@ -28,25 +33,40 @@
           accum
           coords))
 
-(defn combiner [dicts]
-  (let [counts (map #(map-coords {} (:num %) (get-coords %))  dicts)]
-    (apply merge-with concat counts)))
+(defn claim-coords [dicts]
+  (let [map-claim (fn [dict]
+                    (map-coords {}
+                                (:num dict)
+                                (get-coords dict)))]
+    (map map-claim dicts)))
 
-(def part1
-  (let [dicts (map parse-line input)
-        coord-map (combiner dicts)
-        has-more-than-1-val #(->>
-                   %
-                   val
-                   count
-                   (< 1))]
-    (count (filter has-more-than-1-val coord-map))))
+(defn coordinate-map [dicts]
+  (let [claims (claim-coords dicts)]
+    (apply merge-with concat (claim-coords dicts))))
+
+(defn has-more-than-1-val [dicts]
+  (let [more-than-1-val #(->> % val count (< 1))]
+    (->>
+     dicts
+     coordinate-map
+     (filter more-than-1-val)
+     keys
+     concat)))
+
+(def part1 (count (has-more-than-1-val input)))
 
 
 ;; Part 2 ---------------------------------------------------------------------------------
 
 
-;; ---------------------------------------------------------------------------------
+(def part2
+  (let [set-with-more-than-1 (set (has-more-than-1-val input))
+        coord-with-more-than-1 #(contains? set-with-more-than-1 %)
+        all-good #(not (some coord-with-more-than-1 (get-coords %)))]
+    (filter all-good input)))
+
+
+;; Test ----------------------------------------------------------------------------------
 
 
 (def test
@@ -54,7 +74,7 @@
                    (println "Success!")
                    (println (str "Failure! Expected " %2 ", but got " %1)))]
     (checker part1 101781)
-    ;; (checker part2 "evsialkqyiurohzpwucngttmf")
+    (checker (:num (first part2)) 909)
 ))
 
 (def test-input
