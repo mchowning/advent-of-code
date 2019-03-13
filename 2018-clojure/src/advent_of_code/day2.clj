@@ -44,11 +44,11 @@
 ;; Part 2 ---------------------------------------------------------------------------------
 
 
-(defn numDiffChars [words]
-  (let [numDiffChars #(count (set %))
-        hasDiffChars #(not= 1 (numDiffChars %))
-        pairedChars (apply map vector words)]
-    (count (filter hasDiffChars pairedChars))))
+(defn numDiffChars [wordPair]
+  (let [pairedChars (apply map vector wordPair)]
+    (->> pairedChars
+         (filter (partial apply not=))
+         count)))
 
 (defn string-pairs-differing-by-1-char [words]
   (let [pairs (combo/combinations words 2)
@@ -57,7 +57,7 @@
 
 (defn only-matching-chars [[w1 w2]]
   (let [pairedChars (map vector w1 w2)
-        onlyMatchingPairs (filter #(= (first %) (second %)) pairedChars)]
+        onlyMatchingPairs (filter (partial apply =) pairedChars)]
     (map first onlyMatchingPairs)))
 
 (def part2 (apply str (->>
