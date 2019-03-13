@@ -7,38 +7,12 @@
 
 ;; Part 1 ---------------------------------------------------------------------------------
 
-(defn wordCheck [word]
-  (let [counts (vals (frequencies word))
-        numTwos (some #{2} counts)
-        numThrees (some #{3} counts)
-        limit-to-1 #(if % 1 0)]
-    [(limit-to-1 numTwos) (limit-to-1 numThrees)]))
-
-(defn combiner [acc word]
-  (map + acc (wordCheck word)))
-
 (def part1
-  (let [[twos threes] (reduce combiner [0 0] input)]
-    (* twos threes)))
-
-;; ------------------------------
-
-(defn occurrenceFrequencies [word]
-  (str "Returns a set with the frequencies of letters in the word. "
-       "For example, 'matt' has single and double letters, so it "
-       "would return #{1 2}")
-    (-> word frequencies vals set))
-
-(defn combiner [acc word]
-  (let [freqs (occurrenceFrequencies word)
-        keywordOf #(keyword (str %))
-        inc' (fnil inc 0)
-        combiner' #(update %1 (keywordOf %2) inc')]
-    (reduce combiner' acc freqs)))
-
-(def part1'
-  (let [{twos :2 threes :3} (reduce combiner {} input)]
-  (* twos threes)))
+  (let [repetitions (map (comp vals frequencies) input)
+        numWithNRepetitions #(->> repetitions
+                                  (filter (partial some #{%}))
+                                  count)]
+    (* (numWithNRepetitions 2) (numWithNRepetitions 3))))
 
 
 ;; Part 2 ---------------------------------------------------------------------------------
@@ -51,20 +25,20 @@
          count)))
 
 (defn string-pairs-differing-by-1-char [words]
-  (let [pairs (combo/combinations words 2)
-        has-1-diff-char #(= 1 (numDiffChars %))]
-    (filter has-1-diff-char pairs)))
+  (let [pairs (combo/combinations words 2)]
+    ;; (filter #(->> % numDiffChars (= 1)) pairs)))
+    (filter #(= 1 (numDiffChars %)) pairs)))
 
 (defn only-matching-chars [[w1 w2]]
   (let [pairedChars (map vector w1 w2)
         onlyMatchingPairs (filter (partial apply =) pairedChars)]
     (map first onlyMatchingPairs)))
 
-(def part2 (apply str (->>
-                       input
-                       string-pairs-differing-by-1-char
-                       first
-                       only-matching-chars)))
+(def part2 (->> input
+                string-pairs-differing-by-1-char
+                first
+                only-matching-chars
+                (apply str)))
 
 ;; ---------------------------------------------------------------------------------
 
