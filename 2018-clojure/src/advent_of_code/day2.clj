@@ -21,7 +21,28 @@
   (let [[twos threes] (reduce combiner [0 0] input)]
     (* twos threes)))
 
+;; ------------------------------
+
+(defn occurrenceFrequencies [word]
+  (str "Returns a set with the frequencies of letters in the word. "
+       "For example, 'matt' has single and double letters, so it "
+       "would return #{1 2}")
+    (-> word frequencies vals set))
+
+(defn combiner [acc word]
+  (let [freqs (occurrenceFrequencies word)
+        keywordOf #(keyword (str %))
+        inc' (fnil inc 0)
+        combiner' #(update %1 (keywordOf %2) inc')]
+    (reduce combiner' acc freqs)))
+
+(def part1'
+  (let [{twos :2 threes :3} (reduce combiner {} input)]
+  (* twos threes)))
+
+
 ;; Part 2 ---------------------------------------------------------------------------------
+
 
 (defn numDiffChars [words]
   (let [numDiffChars #(count (set %))
@@ -47,7 +68,7 @@
 
 ;; ---------------------------------------------------------------------------------
 
-(def test
+(def test_
   (let [checker #(if (= %1 %2)
                    (println "Success!")
                    (println (str "Failure! Expected " %2 ", but got " %1)))]
