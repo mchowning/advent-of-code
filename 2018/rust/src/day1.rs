@@ -52,6 +52,6 @@ fn part2() -> i32 {
 }
 
 fn read_file() -> String {
-    fs::read_to_string("../input.txt")
+    fs::read_to_string("../inputs/day1.txt")
         .expect("Something went wrong reading input")
 }
