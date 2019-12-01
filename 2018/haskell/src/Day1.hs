@@ -58,5 +58,5 @@ readInput = parseInput (signedInt `sepBy1` eol) "day1.txt"
     signedInt = signed (return ()) decimal
 
 test :: IO ()
-test = runTestCases [ TestCase "part 1" 47 part1
-                    , TestCase "part 2" 790 part2 ]
+test = runTestCases (TestCase "part 1" 47  part1)
+                    (TestCase "part 2" 790 part2)

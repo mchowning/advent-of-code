@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 use std::fs;
+use std::borrow::Borrow;
 
 pub fn day1() {
     let part_1_result = part1();
@@ -54,4 +55,16 @@ fn part2() -> i32 {
 fn read_file() -> String {
     fs::read_to_string("../inputs/day1.txt")
         .expect("Something went wrong reading input")
+}
+
+//fn read_input() -> Map<std::str::Lines<'_>, str>{
+fn read_input() -> Box<dyn Iterator<Item=String>> {
+//fn read_input() -> Box<dyn Iterator<Item=i32>> {
+    Box::new(fs::read_to_string("../inputs/day1.txt")
+        .expect("Something went wrong reading input")
+        .lines()
+//        .map(|line|
+//            line.parse::<i32>().expect("Problem parsing line to i32")
+//        )
+         )
 }
