@@ -15,7 +15,9 @@ part1' :: [Int] -> Int
 part1' = sum . fmap calculateFuel
 
 calculateFuel :: Int -> Int
-calculateFuel n = (n `div` 3) - 2
+calculateFuel = subtract 2 . (`div` 3)
+
+-- calculateFuel n = (n `div` 3) - 2
 
 --------------------------------------------------------------
 
@@ -26,16 +28,22 @@ part2' :: [Int] -> Int
 part2' = sum . fmap calculateFuelRecursive
 
 calculateFuelRecursive :: Int -> Int
-calculateFuelRecursive n =
-  let more = calculateFuel n
-  in if more > 0
-       then more + calculateFuelRecursive more
-       else 0
+calculateFuelRecursive =
+  sum . takeWhile (> 0) . tail . iterate calculateFuel
+
+-- calculateFuelRecursive n =
+--   let more = calculateFuel n
+--   in if more > 0
+--        then more + calculateFuelRecursive more
+--        else 0
+
 
 --------------------------------------------------------------
 
 readInput :: IO [Int]
 readInput = parseInput (decimal `sepBy1` eol) "day1.txt"
+
+-- readInput = fmap read . lines <$> readFile "../inputs/day1.txt"
 
 test :: IO ()
 test = runTestCases (TestCase "part 1" 3299598 part1)
