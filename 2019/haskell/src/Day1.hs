@@ -17,8 +17,6 @@ part1' = sum . fmap calculateFuel
 calculateFuel :: Int -> Int
 calculateFuel = subtract 2 . (`div` 3)
 
--- calculateFuel n = (n `div` 3) - 2
-
 --------------------------------------------------------------
 
 part2 :: IO Int
@@ -33,9 +31,9 @@ calculateFuelRecursive =
 
 -- calculateFuelRecursive n =
 --   let more = calculateFuel n
---   in if more > 0
---        then more + calculateFuelRecursive more
---        else 0
+--   in if more <= 0
+--        then 0
+--        else more + calculateFuelRecursive more
 
 
 --------------------------------------------------------------
