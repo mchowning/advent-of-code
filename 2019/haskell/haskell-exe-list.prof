@@ -1,0 +1,155 @@
+	Mon Dec  2 21:28 2019 Time and Allocation Profiling Report  (Final)
+
+	   haskell-exe +RTS -N -p -RTS
+
+	total time  =        0.56 secs   (1737 ticks @ 1000 us, 16 processors)
+	total alloc = 5,277,045,448 bytes  (excludes profiling overheads)
+
+COST CENTRE                   MODULE SRC                         %time %alloc
+
+replaceElement.(...)          Day2   src/Day2.hs:48:7-40          40.1   39.1
+runProgram.runProgram'.(...)  Day2   src/Day2.hs:27:11-39         37.1   42.9
+replaceElement                Day2   src/Day2.hs:(47,1)-(49,24)   14.4   17.6
+runProgram.runProgram'.newVal Day2   src/Day2.hs:32:16-46          5.2    0.0
+runProgram.runProgram'        Day2   src/Day2.hs:(26,5)-(34,41)    2.6    0.2
+
+
+                                                                                                                                       individual      inherited
+COST CENTRE                           MODULE                     SRC                                               no.      entries  %time %alloc   %time %alloc
+
+MAIN                                  MAIN                       <built-in>                                         880          0    0.2    0.0   100.0  100.0
+ CAF                                  Data.Text.Array            <entire-module>                                   1076          0    0.0    0.0     0.0    0.0
+ CAF                                  Data.Text.Internal         <entire-module>                                   1072          0    0.0    0.0     0.0    0.0
+ CAF                                  GHC.Conc.Signal            <entire-module>                                    983          0    0.0    0.0     0.0    0.0
+ CAF                                  GHC.IO.Encoding            <entire-module>                                    964          0    0.0    0.0     0.0    0.0
+ CAF                                  GHC.IO.Encoding.Iconv      <entire-module>                                    962          0    0.0    0.0     0.0    0.0
+ CAF                                  GHC.IO.Exception           <entire-module>                                    956          0    0.0    0.0     0.0    0.0
+ CAF                                  GHC.IO.FD                  <entire-module>                                    955          0    0.0    0.0     0.0    0.0
+ CAF                                  GHC.IO.Handle.FD           <entire-module>                                    953          0    0.0    0.0     0.0    0.0
+ CAF                                  GHC.IO.Handle.Internals    <entire-module>                                    952          0    0.0    0.0     0.0    0.0
+ CAF                                  GHC.IO.Handle.Text         <entire-module>                                    951          0    0.0    0.0     0.0    0.0
+ CAF                                  System.Posix.Internals     <entire-module>                                    918          0    0.0    0.0     0.0    0.0
+ CAF                                  GHC.Event.Poll             <entire-module>                                    897          0    0.0    0.0     0.0    0.0
+ CAF                                  GHC.Event.Thread           <entire-module>                                    896          0    0.0    0.0     0.0    0.0
+ CAF:$fAlternativeParsecT_$cfmap      Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:161:3-6               1566          0    0.0    0.0     0.0    0.0
+  fmap                                Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:161:3-13              1800          1    0.0    0.0     0.0    0.0
+ CAF:$fStreamText4                    Text.Megaparsec.Stream     <no location info>                                1461          0    0.0    0.0     0.0    0.0
+  takeWhile_                          Text.Megaparsec.Stream     Text/Megaparsec/Stream.hs:267:3-21                1804          1    0.0    0.0     0.0    0.0
+ CAF:$fStreamText5                    Text.Megaparsec.Stream     <no location info>                                1462          0    0.0    0.0     0.0    0.0
+  take1_                              Text.Megaparsec.Stream     Text/Megaparsec/Stream.hs:262:3-19                1815          1    0.0    0.0     0.0    0.0
+ CAF:$sdecimal1                       Day2                       <no location info>                                1714          0    0.0    0.0     0.0    0.0
+  decimal                             Text.Megaparsec.Char.Lexer Text/Megaparsec/Char/Lexer.hs:336:1-32            1795          1    0.0    0.0     0.0    0.0
+   label                              Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:317:3-28              1796          1    0.0    0.0     0.0    0.0
+ CAF:$sdecimal17                      Day2                       <no location info>                                1708          0    0.0    0.0     0.0    0.0
+  decimal                             Text.Megaparsec.Char.Lexer Text/Megaparsec/Char/Lexer.hs:336:1-32            1845          0    0.0    0.0     0.0    0.0
+   chunkToTokens                      Text.Megaparsec.Stream     Text/Megaparsec/Stream.hs:259:3-32                1846          1    0.0    0.0     0.0    0.0
+ CAF:$sdecimal8                       Day2                       <no location info>                                1711          0    0.0    0.0     0.0    0.0
+  decimal                             Text.Megaparsec.Char.Lexer Text/Megaparsec/Char/Lexer.hs:336:1-32            1801          0    0.0    0.0     0.0    0.0
+   takeWhile1P                        Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:327:3-34              1802          1    0.0    0.0     0.0    0.0
+ CAF:$sdecimal_p                      Day2                       <no location info>                                1712          0    0.0    0.0     0.0    0.0
+  decimal                             Text.Megaparsec.Char.Lexer Text/Megaparsec/Char/Lexer.hs:336:1-32            1799          0    0.0    0.0     0.0    0.0
+ CAF:lvl22_rgXi                       Day2                       <no location info>                                1719          0    0.0    0.0     0.0    0.0
+  mplus                               Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:268:3-15              1810          1    0.0    0.0     0.0    0.0
+ CAF:lvl4_r907                        Util                       <no location info>                                1686          0    0.0    0.0     0.0    0.0
+  parseInput                          Util                       src/Util.hs:(13,1)-(15,38)                        1768          0    0.0    0.0     0.0    0.0
+ CAF:m1_rgXe                          Day2                       <no location info>                                1715          0    0.0    0.0     0.0    0.0
+  token                               Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:324:3-28              1813          1    0.0    0.0     0.0    0.0
+ CAF:m2_rgXg                          Day2                       <no location info>                                1717          0    0.0    0.0     0.0    0.0
+  readInput                           Day2                       src/Day2.hs:75:1-61                               1811          0    0.0    0.0     0.0    0.0
+ CAF:main1                            Main                       <no location info>                                1758          0    0.0    0.0     0.0    0.0
+  main                                Main                       app/Main.hs:6:1-22                                1760          1    0.0    0.0     0.0    0.0
+ CAF:n_rgXh                           Day2                       <no location info>                                1718          0    0.0    0.0     0.0    0.0
+  return                              Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:201:3-15              1824          1    0.0    0.0     0.0    0.0
+   pure                               Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:171:3-18              1825          1    0.0    0.0     0.0    0.0
+ CAF:p1_rgXf                          Day2                       <no location info>                                1716          0    0.0    0.0     0.0    0.0
+  >>=                                 Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:202:3-16              1812          1    0.0    0.0     0.0    0.0
+ CAF:part10                           Day2                       <no location info>                                1720          0    0.0    0.0     0.0    0.0
+  readInput                           Day2                       src/Day2.hs:75:1-61                               1807          0    0.0    0.0     0.0    0.0
+   >>=                                Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:202:3-16              1808          1    0.0    0.0     0.0    0.0
+ CAF:part12                           Day2                       <no location info>                                1724          0    0.0    0.0     0.0    0.0
+  part2                               Day2                       src/Day2.hs:54:1-28                               1762          1    0.0    0.0     0.0    0.0
+ CAF:part2'                           Day2                       src/Day2.hs:57:1-6                                1707          0    0.0    0.0     0.0    0.0
+  part2'                              Day2                       src/Day2.hs:(57,1)-(62,36)                        1771          1    0.0    0.0     0.0    0.0
+ CAF:part2'_candidates                Day2                       src/Day2.hs:61:5-14                               1700          0    0.0    0.0     0.0    0.0
+  part2'                              Day2                       src/Day2.hs:(57,1)-(62,36)                        1774          0    0.0    0.0     0.0    0.0
+   part2'.candidates                  Day2                       src/Day2.hs:61:5-71                               1775          1    0.0    0.0     0.0    0.0
+   part2'.maxNum                      Day2                       src/Day2.hs:60:5-15                               1777          1    0.0    0.0     0.0    0.0
+   part2'.minNum                      Day2                       src/Day2.hs:59:5-14                               1776          1    0.0    0.0     0.0    0.0
+ CAF:part5                            Day2                       <no location info>                                1722          0    0.0    0.0     0.0    0.0
+  readInput                           Day2                       src/Day2.hs:75:1-61                               1764          1    0.0    0.0     0.0    0.0
+   parseInput                         Util                       src/Util.hs:(13,1)-(15,38)                        1765          1    0.0    0.0     0.0    0.0
+ CAF:part6                            Day2                       <no location info>                                1699          0    0.0    0.0     0.0    0.0
+  readInput                           Day2                       src/Day2.hs:75:1-61                               1769          0    0.0    0.0     0.0    0.0
+ CAF:part8                            Day2                       <no location info>                                1721          0    0.0    0.0     0.0    0.0
+  >>=                                 Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:202:3-16              1794          1    0.0    0.0     0.0    0.0
+ CAF:runProgram                       Day2                       src/Day2.hs:23:1-10                               1704          0    0.0    0.0     0.0    0.0
+  runProgram                          Day2                       src/Day2.hs:(23,1)-(34,41)                        1779          1    0.0    0.0     0.0    0.0
+ main                                 Main                       app/Main.hs:6:1-22                                1761          0    0.0    0.0    99.8  100.0
+  part2                               Day2                       src/Day2.hs:54:1-28                               1763          0    0.0    0.0    99.8  100.0
+   part2'                             Day2                       src/Day2.hs:(57,1)-(62,36)                        1772          0    0.0    0.0    99.8  100.0
+    findResult                        Day2                       src/Day2.hs:(65,1)-(70,39)                        1773       8479    0.1    0.0    99.8  100.0
+     findResult.actual                Day2                       src/Day2.hs:67:7-44                               1778       8479    0.0    0.0    99.7   99.9
+      runProgram                      Day2                       src/Day2.hs:(23,1)-(34,41)                        1780          0    0.1    0.0    99.7   99.9
+       runProgram.runProgram'         Day2                       src/Day2.hs:(26,5)-(34,41)                        1781     279807    2.6    0.2    99.6   99.9
+        runProgram.runProgram'.(...)  Day2                       src/Day2.hs:27:11-39                              1783     279807   37.1   42.9    37.1   42.9
+        runProgram.runProgram'.a      Day2                       src/Day2.hs:27:11-39                              1782     279807    0.0    0.0     0.0    0.0
+        runProgram.runProgram'.d      Day2                       src/Day2.hs:27:11-39                              1848     271328    0.0    0.0     0.0    0.0
+        runProgram.runProgram'.newLs  Day2                       src/Day2.hs:33:16-49                              1850     271328    0.1    0.0    54.5   56.7
+         replaceElement               Day2                       src/Day2.hs:(47,1)-(49,24)                        1851     271328   14.3   17.6    54.4   56.7
+          replaceElement.(...)        Day2                       src/Day2.hs:48:7-40                               1852     271328   40.1   39.1    40.1   39.1
+          replaceElement.after        Day2                       src/Day2.hs:48:7-40                               1854     271328    0.0    0.0     0.0    0.0
+          replaceElement.before       Day2                       src/Day2.hs:48:7-40                               1853     271328    0.0    0.0     0.0    0.0
+        runProgram.runProgram'.b      Day2                       src/Day2.hs:27:11-39                              1856     237412    0.0    0.0     0.0    0.0
+        runProgram.runProgram'.c      Day2                       src/Day2.hs:27:11-39                              1855     237412    0.0    0.0     0.0    0.0
+        runProgram.runProgram'.newVal Day2                       src/Day2.hs:32:16-46                              1857     237412    5.2    0.0     5.4    0.1
+         runProgram.runProgram'.op    Day2                       src/Day2.hs:31:16-47                              1858     237412    0.1    0.1     0.1    0.1
+     findResult.updatedList           Day2                       src/Day2.hs:66:7-38                               1784       8479    0.0    0.0     0.1    0.1
+      updateInput                     Day2                       src/Day2.hs:44:1-57                               1785       8479    0.0    0.0     0.1    0.1
+       replaceElement                 Day2                       src/Day2.hs:(47,1)-(49,24)                        1786      16958    0.1    0.0     0.1    0.1
+        replaceElement.(...)          Day2                       src/Day2.hs:48:7-40                               1787      16958    0.0    0.0     0.0    0.0
+        replaceElement.after          Day2                       src/Day2.hs:48:7-40                               1844      16958    0.0    0.0     0.0    0.0
+        replaceElement.before         Day2                       src/Day2.hs:48:7-40                               1843      16958    0.0    0.0     0.0    0.0
+    part2'.nounVerbHash               Day2                       src/Day2.hs:62:5-36                               1859          1    0.0    0.0     0.0    0.0
+   readInput                          Day2                       src/Day2.hs:75:1-61                               1766          0    0.0    0.0     0.0    0.0
+    unParser                          Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:124:5-12              1809          5    0.0    0.0     0.0    0.0
+    decimal                           Text.Megaparsec.Char.Lexer Text/Megaparsec/Char/Lexer.hs:336:1-32            1817          0    0.0    0.0     0.0    0.0
+     unParser                         Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:124:5-12              1818       1056    0.0    0.0     0.0    0.0
+     >>=                              Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:202:3-16              1821        132    0.0    0.0     0.0    0.0
+     chunkEmpty                       Text.Megaparsec.Stream     Text/Megaparsec/Stream.hs:261:3-27                1820        132    0.0    0.0     0.0    0.0
+     chunkLength                      Text.Megaparsec.Stream     Text/Megaparsec/Stream.hs:260:3-30                1822        132    0.0    0.0     0.0    0.0
+     return                           Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:201:3-15              1826          1    0.0    0.0     0.0    0.0
+      pure                            Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:171:3-18              1828          1    0.0    0.0     0.0    0.0
+      unParser                        Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:124:5-12              1827          1    0.0    0.0     0.0    0.0
+      parseInput                      Util                       src/Util.hs:(13,1)-(15,38)                        1829          0    0.0    0.0     0.0    0.0
+       parse                          Util                       src/Util.hs:(18,1)-(21,33)                        1830          0    0.0    0.0     0.0    0.0
+        runParser                     Text.Megaparsec            Text/Megaparsec.hs:214:1-61                       1831          0    0.0    0.0     0.0    0.0
+         runParser'                   Text.Megaparsec            Text/Megaparsec.hs:227:1-42                       1832          0    0.0    0.0     0.0    0.0
+          runParserT'                 Text.Megaparsec            Text/Megaparsec.hs:(252,1)-(261,26)               1833          0    0.0    0.0     0.0    0.0
+           runParsecT                 Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:(609,1)-(614,56)      1834          0    0.0    0.0     0.0    0.0
+            runParsecT.cok            Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:611:5-51              1835          1    0.0    0.0     0.0    0.0
+     chunkToTokens                    Text.Megaparsec.Stream     Text/Megaparsec/Stream.hs:259:3-32                1849          0    0.0    0.0     0.0    0.0
+     parseInput                       Util                       src/Util.hs:(13,1)-(15,38)                        1837          0    0.0    0.0     0.0    0.0
+      parse                           Util                       src/Util.hs:(18,1)-(21,33)                        1838          0    0.0    0.0     0.0    0.0
+       runParser                      Text.Megaparsec            Text/Megaparsec.hs:214:1-61                       1839          0    0.0    0.0     0.0    0.0
+        runParser'                    Text.Megaparsec            Text/Megaparsec.hs:227:1-42                       1840          0    0.0    0.0     0.0    0.0
+         runParserT'                  Text.Megaparsec            Text/Megaparsec.hs:(252,1)-(261,26)               1841          0    0.0    0.0     0.0    0.0
+          runParsecT                  Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:(609,1)-(614,56)      1842          0    0.0    0.0     0.0    0.0
+     take1_                           Text.Megaparsec.Stream     Text/Megaparsec/Stream.hs:262:3-19                1823          0    0.0    0.0     0.0    0.0
+     takeWhile_                       Text.Megaparsec.Stream     Text/Megaparsec/Stream.hs:267:3-21                1819          0    0.0    0.0     0.0    0.0
+    parseInput                        Util                       src/Util.hs:(13,1)-(15,38)                        1767          0    0.0    0.0     0.0    0.0
+     readTextDevice                   Data.Text.Internal.IO      libraries/text/Data/Text/Internal/IO.hs:133:39-64 1770          2    0.0    0.0     0.0    0.0
+     parse                            Util                       src/Util.hs:(18,1)-(21,33)                        1788          1    0.0    0.0     0.0    0.0
+      parse.processEither             Util                       src/Util.hs:(20,5)-(21,33)                        1836          1    0.0    0.0     0.0    0.0
+      runParser                       Text.Megaparsec            Text/Megaparsec.hs:214:1-61                       1789          1    0.0    0.0     0.0    0.0
+       initialState                   Text.Megaparsec            Text/Megaparsec.hs:(266,1)-(276,3)                1803          1    0.0    0.0     0.0    0.0
+       runParser'                     Text.Megaparsec            Text/Megaparsec.hs:227:1-42                       1790          1    0.0    0.0     0.0    0.0
+        runParserT'                   Text.Megaparsec            Text/Megaparsec.hs:(252,1)-(261,26)               1791          1    0.0    0.0     0.0    0.0
+         runParsecT                   Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:(609,1)-(614,56)      1792          1    0.0    0.0     0.0    0.0
+          unParser                    Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:124:5-12              1793          2    0.0    0.0     0.0    0.0
+          decimal                     Text.Megaparsec.Char.Lexer Text/Megaparsec/Char/Lexer.hs:336:1-32            1797          0    0.0    0.0     0.0    0.0
+           unParser                   Text.Megaparsec.Internal   Text/Megaparsec/Internal.hs:124:5-12              1798          4    0.0    0.0     0.0    0.0
+           chunkEmpty                 Text.Megaparsec.Stream     Text/Megaparsec/Stream.hs:261:3-27                1806          1    0.0    0.0     0.0    0.0
+           chunkLength                Text.Megaparsec.Stream     Text/Megaparsec/Stream.hs:260:3-30                1814          1    0.0    0.0     0.0    0.0
+           chunkToTokens              Text.Megaparsec.Stream     Text/Megaparsec/Stream.hs:259:3-32                1847          0    0.0    0.0     0.0    0.0
+           takeWhile_                 Text.Megaparsec.Stream     Text/Megaparsec/Stream.hs:267:3-21                1805          0    0.0    0.0     0.0    0.0
+    take1_                            Text.Megaparsec.Stream     Text/Megaparsec/Stream.hs:262:3-19                1816          0    0.0    0.0     0.0    0.0

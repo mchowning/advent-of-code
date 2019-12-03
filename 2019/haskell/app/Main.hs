@@ -1,4 +1,6 @@
 module Main where
 
+import Day2
+
 main :: IO ()
-main = error "not implemented"
+main = print =<< part2

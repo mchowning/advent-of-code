@@ -25,6 +25,7 @@ dependencies:
 - megaparsec
 - mtl
 - text
+- vector
 
 library:
   source-dirs: src
@@ -48,5 +49,11 @@ tests:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -O2
+    - -Wall
+    - -Wcompat
+    - -Wincomplete-record-updates
+    - -Wincomplete-uni-patterns
+    - -Wredundant-constraints
     dependencies:
     - haskell
