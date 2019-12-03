@@ -8,52 +8,39 @@ import Text.Megaparsec (sepBy1)
 import Text.Megaparsec.Char (char)
 import Text.Megaparsec.Char.Lexer (decimal, symbol)
 
-import Data.Vector.Unboxed (Vector, (//))
+import Data.Vector.Unboxed (Vector, (//), (!))
 import qualified Data.Vector.Unboxed as V
-
--- TODO: Update to use Vecotrs, mutable Vectors, Arrays for efficiency?
 
 part1 :: IO Int
 part1 = part1' <$> readInput
 
-part1' :: [Int] -> Int
-part1' = head . runProgram . updateInput 12 2
+part1' :: Vector Int -> Int
+part1' = V.head . runProgram . updateInput 12 2
 
-runProgram :: [Int] -> [Int]
+runProgram :: Vector Int -> Vector Int
 runProgram = runProgram' 0
   where
-    runProgram' :: Int -> [Int] -> [Int]
+    runProgram' :: Int -> Vector Int -> Vector Int
     runProgram' n ls =
-      let (_, a:b:c:d:_) = splitAt n ls
+      let (a:b:c:d:_) = V.toList (V.slice n 4 ls)
       in if a == 99
            then ls
            else let
                op = if a == 1 then (+) else (*)
-               newVal = op (ls !! b) (ls !! c)
-               newLs = replaceElement d newVal ls
+               newVal = op (ls ! b) (ls ! c)
+               newLs = ls // [(d,newVal)]
              in runProgram' (n + 4) newLs
 
--- updateInputForPart1 :: [Int] -> [Int]
--- -- updateInputForPart1 = replaceElement 1 12 . replaceElement 2 2
--- updateInputForPart1 = updateInput 12 2
--- updateInputForPart1 :: Vector Int -> Vector Int
--- updateInputForPart1 = (// [(1,12), (2,2)])
 
-
-updateInput :: Int -> Int -> [Int] -> [Int]
-updateInput a b = replaceElement 1 a . replaceElement 2 b
-
-replaceElement :: Int -> Int -> [Int] -> [Int]
-replaceElement i n xs =
-  let (before, _ : after) = splitAt i xs
-  in before ++ n : after
+updateInput :: Int -> Int -> Vector Int -> Vector Int
+updateInput a b = (// [(1,a), (2,b)])
 
 --------------------------------------------------------------
 
 part2 :: IO Int
 part2 = part2' <$> readInput
 
-part2' :: [Int] -> Int
+part2' :: Vector Int -> Int
 part2' = nounVerbHash . findResult 19690720 candidates
   where
     minNum = 0
@@ -61,20 +48,18 @@ part2' = nounVerbHash . findResult 19690720 candidates
     candidates = [(x,y) | x <- [minNum..maxNum], y <- [minNum..maxNum]]
     nounVerbHash (a,b) = 100 * a + b
 
-findResult :: Int -> [(Int, Int)] -> [Int] -> (Int, Int)
+findResult :: Int -> [(Int, Int)] -> Vector Int -> (Int, Int)
 findResult expected ((x,y) : xys) ls =
   let updatedList = updateInput x y ls
-      actual = head (runProgram updatedList)
+      actual = V.head (runProgram updatedList)
   in if actual == expected
         then (x,y)
         else findResult expected xys ls
 
 --------------------------------------------------------------
 
-readInput :: IO [Int]
-readInput = parseInput (decimal `sepBy1` char ',') "day2.txt"
--- readInput :: IO (Vector Int)
--- readInput = V.fromList <$> parseInput (decimal `sepBy1` char ',') "day2.txt"
+readInput :: IO (Vector Int)
+readInput = V.fromList <$> parseInput (decimal `sepBy1` char ',') "day2.txt"
 
 --------------------------------------------------------------
 
