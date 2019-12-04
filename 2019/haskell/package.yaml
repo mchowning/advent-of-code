@@ -38,17 +38,6 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    dependencies:
-    - haskell
-
-tests:
-  haskell-test:
-    main:                Spec.hs
-    source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
     - -O2
     - -Wall
     - -Wcompat
@@ -57,3 +46,16 @@ tests:
     - -Wredundant-constraints
     dependencies:
     - haskell
+
+tests:
+  haskell-test:
+    main:                TestMain.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - haskell
+    - tasty
+    - tasty-hunit

@@ -2,7 +2,6 @@
 module Day1 where
 
 import Util
-import TestHelpers
 
 import Text.Megaparsec (sepBy1)
 import Text.Megaparsec.Char (eol)
@@ -42,7 +41,3 @@ readInput :: IO [Int]
 readInput = parseInput (decimal `sepBy1` eol) "day1.txt"
 
 -- readInput = fmap read . lines <$> readFile "../inputs/day1.txt"
-
-test :: IO ()
-test = runTestCases (TestCase "part 1" 3299598 part1)
-                    (TestCase "part 2" 4946546 part2)

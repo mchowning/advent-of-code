@@ -1,7 +1,15 @@
 {-# LANGUAGE GADTs #-}
-module TestHelpers (TestCase (..), runCase, runTestCases) where
+module TestHelpers (TestCase (..), runCase, runTestCases, testParse) where
+
+import           Util
 
 import Control.Monad (unless)
+
+import           Test.Tasty
+import           Test.Tasty.HUnit
+
+import           Data.Text                  (Text)
+import           Text.Megaparsec            (parse, errorBundlePretty)
 
 data TestCase a where
   TestCase :: (Eq a, Show a) => { name :: String,
@@ -28,3 +36,11 @@ runCase (TestCase name expected actual) = do
       red = "\x1b[31m"
       green = "\x1b[32m"
       normal = "\x1b[0m"
+
+
+testParse :: (Show a, Eq a) => Parser a -> Text -> a -> Assertion
+testParse parser input expected =
+  -- case parse parser "test input" input of
+  --   Right a -> a @=? expected
+  --   Left e -> error (errorBundlePretty e)
+  processEither (parse parser "test input" input) @=? expected

@@ -1,11 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Util (Parser, parseInput) where
+module Util (Parser, parseInput, processEither) where
 
 import Data.Void (Void)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Text.Megaparsec (Parsec, errorBundlePretty, runParser)
+import Text.Megaparsec.Error (ParseErrorBundle)
 
 type Parser = Parsec Void Text
 
@@ -16,6 +17,7 @@ parseInput parser filename = do
 
 parse :: Parser a -> Text -> Text -> a
 parse parser filename input = processEither (runParser parser (T.unpack filename) input)
-  where
-    processEither (Left  e ) = error (errorBundlePretty e)
-    processEither (Right rs) = rs
+
+processEither :: Either (ParseErrorBundle Text Void) a -> a
+processEither (Left  e ) = error (errorBundlePretty e)
+processEither (Right rs) = rs

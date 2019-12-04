@@ -2,7 +2,6 @@
 module Day2 where
 
 import Util
-import TestHelpers
 
 import Text.Megaparsec (sepBy1)
 import Text.Megaparsec.Char (char)
@@ -60,10 +59,3 @@ findResult expected ((x,y) : xys) ls =
 
 readInput :: IO (Vector Int)
 readInput = V.fromList <$> parseInput (decimal `sepBy1` char ',') "day2.txt"
-
---------------------------------------------------------------
-
-
-test :: IO ()
-test = runTestCases (TestCase "part 1" 3101844 part1)
-                    (TestCase "part 2" 8478 part2)
