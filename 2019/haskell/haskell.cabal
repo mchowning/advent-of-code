@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f398e2eb76271f47db3723c6d5ae2affe844d43b44eb91ac77abc4438a1a1e19
+-- hash: eecde27bf8d21fe1fb013e1aa3cfb7970f42dbff5f04df8e4c3d99e87dcf4c80
 
 name:           haskell
 version:        0.1.0.0
@@ -30,6 +30,7 @@ library
       Day1
       Day2
       Day3
+      Day4
       Util
   other-modules:
       Paths_haskell
@@ -68,6 +69,7 @@ test-suite haskell-test
       Day1Tests
       Day2Tests
       Day3Tests
+      Day4Tests
       TestHelpers
       Paths_haskell
   hs-source-dirs:
@@ -77,9 +79,11 @@ test-suite haskell-test
       base >=4.7 && <5
     , containers
     , haskell
+    , hedgehog
     , megaparsec
     , mtl
     , tasty
+    , tasty-hedgehog
     , tasty-hunit
     , text
     , vector

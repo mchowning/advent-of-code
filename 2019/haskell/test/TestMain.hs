@@ -3,6 +3,7 @@
 import Day1Tests
 import Day2Tests
 import Day3Tests
+import Day4Tests
 
 import TestHelpers
 
@@ -20,9 +21,10 @@ main :: IO ()
 main = defaultMain $
   testGroup "All tests"
     [ testGroup "fast tests"
-      [ day1Tests
-      , day2Tests
-      , day3Tests
+      [ --day1Tests
+      -- , day2Tests
+      -- , day3Tests
+        day4Tests
       ]
     -- , testGroup "slow tests"
     --   [
