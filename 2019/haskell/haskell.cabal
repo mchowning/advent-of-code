@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: eecde27bf8d21fe1fb013e1aa3cfb7970f42dbff5f04df8e4c3d99e87dcf4c80
+-- hash: c7a7cfa0d2f871b25c46532b1f7fb0c56c57311703a1a599c2cfca14f0c89062
 
 name:           haskell
 version:        0.1.0.0
@@ -31,6 +31,7 @@ library
       Day2
       Day3
       Day4
+      Day5
       Util
   other-modules:
       Paths_haskell
@@ -70,6 +71,7 @@ test-suite haskell-test
       Day2Tests
       Day3Tests
       Day4Tests
+      Day5Tests
       TestHelpers
       Paths_haskell
   hs-source-dirs:

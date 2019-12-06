@@ -9,9 +9,8 @@ import           Prelude                    hiding (Left, Right)
 import           Control.Monad              (join, void)
 
 import           Data.Bifunctor             (bimap)
-import           Data.List                  (foldl', foldl1', minimumBy, sortBy)
+import           Data.List                  (foldl')
 import qualified Data.Map.Strict            as M
-import           Data.Ord                   (comparing)
 import qualified Data.Set                   as S
 
 import           Text.Megaparsec            (satisfy, sepBy1)
@@ -41,8 +40,8 @@ route = route' (0, 0)
        in newPositions <> route' end ms
 
 travel :: Coord -> Move -> [Coord]
-travel start move =
-  let end = findEnd start move
+travel start move' =
+  let end = findEnd start move'
    in tail (coordsBetweenPoints start end)
 
 coordsBetweenPoints :: Coord -> Coord -> [Coord]

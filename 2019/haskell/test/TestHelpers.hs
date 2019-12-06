@@ -5,16 +5,15 @@ import           Util
 
 import Control.Monad (unless)
 
-import           Test.Tasty
 import           Test.Tasty.HUnit
 
 import           Data.Text                  (Text)
-import           Text.Megaparsec            (parse, errorBundlePretty)
+import           Text.Megaparsec            (parse)
 
 data TestCase a where
-  TestCase :: (Eq a, Show a) => { name :: String,
-                                  expected :: a,
-                                  actual :: IO a } -> TestCase a
+  TestCase :: (Eq a, Show a) => { testName :: String,
+                                  expectedResult :: a,
+                                  actualResult :: IO a } -> TestCase a
 
 runTestCases :: TestCase a -> TestCase b -> IO ()
 runTestCases tc1 tc2 = do
@@ -40,7 +39,4 @@ runCase (TestCase name expected actual) = do
 
 testParse :: (Show a, Eq a) => Parser a -> Text -> a -> Assertion
 testParse parser input expected =
-  -- case parse parser "test input" input of
-  --   Right a -> a @=? expected
-  --   Left e -> error (errorBundlePretty e)
   processEither (parse parser "test input" input) @=? expected

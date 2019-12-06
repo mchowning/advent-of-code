@@ -4,9 +4,6 @@ module Day4Tests where
 
 import Day4
 
-import TestHelpers
-
-import Control.Monad (join)
 import Data.Char (digitToInt)
 import Data.List (group, nub)
 import Hedgehog
@@ -16,8 +13,6 @@ import qualified Hedgehog.Range as Range
 import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.Hedgehog
-
-import Control.Applicative
 
 day4Tests :: TestTree
 day4Tests = testGroup "Day 4 tests"
@@ -67,26 +62,29 @@ day4Tests = testGroup "Day 4 tests"
     ]
   ]
 
+part1Prop :: Property
 part1Prop = passwordProp passwordSatisfiesPart1Rule adjacencyCheck
   where adjacencyCheck n = (< length (show n)) . length . nub . show $ n
 
 -- FIXME just repeating logic being tested
+part2Prop :: Property
 part2Prop = passwordProp passwordSatisfiesPart2Rule adjacencyCheck
   where adjacencyCheck = elem 2 . map length . group . show
 
+passwordProp :: (Int -> Bool) -> (Int -> Bool) -> Property
 passwordProp checker adjacencyRequirement = withTests 5000 . property $ do
   n <- generateSample
   let isValidPassword = checker n
-  let neverDecreases = all (uncurry (<=)) (pairs (digitToInt <$> show n))
+  let noDecrease = all (uncurry (<=)) (pairs (digitToInt <$> show n))
   let adjacencyCheck = adjacencyRequirement n
   annotateShow isValidPassword
-  annotateShow neverDecreases
-  annotateShow (Day4.neverDecreases (digitToInt <$> show n))
+  annotateShow noDecrease
+  annotateShow (neverDecreases (digitToInt <$> show n))
   annotateShow adjacencyCheck
   annotateShow (hasTwoAdjacent n)
   HH.assert $ if isValidPassword
-    then neverDecreases && adjacencyCheck
-    else not (neverDecreases && adjacencyCheck)
+    then noDecrease && adjacencyCheck
+    else not (noDecrease && adjacencyCheck)
 
 pairs :: [Int] -> [(Int, Int)]
 pairs xs =

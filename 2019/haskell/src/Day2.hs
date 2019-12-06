@@ -5,7 +5,7 @@ import Util
 
 import Text.Megaparsec (sepBy1)
 import Text.Megaparsec.Char (char)
-import Text.Megaparsec.Char.Lexer (decimal, symbol)
+import Text.Megaparsec.Char.Lexer (decimal)
 
 import Data.Vector.Unboxed (Vector, (//), (!))
 import qualified Data.Vector.Unboxed as V
