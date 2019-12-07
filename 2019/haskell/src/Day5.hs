@@ -7,10 +7,11 @@ import           Text.Megaparsec            (sepBy1)
 import           Text.Megaparsec.Char       (char)
 import           Text.Megaparsec.Char.Lexer (decimal, signed)
 
+import           Data.Text                  (Text)
 import           Data.Vector.Unboxed        (Vector, (!), (//))
 import qualified Data.Vector.Unboxed        as V
 
-import Debug.Trace
+import           Debug.Trace
 
 type Index = Int
 
@@ -30,18 +31,18 @@ part1 :: IO Int
 part1 = part1' <$> readInput
 
 part1' :: Vector Int -> Int
-part1' = last . runProgram False 1
+part1' = last . runProgram False [1]
 
 getValue :: Mode -> Vector Int -> Index -> Int
-getValue Position v i = v ! (v ! i)
+getValue Position v i  = v ! (v ! i)
 getValue Immediate v i = v ! i
 
-putValue :: Mode -> Vector Int -> Index -> Int -> Vector Int
-putValue Position v i n = v // [(v ! i, n)]
-putValue Immediate v i n = v // [(i,n)]
+--putValue :: Mode -> Vector Int -> Index -> Int -> Vector Int
+--putValue Position v i n  = v // [(v ! i, n)]
+--putValue Immediate v i n = v // [(i,n)]
 
-putValue' :: Vector Int -> Index -> Int -> Vector Int
-putValue' v i n = v // [(i,n)]
+putValue :: Vector Int -> Index -> Int -> Vector Int
+putValue v i n = v // [(i,n)]
 
 withLength :: Int -> String -> String
 withLength n str =
@@ -71,50 +72,50 @@ part2 :: IO Int
 part2 = part2' <$> readInput
 
 part2' :: Vector Int -> Int
-part2' = head . runProgram True 5
+part2' = head . runProgram True [5]
 
-runProgram :: Bool -> Int -> Vector Int -> [Int]
-runProgram isPart2 n v = runProgram' isPart2 n 0 v []
+runProgram :: Bool -> [Int] -> Vector Int -> [Int]
+runProgram isPart2 ns v = runProgram' isPart2 ns 0 v []
 
 -- TODO: I don't know why ignoring the index rule works
-runProgram' :: Bool -> Int -> Index -> Vector Int -> [Int] -> [Int]
-runProgram' isPart2 input index vs acc = --trace (unwords ["\n", show index, show vs]) $
+runProgram' :: Bool -> [Int] -> Index -> Vector Int -> [Int] -> [Int]
+runProgram' isPart2 inputs index vs acc = --trace (unwords ["\n", show index, show vs]) $
   case processInstruction vs index <$> parseInstruction (vs ! index) of
     Just (Add v1 v2 v3) ->
       let newVal = v1 + v2
-          newVs = putValue' vs v3 newVal
-          newIndex = if isPart2 && index == newVal then index else index + 4
-      in  runProgram' isPart2 input newIndex newVs acc
+          newVs = putValue vs v3 newVal
+          newIndex = if isPart2 && index == v3 then index else index + 4
+      in  runProgram' isPart2 inputs newIndex newVs acc
     Just (Multiply v1 v2 v3) ->
       let newVal = v1 * v2
-          newVs = putValue' vs v3 newVal
-          newIndex = if isPart2 && index == newVal then index else index + 4
-      in runProgram' isPart2 input newIndex newVs acc
+          newVs = putValue vs v3 newVal
+          newIndex = if isPart2 && index == v3 then index else index + 4
+      in runProgram' isPart2 inputs newIndex newVs acc
     Just (Input v) ->
-      let newVs = putValue' vs v input
-          newIndex = if isPart2 && index == v then v else index + 4
-      in runProgram' isPart2 input (index + 2) newVs acc
+      let newVs = putValue vs v (head inputs)
+          newIndex = if isPart2 && index == v then index else index + 4
+      in runProgram' isPart2 (tail inputs) (index + 2) newVs acc
     Just (Output v) ->
       let newAcc = acc ++ [v]
-      in runProgram' isPart2 input (index + 2) vs newAcc
+      in runProgram' isPart2 inputs (index + 2) vs newAcc
     Just (JumpIfTrue v1 v2) ->
       case v1 of
-        0 -> runProgram' isPart2 input (index + 3) vs acc
-        _ -> runProgram' isPart2 input v2 vs acc
+        0 -> runProgram' isPart2 inputs (index + 3) vs acc
+        _ -> runProgram' isPart2 inputs v2 vs acc
     Just (JumpIfFalse v1 v2) ->
       case v1 of
-        0 -> runProgram' isPart2 input v2 vs acc
-        _ -> runProgram' isPart2 input (index + 3) vs acc
+        0 -> runProgram' isPart2 inputs v2 vs acc
+        _ -> runProgram' isPart2 inputs (index + 3) vs acc
     Just (LessThan v1 v2 v3) ->
       let newVal = if v1 < v2 then 1 else 0
-          newVs = putValue' vs v3 newVal
-          newIndex = if isPart2 && index == v3 then newVal else index + 4
-      in runProgram' isPart2 input newIndex newVs acc
+          newVs = putValue vs v3 newVal
+          newIndex = if isPart2 && index == v3 then index else index + 4
+      in runProgram' isPart2 inputs newIndex newVs acc
     Just (Equals v1 v2 v3) ->
       let newVal = if v1 == v2 then 1 else 0
-          newVs = putValue Immediate vs v3 newVal
-          newIndex = if isPart2 && index == v3 then newVal else index + 4
-      in runProgram' isPart2 input newIndex newVs acc
+          newVs = putValue vs v3 newVal
+          newIndex = if isPart2 && index == v3 then index else index + 4
+      in runProgram' isPart2 inputs newIndex newVs acc
     Nothing -> acc
 
 processInstruction :: Vector Int -> Index -> Instruction Mode -> Instruction Int
@@ -188,5 +189,8 @@ parse2Modes s =
 --------------------------------------------------------------
 
 readInput :: IO (Vector Int)
-readInput = V.fromList <$> parseInput (signedInt `sepBy1` char ',') "day5.txt"
+readInput = readInputFrom "day5.txt"
+
+readInputFrom :: Text -> IO (Vector Int)
+readInputFrom = fmap V.fromList . parseInput (signedInt `sepBy1` char ',')
   where signedInt = signed (return()) decimal
