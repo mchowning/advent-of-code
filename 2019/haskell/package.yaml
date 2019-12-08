@@ -25,6 +25,7 @@ dependencies:
 - megaparsec
 - mtl
 - safe
+- split
 - text
 - vector
 
