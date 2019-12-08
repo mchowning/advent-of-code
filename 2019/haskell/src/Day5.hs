@@ -37,10 +37,6 @@ getValue :: Mode -> Vector Int -> Index -> Int
 getValue Position v i  = v ! (v ! i)
 getValue Immediate v i = v ! i
 
---putValue :: Mode -> Vector Int -> Index -> Int -> Vector Int
---putValue Position v i n  = v // [(v ! i, n)]
---putValue Immediate v i n = v // [(i,n)]
-
 putValue :: Vector Int -> Index -> Int -> Vector Int
 putValue v i n = v // [(i,n)]
 
@@ -49,9 +45,6 @@ withLength n str =
   if length str == n
     then str
     else withLength n ('0':str)
-
-parseOutput :: String -> Instruction Mode
-parseOutput = Output . parseMode . head
 
 parse3Modes :: String -> (Mode, Mode, Mode)
 parse3Modes s =
@@ -158,6 +151,8 @@ parseMultiply s =
   let (m1, m2) = parse2Modes s
   in Multiply m1 m2 Immediate
 
+parseOutput :: String -> Instruction Mode
+parseOutput = Output . parseMode . head
 
 parseJumpIfTrue :: String -> Instruction Mode
 parseJumpIfTrue = parse2Params JumpIfTrue
