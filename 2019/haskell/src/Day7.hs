@@ -6,7 +6,7 @@ import qualified Day5
 import           Util
 
 import           Data.List                  (foldl', permutations)
-import           Data.Sequence              (Seq)
+import           Data.Sequence              (Seq, (<|))
 import qualified Data.Sequence              as S
 import           Data.Text                  (Text)
 import           Data.Vector.Unboxed        (Vector, (!), (//))
@@ -35,6 +35,62 @@ runProgram1 = Day5.runProgram True
 
 --------------------------------------------------------------------
 
+
+parseOpcode :: Int -> (Int, [Mode])
+parseOpcode op = (mod op 100, map parseMode powers)
+    where parseMode mode = if mod (div op mode) 10 == 0 then Position else Immediate
+          powers = 100 : map (*10) powers -- [100,1000,10000,...]
+
+set :: Int -> Int -> [Int] -> [Int]
+set index value program = map (\(i,x) -> if i == index then value else x) $ zip [0..] program
+
+intcode :: [Int] -> [Int] -> Int -> [Int]
+intcode input program index =
+    let (op, mode1:mode2:_) = parseOpcode $ program !! index
+        arg :: Mode -> Int -> Int
+        arg mode offset =
+            let immediate = program !! (index + offset)
+            in case mode of Immediate -> immediate
+                            Position -> program !! immediate
+    in case op of
+           -- add
+           1 -> intcode input newprogram $ index + 4
+                    where newprogram = set (arg Immediate 3) (arg mode1 1 + arg mode2 2) program
+           -- mul
+           2 -> intcode input newprogram $ index + 4
+                    where newprogram = set (arg Immediate 3) (arg mode1 1 * arg mode2 2) program
+           -- input
+           3 -> intcode (tail input) newprogram $ index + 2
+                    where newprogram = set (arg Immediate 1) (head input) program
+           -- output
+           4 -> arg mode1 1 : intcode input program (index + 2)
+           -- jump if true
+           5 -> intcode input program $ if arg mode1 1 /= 0 then arg mode2 2 else index + 3
+           -- jump if false
+           6 -> intcode input program $ if arg mode1 1 == 0 then arg mode2 2 else index + 3
+           -- less than
+           7 -> intcode input newprogram $ index + 4
+                    where newprogram = set (arg Immediate 3) (if arg mode1 1 < arg mode2 2 then 1 else 0) program
+           -- equals
+           8 -> intcode input newprogram $ index + 4
+                    where newprogram = set (arg Immediate 3) (if arg mode1 1 == arg mode2 2 then 1 else 0) program
+           -- halt
+           99 -> []
+           -- unknown
+           x -> error $ "invalid opcode: " ++ show x
+
+amplify :: [Int] -> [Int] -> Int
+amplify program [a,b,c,d,e] = last oute
+    where outa = intcode (a:0:oute) program 0
+          outb = intcode (b:outa) program 0
+          outc = intcode (c:outb) program 0
+          outd = intcode (d:outc) program 0
+          oute = intcode (e:outd) program 0
+
+
+
+--------------------------------------------------------------------
+
 -- Amp E loops back to Amp A
 -- Phase settings are now in the range 5..9
 -- Again, each phase setting is used exactly once
@@ -42,11 +98,13 @@ runProgram1 = Day5.runProgram True
 --     ...all further input/output instructions are for signals."
 
 data Amp = Amp { identifier :: Char
-               , inputs  :: Seq Int
+--               , inputs  :: Seq Int
+--               , outputs :: Seq Int
+               , inputs  :: [Int]
                , index   :: Int
                , program :: Vector Int
                }
-         | AmpFinished
+--         | AmpFinished
          deriving (Eq, Show)
 
 type PhaseSetting = Int
@@ -58,32 +116,18 @@ part2' :: Vector Int -> Int
 part2' program = maximum (ampTest program <$> permutations [5..9])
 
 ampTest :: Vector Int -> [PhaseSetting] -> Int
-ampTest program phases =
-  let (a1 S.:<| as) = makeAmp program <$> S.fromList (zip phases ['A'..])
-      Amp { inputs } = a1
-      initialInput = inputs S.|> 0
-  in runAmps ( a1 {inputs = initialInput } S.<| as)
-
-runAmps :: Seq Amp -> Int
-runAmps amps@(a1 S.:<| a2 S.:<| as) =
-  case a1 of
-    AmpFinished -> error "runAmps called with finishedAmp"
-    Amp { inputs } ->
-      if S.null inputs
-        then error "null inputs"
-        else
-          let (updatedA1, output) = runAmp a1
-              Amp{inputs=a2Inputs} = a2
-              newA2Inputs = a2Inputs S.|> output
-              updatedA2 = a2 {inputs = newA2Inputs }
-          in case updatedA1 of
-                AmpFinished -> output
-                _ -> runAmps ((updatedA2 S.<| as) S.|> updatedA1)
+ampTest program [a,b,c,d,e] = last outE
+  where 
+    outA = runAmp Amp { identifier = 'A', inputs = a:0:outE, index = 0, program}
+    outB = runAmp Amp { identifier = 'B', inputs = b:outA,   index = 0, program}
+    outC = runAmp Amp { identifier = 'C', inputs = c:outB,   index = 0, program}
+    outD = runAmp Amp { identifier = 'D', inputs = d:outC,   index = 0, program}
+    outE = runAmp Amp { identifier = 'E', inputs = e:outD,   index = 0, program}
 
 makeAmp :: Vector Int -> (PhaseSetting, Char) -> Amp
-makeAmp program (phase, c) = Amp c (S.singleton phase) 0 program
+makeAmp program (phase, c) = Amp c [phase] 0 program
 
-runAmp :: Amp -> (Amp, Int)
+runAmp :: Amp -> [Int]
 runAmp amp@Amp { identifier, inputs, index, program } =
   let mInstruction = parseInstruction (program ! index)
   in case processInstruction program index <$> mInstruction of
@@ -101,16 +145,13 @@ runAmp amp@Amp { identifier, inputs, index, program } =
       in  runAmp ( amp {index = newIndex, program = newProgram })
 
     Just (Input v) ->
-      if S.null inputs
-        then error "Should never run an amp with empty inputs"
-        else
-          let (i S.:<| newInputs) = inputs
+          let (i:newInputs) = inputs
               newProgram = putValue program v i
               newIndex = if index == v then index else index + 2
           in runAmp (amp {inputs = newInputs, index = newIndex, program = newProgram})
 
     Just (Output v) ->
-      (amp {index = index + 2}, v)
+      v : runAmp (amp {index = index + 2 })
 
     Just (JumpIfTrue v1 v2) ->
       runAmp $ case v1 of
@@ -134,9 +175,7 @@ runAmp amp@Amp { identifier, inputs, index, program } =
           newIndex = if index == v3 then index else index + 4
       in runAmp (amp { index = newIndex, program = newProgram })
 
-    Nothing ->
-          let (i S.:<| newInputs) = inputs
-          in (AmpFinished, i)
+    Nothing -> []
 
 
 
