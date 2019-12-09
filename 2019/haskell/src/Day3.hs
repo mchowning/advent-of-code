@@ -111,4 +111,5 @@ move = do
           'R' -> Right
           'D' -> Down
           'L' -> Left
+          x -> error ("unexpected direction of " <> show x)
   return (Move direction distance)

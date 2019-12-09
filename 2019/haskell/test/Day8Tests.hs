@@ -1,22 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Day8Tests where
 
-import qualified Day5
 import Day8
-
-import TestHelpers
 
 import Data.Char (digitToInt)
 import           Data.List            (transpose)
 import           Data.List.Split      (chunksOf)
 
-import Hedgehog
-import qualified Hedgehog as HH
-import qualified Hedgehog.Gen as Gen
-import qualified Hedgehog.Range as Range
 import Test.Tasty
 import Test.Tasty.HUnit
-import Test.Tasty.Hedgehog
 
 day8Tests :: TestTree
 day8Tests = testGroup "day 8"

@@ -13,8 +13,6 @@ import           Text.Megaparsec.Char (digitChar)
 
 import           Data.Char            (digitToInt)
 
-import           Debug.Trace
-
 -- each digit represents color of a single pixel
 -- layer is 25x6
 -- answer is "the number of 1 digits multiplied by the number of 2 digits" on the layer with the fewest 0 digits
@@ -63,6 +61,7 @@ toPixel :: Int -> Pixel
 toPixel 0 = Black
 toPixel 1 = White
 toPixel 2 = Transparent
+toPixel n = error ("unexpected pixel value: " <> show n)
 
 showMessage :: [Pixel] -> IO ()
 showMessage [] = return ()

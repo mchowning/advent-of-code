@@ -4,17 +4,10 @@ module Day5Tests where
 
 import Day5
 
-import TestHelpers
-
 import Data.Vector.Unboxed as V
 
-import Hedgehog
-import qualified Hedgehog as HH
-import qualified Hedgehog.Gen as Gen
-import qualified Hedgehog.Range as Range
 import Test.Tasty
 import Test.Tasty.HUnit
-import Test.Tasty.Hedgehog
 
 day5Tests :: TestTree
 day5Tests = testGroup "Day 5 tests"

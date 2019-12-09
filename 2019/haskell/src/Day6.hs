@@ -7,7 +7,6 @@ import Control.Monad (void)
 import Data.List (foldl')
 import Data.Maybe (maybe, catMaybes)
 import Data.Text (Text)
-import Data.Tuple (swap)
 import qualified Data.Text as T
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
@@ -15,9 +14,6 @@ import Safe.Foldable (minimumMay)
 
 import           Text.Megaparsec            (sepBy1, some)
 import           Text.Megaparsec.Char       (alphaNumChar, char, eol)
-import           Text.Megaparsec.Char.Lexer (decimal, signed)
-
-import Debug.Trace
 
 -- FIXME Try using Data.Tree or some other pre-made graph structure
 
@@ -26,14 +22,14 @@ part1 = part1' <$> readInput
 
 part1' :: [(Text, Text)] -> Int
 part1' tup =
-  let orbitMap = orbitsMap tup
+  let orbitMap = mapOfOrbits tup
   in sum . fmap (indirectOrbits orbitMap) $ M.keys orbitMap
 
-orbitsMap :: [(Text,Text)] -> M.Map Text Text
-orbitsMap = foldl' (\m (a,b) -> M.insert b a m) M.empty
+mapOfOrbits :: [(Text,Text)] -> M.Map Text Text
+mapOfOrbits = foldl' (\m (a,b) -> M.insert b a m) M.empty
 
-orbitedMap :: [(Text,Text)] -> M.Map Text [Text]
-orbitedMap = foldl' (\m (a,b) -> M.insertWith (++) a [b] m) M.empty
+mapOfOrbited :: [(Text,Text)] -> M.Map Text [Text]
+mapOfOrbited = foldl' (\m (a,b) -> M.insertWith (++) a [b] m) M.empty
 
 indirectOrbits :: M.Map Text Text -> Text -> Int
 indirectOrbits m t = maybe 0 (\t' -> 1 + indirectOrbits m t') (m M.!? t)
@@ -45,7 +41,7 @@ part2 = part2' <$> readInput
 
 part2' :: [(Text, Text)] -> Maybe Int
 part2' tup =
-  let allPlanets = search (orbitsMap tup) (orbitedMap tup) S.empty "SAN" "YOU"
+  let allPlanets = search (mapOfOrbits tup) (mapOfOrbited tup) S.empty "SAN" "YOU"
       transfers = subtract 2 <$> allPlanets -- subtract ends (2)
   in transfers
 

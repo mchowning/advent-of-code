@@ -11,8 +11,6 @@ import           Data.Text                  (Text)
 import           Data.Vector.Unboxed        (Vector, (!), (//))
 import qualified Data.Vector.Unboxed        as V
 
-import           Debug.Trace
-
 type Index = Int
 
 data Mode = Position | Immediate deriving (Eq, Show)
@@ -86,8 +84,8 @@ runProgram' isPart2 inputs index vs acc = --trace (unwords ["\n", show index, sh
       in runProgram' isPart2 inputs newIndex newVs acc
     Just (Input v) ->
       let newVs = putValue vs v (head inputs)
-          newIndex = if isPart2 && index == v then index else index + 4
-      in runProgram' isPart2 (tail inputs) (index + 2) newVs acc
+          newIndex = if isPart2 && index == v then index else index + 2
+      in runProgram' isPart2 (tail inputs) newIndex newVs acc
     Just (Output v) ->
       let newAcc = acc ++ [v]
       in runProgram' isPart2 inputs (index + 2) vs newAcc
