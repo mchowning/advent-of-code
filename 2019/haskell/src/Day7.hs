@@ -55,6 +55,7 @@ part2' program = maximum (ampTest program <$> permutations [5..9])
 
 ampTest :: Vector Int -> [PhaseSetting] -> Int
 ampTest program [a,b,c,d,e] = last outE
+-- TODO could use foldr here
   where
     outA = runAmp Amp { identifier = 'A', inputs = a:0:outE, index = 0, program}
     outB = runAmp Amp { identifier = 'B', inputs = b:outA,   index = 0, program}
