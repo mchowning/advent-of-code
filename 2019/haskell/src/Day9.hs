@@ -1,7 +1,6 @@
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
---{-# LANGUAGE RecordWildCards #-}
 module Day9 where
 
 import           Util
