@@ -3,7 +3,6 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE LambdaCase #-}
 module Day12 where
 
 import Util
