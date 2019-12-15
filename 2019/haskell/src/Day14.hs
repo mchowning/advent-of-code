@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE MultiWayIf #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TupleSections #-}
 
 module Day14 where
@@ -9,6 +10,7 @@ module Day14 where
 import Util
 
 --import Data.Text (Text)
+import Data.Functor (($>))
 import Data.Maybe (catMaybes, fromMaybe)
 import Data.List (foldl')
 import qualified Data.Map.Strict as M
@@ -26,7 +28,7 @@ data Ingredient = Ingredient
                 , quantity :: Integer
                 } deriving Show
 
-newtype IngredientCollection = IngredientCollection (M.Map String Integer)
+newtype IngredientCollection = IngredientCollection { toMap :: M.Map String Integer }
                              deriving (Eq, Monoid, Ord, Semigroup, Show)
 
 ingredients :: IngredientCollection -> [Ingredient]
@@ -152,12 +154,79 @@ collectionToMap :: IngredientCollection -> M.Map String Integer
 collectionToMap (IngredientCollection m) = m
 
 part1' :: [Reaction] -> Integer
-part1' rs =
+part1' = oreForFuel 1
+
+oreForFuel :: Integer -> [Reaction] -> Integer
+oreForFuel n rs =
   let remainingIngredients (IngredientCollection m) = M.filter (> 0) m
       onlyOreRemains = (== ["ORE"]) . M.keys . remainingIngredients
-      candidates = fillRequirement S.empty rs (mkIngredientCollection [Ingredient "FUEL" 1]) onlyOreRemains
+      candidates = fillRequirement S.empty rs (mkIngredientCollection [Ingredient "FUEL" n]) onlyOreRemains
       requiredOre = head (remainingIngredients <$> candidates)
   in head (remainingIngredients <$> candidates) M.! "ORE"
+
+------------------------------------------------------------------------------------------
+
+fillRequirement' :: S.Set IngredientCollection -> [Reaction] -> (IngredientCollection, [Reaction]) -> (IngredientCollection -> Bool) -> [(IngredientCollection, [Reaction])]
+fillRequirement' s rs (i@(IngredientCollection m), accRs) pred
+  | pred i = [(i,accRs)]
+  | S.member i s = []
+  | otherwise =
+      let remainingRequirements = M.filter (> 0) m
+          matchingReactions = filter ((`M.member` remainingRequirements) . name . output) rs
+      in if null matchingReactions
+           then trace ("could not find any matching reactions with " <> show m) []
+           else let newRequirements = (\r -> (reverseReaction' r i, r: accRs)) <$> matchingReactions
+                    filteredRequirements = filter (not . flip S.member s . fst) newRequirements
+                    newSet = S.insert i s
+                in concatMap (\newReq -> fillRequirement' newSet rs newReq pred) filteredRequirements
+
+--reverseReaction' :: Reaction
+--                 -> IngredientCollection -- requirements
+--                 -> IngredientCollection -- remaining requirements after reaction
+--reverseReaction' Reaction {..} ic =
+--  let withoutOutput = removeIngredient' output ic
+--      withInput = foldr addIngredient withoutOutput (ingredients inputs)
+--  in withInput
+--
+--
+--removeIngredient' :: Ingredient -> IngredientCollection -> IngredientCollection
+--removeIngredient' Ingredient {..} (IngredientCollection allAvailable) =
+--    let newValue = fromMaybe 0 (allAvailable M.!? name) - quantity
+--    -- FIXME when we buy extra we need to save that amount, BUT NOT AS A REQUIREMENT, it is an asset
+--    in IngredientCollection $ M.insert name newValue allAvailable
+
+part2' :: Int -> [Reaction] -> IngredientCollection
+part2' n rs = part2'' n rs (mkIngredientCollection [Ingredient "ORE" 1000000000000])
+--  let remainingIngredients (IngredientCollection m) = M.filter (> 0) m
+--      onlyOreRemains = (== ["ORE"]) . M.keys . remainingIngredients
+--      candidates = fillRequirement' S.empty rs (mkIngredientCollection [Ingredient "FUEL" n], []) onlyOreRemains
+----      requiredOre = head (remainingIngredients <$> candidates)
+----  in head (remainingIngredients <$> candidates) M.! "ORE"
+--      (is, actualRs) = head candidates
+--      amountOfOre = toMap is M.! "ORE"
+----  in trace (show actualRs) $ runAll (mkIngredientCollection [Ingredient "ORE" 1000000000000]) actualRs
+--   in iterate (`runAll` actualRs) (mkIngredientCollection [Ingredient "ORE" 1000000000000]) !! 10000
+
+-- iterate (`runAll` reactionsToFuel rs) (mkIngredientCollection [Ingredient "ORE" 1000000000000]) !! n
+
+part2'' :: Int -> [Reaction] -> IngredientCollection -> IngredientCollection
+part2'' n rs ic =
+ iterate (`runAll` reactionsToFuel rs) ic !! n
+
+
+reactionsToFuel :: [Reaction] -> [Reaction]
+reactionsToFuel rs =
+  let remainingIngredients (IngredientCollection m) = M.filter (> 0) m
+      onlyOreRemains = (== ["ORE"]) . M.keys . remainingIngredients
+      candidates = fillRequirement' S.empty rs (mkIngredientCollection [Ingredient "FUEL" 1], []) onlyOreRemains
+--      requiredOre = head (remainingIngredients <$> candidates)
+--  in head (remainingIngredients <$> candidates) M.! "ORE"
+      (_, actualRs) = head candidates
+   in actualRs
+
+
+runAll :: IngredientCollection -> [Reaction] -> IngredientCollection
+runAll = foldl' (\ic r -> fromMaybe ic (performReaction r ic))
 
 
 
