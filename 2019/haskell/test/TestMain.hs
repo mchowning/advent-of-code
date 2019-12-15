@@ -12,7 +12,8 @@
 --import Day10Tests
 --import Day11Tests
 --import Day12Tests
-import Day13Tests
+--import Day13Tests
+import Day14Tests
 
 import           Test.Tasty
 
@@ -32,7 +33,8 @@ main = defaultMain $
 --      , day10Tests
 --      , day11Tests
 --      , day12Tests
-        day13Tests
+--      , day13Tests
+        day14Tests 
       ]
     -- , testGroup "slow tests"
     --   [

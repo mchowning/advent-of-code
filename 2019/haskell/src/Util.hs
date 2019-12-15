@@ -10,13 +10,18 @@ import Text.Megaparsec.Error (ParseErrorBundle)
 
 type Parser = Parsec Void Text
 
-parseInput :: Parser a -> Text -> IO a
+parseInput :: Parser a 
+           -> Text -- path to file source of input
+           -> IO a
 parseInput parser filename = do
   input <- T.readFile (T.unpack ("../inputs/" <> filename))
   return $ parse' parser filename input
 
-parse' :: Parser a -> Text -> Text -> a
-parse' parser filename input = processEither (parse parser (T.unpack filename) input)
+parse' :: Parser a 
+       -> Text -- input description
+       -> Text -- input
+       -> a
+parse' parser description input = processEither (parse parser (T.unpack description) input)
 
 processEither :: Either (ParseErrorBundle Text Void) a -> a
 processEither (Left  e ) = error (errorBundlePretty e)
