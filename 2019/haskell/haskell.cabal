@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ad93b0c8b1d0a8be4f42326d5473c6394eeee9c79e10a235c4cc497eae56fbef
+-- hash: e10c55402da70bcdb7e4a0fd17461fb00b4ec3308d9e453ceaba9a6893d44a9d
 
 name:           haskell
 version:        0.1.0.0
@@ -33,6 +33,7 @@ library
       Day12
       Day13
       Day14
+      Day14_help
       Day2
       Day3
       Day4
