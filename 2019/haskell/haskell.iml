@@ -93,5 +93,6 @@
     <orderEntry type="library" name="th-abstraction-0.3.1.0" level="project" />
     <orderEntry type="library" name="StateVar-1.2" level="project" />
     <orderEntry type="library" name="invariant-0.5.3" level="project" />
+    <orderEntry type="library" name="extra-1.6.18" level="project" />
   </component>
 </module>

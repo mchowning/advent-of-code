@@ -34,7 +34,7 @@ part1 = part1' <$> input
 
 part1' :: Program -> Int
 part1' p =
-  let output = parseComputerOutput' (startComputer [] p)
+  let output = parseComputerOutput' (startLazyComputer [] p)
   in length . filter isBlock $ output
     where
       isBlock (Pos _ Block) = True
@@ -49,7 +49,7 @@ part2' :: Program -> Output
 part2' p =
   let
       updatedProgram = 2 : tail p
-      outputs = parseComputerOutput' (startComputer moves updatedProgram)
+      outputs = parseComputerOutput' (startLazyComputer moves updatedProgram)
       moves = makeMoves outputs Nothing Nothing
   in last (filter isScore outputs)
 
