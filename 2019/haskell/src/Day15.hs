@@ -11,6 +11,7 @@ module Day15 where
 
 import           IntCode
 
+import Control.Applicative (liftA2)
 import           Data.List       (foldl')
 import qualified Data.Map.Strict as M
 import qualified Data.Set        as S
@@ -64,14 +65,13 @@ runAllMoves (comp@Computer {..}, lastMove) =
                            West  -> East
                            East  -> West
                      in filter (exclude /=) (M.keys movementCommands)
-             in concatMap (runMove comp) withoutBacktracking
+             in concatMap (runAllMoves . liftA2 (,) (runMove comp) Just) withoutBacktracking
 
-
-runMove :: Computer -> Move -> [Computer]
+runMove :: Computer -> Move -> Computer
 runMove computer move =
   let moveInteger = fromIntegral (movementCommands M.! move)
       newComputer = computer { inputs = [moveInteger] }
-   in runAllMoves (runComputer newComputer, Just move)
+  in runComputer newComputer
 
 movementCommands :: M.Map Move Int
 movementCommands = M.fromList [ (North, 1)
@@ -96,18 +96,14 @@ part2' :: Program -> Int
 part2' program =
   let cellMap = mapEverything program
       notWalls = M.filter (/= Wall) cellMap
-      (processed :: [(CellMap, Int)] ) = iterate (\(cm, n) -> (spreadOxygen cm, n+1)) (notWalls, 0)
-  in snd . head . dropWhile (not . M.null . M.filter (/= Oxygen) . fst) $ processed
+      processed = iterate spreadOxygen notWalls
+  in length . takeWhile (any (/= Oxygen) . M.elems) $ processed
 
 spreadOxygen :: CellMap -> CellMap
 spreadOxygen cellMap =
-  let oxygenCells = M.filter (== Oxygen) cellMap
-      spreadTo = concatMap (M.keys . adjacentCells) . M.keys $ oxygenCells
-  in foldl' (\cm c -> case M.lookup c cm of
-                        Just Empty -> M.insert c Oxygen cm
-                        _ -> cm
-  
-               ) cellMap spreadTo
+  let adjacentToOxygenCells = concatMap (M.keys . adjacentCells) . M.keys . M.filter (== Oxygen) $ cellMap
+      updateToOxygen cm c = M.adjust (const Oxygen) c cm
+  in foldl' updateToOxygen cellMap adjacentToOxygenCells
 
 statusToCell :: StatusCode -> Cell
 statusToCell = \case
@@ -132,14 +128,8 @@ mapEverything program = mapEverything' mempty
                HitWall -> newCellMap
                _ ->
                  let moves = M.difference (adjacentCells cell) newCellMap
-                     process map (v2, m) = runAllMoves' v2 map (runMove' comp m)
+                     process map (v2, m) = runAllMoves' v2 map (runMove comp m)
                  in foldl' process newCellMap (M.toList moves)
-
-    runMove' :: Computer -> Move -> Computer
-    runMove' computer move =
-      let moveInteger = fromIntegral (movementCommands M.! move)
-          newComputer = computer { inputs = [moveInteger] }
-      in runComputer newComputer
 
 adjacentCells :: V2 Int -> M.Map (V2 Int) Move
 adjacentCells (V2 x y) = M.fromList [ (V2  x   (y+1), North)
