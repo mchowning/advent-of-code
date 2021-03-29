@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo 'Running...'
+echo 'ghcid --command "stack ghci haskell:lib haskell:haskell-test" --test "main"'
+echo ''
+ghcid --command "stack ghci haskell:lib haskell:haskell-test" --test "main"

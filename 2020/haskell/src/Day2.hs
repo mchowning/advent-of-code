@@ -10,21 +10,21 @@ import Text.Megaparsec.Char.Lexer (decimal)
 
 data Input = Input { low :: Int
                    , high :: Int
-                   , c :: Char
+                   , letter :: Char
                    , pwd :: String 
                    } deriving (Eq, Show)
 
 lineParser :: Parser Input
 lineParser = do
-    low' <- decimal
+    low <- decimal
     char '-'
-    high' <- decimal
+    high <- decimal
     space1
-    c <- letterChar
+    letter <- letterChar
     char ':'
     space1
-    pwd' <- some letterChar
-    return (Input low' high' c pwd')
+    pwd <- some letterChar
+    return (Input low high letter pwd)
 
 readInput :: IO [Input]
 readInput = parseInput (lineParser `sepBy1` eol) "../inputs/2.txt"
@@ -53,30 +53,11 @@ isValid2 (Input i1 i2 c' pwd') =
 
 ---------------------------------------------------------------------------------
 
-xor :: Bool -> Bool -> Bool
-xor a b = (a && not b) ||
-          (b && not a)
-
+-- xor :: Bool -> Bool -> Bool
+-- xor a b = (a && not b) ||
+--           (b && not a)
 
 -- isValid2 :: Input -> Bool
 -- isValid2 (Input i1 i2 c' pwd') =
 --     let isMatch i = pwd' !! (i - 1) == c'
 --     in isMatch i1 `xor` isMatch i2
-
----------------------------------------------------------------------------------
-
-testIsValid1 =
-    [ isValid1 $ Input 1 3 'a' "abcde"
-    , not . isValid1 $ Input 1 3 'b' "cdefg"
-    , isValid1 $ Input 2 9 'c' "ccccccccc" ]
-
-testIsValid2 =
-    [ isValid2 $ Input 1 3 'a' "abcde"
-    , not . isValid2 $ Input 1 3 'b' "cdefg"
-    , not . isValid2 $ Input 2 9 'c' "ccccccccc" ]
-
-testDay2 = do
-    print testIsValid1
-    print testIsValid2
-    print . (== 378) =<< day2part1
-    print . (== 280) =<< day2part2

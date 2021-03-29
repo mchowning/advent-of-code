@@ -54,8 +54,9 @@ executable haskell-exe
 
 test-suite haskell-test
   type: exitcode-stdio-1.0
-  main-is: Spec.hs
+  main-is: TestMain.hs
   other-modules:
+      TestHelpers
       Paths_haskell
   hs-source-dirs:
       test
@@ -63,4 +64,26 @@ test-suite haskell-test
   build-depends:
       base >=4.7 && <5
     , haskell
+    , hedgehog
+    , megaparsec
+    , tasty
+    , tasty-hedgehog
+    , tasty-hunit
+    , text
+
+    -- , containers
+    -- , extra
+    -- , haskell
+    -- , hedgehog
+    -- , lens
+    -- , linear
+    -- , megaparsec
+    -- , mtl
+    -- , safe
+    -- , split
+    -- , tasty
+    -- , tasty-hedgehog
+    -- , tasty-hunit
+    -- , text
+    -- , vector
   default-language: Haskell2010

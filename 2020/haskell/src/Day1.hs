@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings, TupleSections #-}
-module Day1 (day1Part1, day1Part2, testDay1) where
+module Day1 (day1Part1, day1Part2, day1Part1', day1Part2', combinations) where
 
 import Util (parseInput)
 
@@ -40,7 +40,7 @@ productIfSumEquals2020 :: PairSize -> [Int] -> Int
 productIfSumEquals2020 ps = product . head . filter ((== 2020) . sum) . combinations ps
  
 combinations :: PairSize -> [Int] -> [[Int]]
--- combinations _ [] = []
+combinations _ [] = []
 combinations 0 _ = []
 combinations 1 xs = (: []) <$> xs
 combinations ps (x : xs) = 
