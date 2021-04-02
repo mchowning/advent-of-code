@@ -1,6 +1,5 @@
-
 {-# LANGUAGE OverloadedStrings #-}
-module Day2 where
+module Day2 (part1, part2, isValid1, isValid2, Input(Input)) where
 
 import Util (parseInput, Parser)
 
@@ -31,11 +30,13 @@ readInput = parseInput (lineParser `sepBy1` eol) "../inputs/2.txt"
 
 ----------------------------------------------------------------------------------
 
-day2part1 :: IO Int
-day2part1 = count isValid1 <$> readInput
+-- benchmark: 1.5 ms ± 147 μs
+part1 :: IO Int
+part1 = count isValid1 <$> readInput
 
-day2part2 :: IO Int
-day2part2 = count isValid2 <$> readInput
+-- benchmark: 1.6 ms ± 137 μs
+part2 :: IO Int
+part2 = count isValid2 <$> readInput
 
 count :: (Input -> Bool) -> [Input] -> Int
 count predicate = length . filter predicate

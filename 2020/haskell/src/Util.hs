@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Util (Parser, processEither, parseInput) where
+module Util (Parser, processEither, parseInput, parse') where
 
 import Data.Void (Void)
 import Data.Text (Text)
