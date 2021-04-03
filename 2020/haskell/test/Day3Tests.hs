@@ -25,10 +25,10 @@ day3 =
             part2' parsedTestInput
               @?= 336
         ]
-    -- , testGroup
-    --     "slow"
-    --     [ testCase "part 1" $ part1 >>= (@?= 240)
-    --     , testCase "part 2" $ part2 >>= (@?= 2832009600) ]
+    , testGroup
+        "slow"
+        [ testCase "part 1" $ part1 >>= (@?= 240)
+        , testCase "part 2" $ part2 >>= (@?= 2832009600) ]
     ]
 
 parsedTestInput :: [[Square]]
@@ -47,3 +47,17 @@ testInput =
   \#.##...#...\n\
   \#...##....#\n\
   \.#..#...#.#"
+
+-- testInput :: Text
+-- testInput =
+--   "..##.......\n\
+--   \#...#...#..\n\
+--   \.#....#..#." -- \n\
+--   \..#.#...#.#\n\
+--   \.#...##..#.\n\
+--   \..#.##.....\n\
+--   \.#.#.#....#\n\
+--   \.#........#\n\
+--   \#.##...#...\n\
+--   \#...##....#\n\
+--   \.#..#...#.#"

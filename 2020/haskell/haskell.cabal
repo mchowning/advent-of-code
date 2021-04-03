@@ -85,6 +85,7 @@ benchmark haskell-bench
       Paths_haskell
       Day1Bench
       Day2Bench
+      Day3Bench
   hs-source-dirs:
       benchmark
   ghc-options: "-with-rtsopts=-A32m"
