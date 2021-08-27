@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Util (Parser, processEither, parseInput, parse') where
+module Util (Parser, processEither, parseInput, unsafeParse, parse') where
 
 import Data.Void (Void)
 import Data.Text (Text)
@@ -15,13 +15,17 @@ parseInput :: Parser a
            -> IO a
 parseInput parser filename = do
   input <- T.readFile (T.unpack ("../inputs/" <> filename))
-  return $ parse' parser filename input
+  return $ unsafeParse parser input
+
+unsafeParse :: Parser a
+            -> Text -- input
+            -> a
+unsafeParse parser = processEither . parse' parser
 
 parse' :: Parser a
-       -> Text -- input description
-       -> Text -- input
-       -> a
-parse' parser description input = processEither (parse parser (T.unpack description) input)
+       -> Text
+       -> Either (ParseErrorBundle Text Void) a
+parse' parser = parse parser ""
 
 processEither :: Either (ParseErrorBundle Text Void) a -> a
 processEither (Left  e ) = error (errorBundlePretty e)

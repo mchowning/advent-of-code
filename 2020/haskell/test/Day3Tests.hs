@@ -16,7 +16,7 @@ day3 =
     [ testGroup
         "fast"
         [ testCase "parsing" $
-            parse' inputParser "" "#.#\n.##"
+            unsafeParse inputParser "#.#\n.##"
               @?= [[Tree, Clear, Tree], [Clear, Tree, Tree]],
           testCase "part 1" $
             part1' parsedTestInput
@@ -32,7 +32,7 @@ day3 =
     ]
 
 parsedTestInput :: [[Square]]
-parsedTestInput = parse' inputParser "" testInput
+parsedTestInput = unsafeParse inputParser testInput
 
 testInput :: Text
 testInput =
@@ -47,17 +47,3 @@ testInput =
   \#.##...#...\n\
   \#...##....#\n\
   \.#..#...#.#"
-
--- testInput :: Text
--- testInput =
---   "..##.......\n\
---   \#...#...#..\n\
---   \.#....#..#." -- \n\
---   \..#.#...#.#\n\
---   \.#...##..#.\n\
---   \..#.##.....\n\
---   \.#.#.#....#\n\
---   \.#........#\n\
---   \#.##...#...\n\
---   \#...##....#\n\
---   \.#..#...#.#"

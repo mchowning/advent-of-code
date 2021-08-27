@@ -2,6 +2,7 @@
 
 module Day3 where
 
+import Control.Monad
 import Debug.Trace
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -24,14 +25,16 @@ squareParser =
 --------------------------------------------------------------------------------------
 
 data Square = Clear | Tree deriving (Eq, Show)
+
 type Hill = [[Square]]
+
 type Slope = (Int, Int)
 
 part1 :: IO Int
 part1 = part1' <$> readInput
 
 part1' :: Hill -> Int
-part1' = checkRunForTrees (1,3)
+part1' = checkRunForTrees (1, 3)
 
 part2 :: IO Int
 part2 = part2' <$> readInput
@@ -49,33 +52,31 @@ part2' =
 --------------------------------------------------------------------------------------
 
 checkRunForTrees :: Slope -> Hill -> Int
-checkRunForTrees (dy, dx) rows =
-    let relevantRows = tail $ (rows !!) <$> filter (\i -> i `rem` dy == 0) [0.. length rows - 1]
-        run = trace (show (length rows) ++ "-" ++ show (length relevantRows)) $ parseRun relevantRows <$> [0.. (length relevantRows - 1) ]
-    in length $ filter (== Tree) run
-    where
-        parseRun :: [[Square]] -> Int -> Square
-        parseRun relevantRows rowIndex = 
-            let row = relevantRows !! rowIndex
-                columnIndex = ((rowIndex + 1) * dx) `rem` length row
-            in row !! columnIndex
+checkRunForTrees slope = length . filter (== Tree) . run slope
+-- checkRunForTrees =
+--     let numMatching = length . filter (== Tree)
+--     in (numMatching .) . run
 
 
--- checkRunForTrees :: Slope -> Hill -> Int
--- checkRunForTrees = checkRun (== Tree)
-
-checkRun :: (Square -> Bool) -> Slope -> Hill -> Int
-checkRun pred slope hill = length . filter pred $ run slope hill
-
+-- use tail because the start row doesn't seem to be counted according to the example
 run :: Slope -> Hill -> [Square]
-run slope hill = case move slope (cycle <$> hill) of
-  Nothing -> []
-  Just remainingHill ->
-    let location = head . head $ remainingHill
-     in location : run slope remainingHill
+-- part 1 bench: 1.2 ms ±  68 μs
+-- part 2 bench: 2.2 ms ± 119 μs
+run (dy, dx) hill = 
+  [ row !! columnIndex
+  | (x, y) <- tail (zip [0, dx..] [0, dy.. length hill - 1])
+  , let row = hill !! y
+  , let columnIndex = x `rem` length row ]
 
-move :: Slope -> Hill -> Maybe Hill
-move (dy, dx) hill =
-  if length hill > dy
-    then Just . (drop dx <$>) . drop dy $ hill
-    else Nothing
+-- part 1 bench: 346 ms ±  32 ms
+-- part 2 bench: 1.97 s ± 114 ms
+-- run slope@(dy,dx) hill = case move (cycle <$> hill) of
+--   Nothing -> []
+--   Just remainingHill ->
+--     let location = head . head $ remainingHill
+--     in location : run slope remainingHill
+--   where
+--     move :: Hill -> Maybe Hill
+--     move hill = do
+--       guard (length hill > dy)
+--       Just (drop dx <$> drop dy hill)

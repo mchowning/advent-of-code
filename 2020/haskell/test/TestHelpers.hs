@@ -36,6 +36,6 @@ runCase (TestCase name expected actual) = do
       green = "\x1b[32m"
       normal = "\x1b[0m"
 
-testParse :: (Show a, Eq a) => Parser a -> Text -> a -> Assertion
-testParse parser input expected =
-  processEither (parse parser "test input" input) @=? expected
+testParse :: (Show a, Eq a) => Parser a -> Text -> a
+testParse parser input =
+  processEither (parse parser "test input" input)

@@ -7,7 +7,8 @@ main :: IO ()
 main =
   defaultMain
     [ --day1
+    day2
     -- , day2
     -- , day3
-    day3
+    -- day3
     ]
