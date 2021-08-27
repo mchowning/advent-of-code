@@ -1,8 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
+--
+-- hash: e8a13c1acdda57b2cd168580f2d1925d43671e13c0197a3455cb4ded3202f310
 
 name:           haskell
 version:        0.1.0.0
@@ -25,10 +27,10 @@ source-repository head
 
 library
   exposed-modules:
+      Util
       Day1
       Day2
       Day3
-      Util
   other-modules:
       Paths_haskell
   hs-source-dirs:
@@ -48,18 +50,18 @@ executable haskell-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , haskell
+    , haskell    
   default-language: Haskell2010
 
 test-suite haskell-test
   type: exitcode-stdio-1.0
   main-is: TestMain.hs
   other-modules:
+      TestHelpers
+      Paths_haskell
       Day1Tests
       Day2Tests
       Day3Tests
-      TestHelpers
-      Paths_haskell
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
@@ -75,21 +77,26 @@ test-suite haskell-test
     , text
   default-language: Haskell2010
 
+
 benchmark haskell-bench
   type: exitcode-stdio-1.0
   main-is: BenchMain.hs
   other-modules:
+      Paths_haskell
       Day1Bench
       Day2Bench
       Day3Bench
-      Paths_haskell
   hs-source-dirs:
       benchmark
-  ghc-options: -with-rtsopts=-A32m
+  ghc-options: "-with-rtsopts=-A32m"
   build-depends:
       base >=4.7 && <5
     , haskell
+    -- , hedgehog
+    -- , megaparsec
     , tasty
     , tasty-bench
+    -- , tasty-hedgehog
+    -- , tasty-hunit
     , text
   default-language: Haskell2010

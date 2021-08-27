@@ -24,6 +24,9 @@ dependencies:
 
 library:
   source-dirs: src
+  dependencies:
+  - megaparsec
+  - text
 
 executables:
   haskell-exe:
@@ -36,6 +39,18 @@ executables:
     dependencies:
     - haskell
 
+benchmarks:
+  haskell-bench:
+    main:               BenchMain.hs
+    source-dirs:        benchmark
+    ghc-options:
+    - "-with-rtsopts=-A32m"
+    dependencies:
+    - haskell
+    - tasty
+    - tasty-bench
+    - text
+
 tests:
   haskell-test:
     main:                TestMain.hs
@@ -46,3 +61,10 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - haskell
+    - hedgehog
+    - megaparsec
+    - tasty
+    - tasty-bench
+    - tasty-hedgehog
+    - tasty-hunit
+    - text
