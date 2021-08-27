@@ -28,7 +28,8 @@ day3 =
     , testGroup
         "slow"
         [ testCase "part 1" $ part1 >>= (@?= 240)
-        , testCase "part 2" $ part2 >>= (@?= 2832009600) ]
+        , testCase "part 2" $ part2 >>= (@?= 2832009600)
+        ]
     ]
 
 parsedTestInput :: [[Square]]

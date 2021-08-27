@@ -6,6 +6,6 @@
   :dependencies [[org.clojure/clojure "1.8.0"] 
                  [org.clojure/math.combinatorics "0.1.4"]
                  [org.clojure/algo.generic "0.1.3"]]
-  :main ^:skip-aot advent-of-code.day1
+  :main ^:skip-aot advent-of-code.day3
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

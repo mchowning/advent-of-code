@@ -20,51 +20,44 @@
 ;; Part 1 ---------------------------------------------------------------------------------
 
 
-(defn get-coords [dict]
+(defn get-coords [{x :x y :y w :w h :h}]
   (let [dim-range #(range %1 (+ %1 %2))]
-    (for [x (dim-range (:x dict) (:w dict))
-          y (dim-range (:y dict) (:h dict))]
-      [x y])))
-
-(defn map-coords [accum n coords]
-  (reduce (fn [accum' coord]
-            (let [oldValue (get accum' coord [])]
-              (assoc accum' coord (conj oldValue n))))
-          accum
-          coords))
+    (for [x' (dim-range x w)
+          y' (dim-range y h)]
+      [x' y'])))
 
 (defn claim-coords [dicts]
-  (let [map-claim (fn [dict]
-                    (map-coords {}
-                                (:num dict)
-                                (get-coords dict)))]
-    (map map-claim dicts)))
+  (let [reduce-claim #(reduce (fn [accum coord]
+                             (let [oldClaims (get accum coord [])]
+                               (assoc accum coord (conj oldClaims (:num %)))))
+                           {}
+                           (get-coords %))]
+    (map reduce-claim dicts)))
 
 (defn coordinate-map [dicts]
   (let [claims (claim-coords dicts)]
     (apply merge-with concat (claim-coords dicts))))
 
-(defn has-more-than-1-val [dicts]
-  (let [more-than-1-val #(->> % val count (< 1))]
+(defn claims-with-conflicts [dicts]
+  (let [more-than-1-claim #(->> % val count (< 1))]
     (->>
      dicts
      coordinate-map
-     (filter more-than-1-val)
+     (filter more-than-1-claim)
      keys
      concat)))
 
-(def part1 (count (has-more-than-1-val input)))
+(def part1 (count (claims-with-conflicts input)))
 
 
 ;; Part 2 ---------------------------------------------------------------------------------
 
 
 (def part2
-  (let [set-with-more-than-1 (set (has-more-than-1-val input))
-        coord-with-more-than-1 #(contains? set-with-more-than-1 %)
-        all-good #(not (some coord-with-more-than-1 (get-coords %)))]
-    (filter all-good input)))
-
+  (let [coords-with-multiple-claims (set (claims-with-conflicts input))
+        coord-has-multiple-claims? #(contains? coords-with-multiple-claims %)
+        claim-has-conflicts? #(some coord-has-multiple-claims? (get-coords %))]
+    (filter #(not (claim-has-conflicts? %)) input)))
 
 ;; Test ----------------------------------------------------------------------------------
 
