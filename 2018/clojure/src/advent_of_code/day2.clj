@@ -26,8 +26,7 @@
 
 (defn string-pairs-differing-by-1-char [words]
   (let [pairs (combo/combinations words 2)]
-    ;; (filter #(->> % numDiffChars (= 1)) pairs)))
-    (filter #(= 1 (numDiffChars %)) pairs)))
+    (filter #(->> % numDiffChars (= 1)) pairs)))
 
 (defn only-matching-chars [[w1 w2]]
   (let [pairedChars (map vector w1 w2)
