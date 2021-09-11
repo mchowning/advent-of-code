@@ -35,11 +35,7 @@ part1 :: IO Int
 part1 = part1' <$> readInput
 
 part1' :: Hill -> Int
-<<<<<<< HEAD
-part1' = checkRunForTrees (1, 3)
-=======
 part1' = checkRun (== Tree) (1, 3)
->>>>>>> origin/master
 
 part2 :: IO Int
 part2 = part2' <$> readInput
